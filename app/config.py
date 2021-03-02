@@ -110,6 +110,9 @@ class GunicornSettings(BaseSettings):
     log_level: str
     cores_number: int
 
+    class Config:
+        env_file = ".env"
+
 
 @lru_cache(maxsize=1)
 def get_gunicorn_settings() -> GunicornSettings:
