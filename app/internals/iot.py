@@ -3,7 +3,7 @@
 IoT utilities package
 
 :author: Angelo Cutaia
-:copyright: Copyright 2020, Angelo Cutaia
+:copyright: Copyright 2021, Angelo Cutaia
 :version: 1.0.0
 
 ..
