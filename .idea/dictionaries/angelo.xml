@@ -1,0 +1,36 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="angelo">
+    <words>
+      <w>accesslog</w>
+      <w>anonengine</w>
+      <w>anonymizer</w>
+      <w>apesmobility</w>
+      <w>azimut</w>
+      <w>cutaia</w>
+      <w>datastream</w>
+      <w>dphi</w>
+      <w>dtheta</w>
+      <w>elapsedtime</w>
+      <w>errorlog</w>
+      <w>fullbiasnano</w>
+      <w>gepid</w>
+      <w>glonass</w>
+      <w>gnss</w>
+      <w>goeasy</w>
+      <w>gunicorn</w>
+      <w>haversine</w>
+      <w>iotauthenticate</w>
+      <w>keycloack</w>
+      <w>msgid</w>
+      <w>obesrvation</w>
+      <w>orjson</w>
+      <w>submsgid</w>
+      <w>svid</w>
+      <w>svinfo</w>
+      <w>timenano</w>
+      <w>typetime</w>
+      <w>ublox</w>
+      <w>uvicorn</w>
+    </words>
+  </dictionary>
+</component>
