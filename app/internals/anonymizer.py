@@ -35,7 +35,7 @@ from ..config import get_anonymizer_settings
 # --------------------------------------------------------------------------------------------
 
 
-async def store_user_in_the_anonengine(user_feed: str) -> None:
+async def store_user_in_the_anonengine(user_feed: dict) -> None:
     """
     Store user info in the anonengine
 
@@ -51,7 +51,7 @@ async def store_user_in_the_anonengine(user_feed: str) -> None:
         try:
             response = await client.post(
                 anonymizer_settings.store_data_url,
-                data=user_feed
+                json=user_feed
             )
             await logger.debug(orjson.loads(response.content))
         except httpx.RequestError as exc:
