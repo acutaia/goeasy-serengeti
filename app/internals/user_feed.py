@@ -271,6 +271,6 @@ async def store_android_data(
                 "sourceApp": source_app
             }
         )
-        await store_user_in_the_anonengine(user_feed_output.json())
+        await store_user_in_the_anonengine(user_feed_output.dict())
     finally:
         return
