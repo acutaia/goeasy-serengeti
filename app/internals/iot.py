@@ -27,14 +27,13 @@ IoT utilities package
 import asyncio
 from datetime import datetime
 import sys
-import uuid
 
 # Third Party
 import httpx
 from fastapi import HTTPException
-from aiologger.loggers.json import JsonLogger
 
 # Internal
+from .logger import get_logger
 from .accounting_manager import store_in_iota
 from .position_alteration_detection import haversine
 from .ublox_api import get_ublox_message, get_ublox_token, get_ublox_message_list
@@ -42,10 +41,6 @@ from ..models.iot_feed.iot import IotInput, IotOutput, ResultOutput
 from ..models.security import Authenticity
 from ..config import get_ublox_api_settings
 
-logger = JsonLogger.with_default_handlers(
-    name="iot-feed",
-    serializer_kwargs={"indent": 4}
-)
 
 # --------------------------------------------------------------------------------------------
 
@@ -71,7 +66,8 @@ async def end_to_end_position_authentication(
     :param obesrvation_gepid: uuid4 associated to the observation
     :return: data validated
     """
-
+    # Get Logger
+    logger = get_logger()
     # Get Ublox-APi token and settings
     ublox_api_settings = get_ublox_api_settings()
     ublox_token = await get_ublox_token(ublox_api_settings)

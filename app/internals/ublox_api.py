@@ -26,20 +26,15 @@ Ublox-Api package
 from typing import Optional, List
 
 # Third Party
-from aiologger.loggers.json import JsonLogger
 from fastapi import status, HTTPException
 import httpx
 import orjson
 
 # Internal
+from .logger import get_logger
 from ..config import UbloxApiSettings
 from ..models.security import Token
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
-
-logger = JsonLogger.with_default_handlers(
-    name="ublox-api",
-    serializer_kwargs={"indent": 4}
-)
 
 # --------------------------------------------------------------------------------------------
 
@@ -51,6 +46,9 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
     :param settings: UbloxApi settings
     :return: UbloxApi valid token
     """
+    # Get Logger
+    logger = get_logger()
+
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
@@ -124,6 +122,9 @@ async def get_galileo_message(
     :param location: Sweden or Italy
     :return: Galileo Message
     """
+    # Get Logger
+    logger = get_logger()
+
     if location == "Italy":
         url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_galileo_uri}"
 
@@ -203,6 +204,9 @@ async def get_ublox_message(
     :param location: Sweden or Italy
     :return: Galileo Message
     """
+    # Get Logger
+    logger = get_logger()
+
     if location == "Italy":
         url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_uri}"
 
@@ -281,6 +285,9 @@ async def get_galileo_message_list(
     :param location: Could be Italy or Sweden
     :return: A list of Galileo Messages
     """
+    # Get logger
+    logger = get_logger()
+
     if location == "Italy":
         url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_galileo_uri}"
 
@@ -375,6 +382,8 @@ async def get_ublox_message_list(
     :param location: Could be Italy or Sweden
     :return: A list of Galileo Messages
     """
+    # Get Logger
+    logger = get_logger()
 
     if location == "Italy":
         url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_uri}"

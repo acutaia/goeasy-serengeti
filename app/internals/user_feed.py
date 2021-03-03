@@ -28,12 +28,12 @@ from datetime import datetime
 import sys
 
 # Third Party
-from aiologger.loggers.json import JsonLogger
 from fastapi import HTTPException
 import httpx
 import orjson
 
 # Internal
+from .logger import get_logger
 from .position_alteration_detection import haversine
 from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_message_list
 from .anonymizer import store_user_in_the_anonengine
@@ -42,10 +42,6 @@ from ..models.user_feed.user import UserFeedInput
 from ..models.security import Authenticity
 from ..config import get_ublox_api_settings
 
-logger = JsonLogger.with_default_handlers(
-    name="user-feed",
-    serializer_kwargs={"indent": 4}
-)
 
 # --------------------------------------------------------------------------------------------
 
@@ -71,6 +67,9 @@ async def end_to_end_position_authentication(
     :param user_id: user_id expressed by the token ("TEST" only for testing purposes)
     :return: data validated
     """
+
+    # Get Logger
+    logger = get_logger()
 
     # Initialize
     galileo_auth_number = 0

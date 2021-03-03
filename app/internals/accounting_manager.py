@@ -27,18 +27,13 @@ Anonymizer package
 from datetime import datetime
 
 # Third Party
-from aiologger.loggers.json import JsonLogger
 from fastapi import status, HTTPException
 import httpx
 import orjson
 
 # Internal
+from .logger import get_logger
 from ..config import get_accounting_manager_settings
-
-logger = JsonLogger.with_default_handlers(
-    name="accounting-manager",
-    serializer_kwargs={"indent": 4}
-)
 
 # ----------------------------------------------------------------------------------------------------
 
@@ -50,6 +45,9 @@ async def get_iota_user(user: str) -> bytes:
     :param user: user of interested
     :return: user_info
     """
+    # Get Logger
+    logger = get_logger()
+
     settings = get_accounting_manager_settings()
 
     async with httpx.AsyncClient() as client:
@@ -105,6 +103,8 @@ async def store_in_iota(
     :param msg_error: error during the parsing
     :param msg_error_description: description of the error
     """
+    # Get Logger
+    logger = get_logger()
 
     settings = get_accounting_manager_settings()
 

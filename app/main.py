@@ -33,6 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import ORJSONResponse
 
 # Internal
+from .internals.logger import get_logger
 from .routers import user_feed, journey, iot, administrator
 from .models.extraction.data_extraction import InputJSONExtraction, RequestType
 from .security.jwt_bearer import Signature
@@ -53,6 +54,19 @@ app.include_router(user_feed.router)
 app.include_router(journey.router)
 app.include_router(iot.router)
 app.include_router(administrator.router)
+
+
+# Configure logger
+@app.on_event("startup")
+async def configure_logger():
+    get_logger()
+
+
+# Shutdown logger
+@app.on_event("shutdown")
+async def shutdown_logger():
+    logger = get_logger()
+    await logger.shutdown()
 
 
 # Documentation end-point

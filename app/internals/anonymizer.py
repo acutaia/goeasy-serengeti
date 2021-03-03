@@ -24,18 +24,13 @@ Anonymizer package
 """
 
 # Third Party
-from aiologger.loggers.json import JsonLogger
 from fastapi import status, HTTPException
 import httpx
 import orjson
 
 # Internal
+from .logger import get_logger
 from ..config import get_anonymizer_settings
-
-logger = JsonLogger.with_default_handlers(
-    name="anonymizer",
-    serializer_kwargs={"indent": 4}
-)
 
 # --------------------------------------------------------------------------------------------
 
@@ -46,28 +41,30 @@ async def store_user_in_the_anonengine(user_feed: bytes) -> None:
 
     :param user_feed: User information to store in the anonengine
     """
+    # Get Logger
+    logger = get_logger()
     # Get anonymizer settings
     anonymizer_settings = get_anonymizer_settings()
     # Store data
-    try:
-        async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient() as client:
+        try:
             await client.post(
                 anonymizer_settings.store_data_url,
                 data=user_feed
             )
-    except httpx.RequestError as exc:
-        # Something went wrong during the connection
-        await logger.error(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Anonymizer service"
-        )
+        except httpx.RequestError as exc:
+            # Something went wrong during the connection
+            await logger.error(
+                {
+                    "method": exc.request.method,
+                    "url": exc.request.url,
+                    "error": exc
+                }
+            )
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Can't contact Anonymizer service"
+            )
 
 # --------------------------------------------------------------------------------------------
 
@@ -78,6 +75,9 @@ async def extract_mobility(journey_id: str) -> str:
 
     :param journey_id: Requested journey id
     """
+    # Get Logger
+    logger = get_logger()
+    # Get settings
     settings = get_anonymizer_settings()
 
     async with httpx.AsyncClient(verify=False) as client:
@@ -108,7 +108,8 @@ async def extract_details(journey_id: str) -> bytes:
 
     :param journey_id: Requested journey id
     """
-
+    # Get Logger
+    logger = get_logger()
     settings = get_anonymizer_settings()
 
     async with httpx.AsyncClient(verify=False) as client:
