@@ -170,7 +170,7 @@ async def end_to_end_position_authentication(
                         break
 
                 if not_authentic:
-                    logger.warning(
+                    await logger.warning(
                         {
                             "message_timestamp": iot_time,
                             "ublox_message": gnss.raw_data,
@@ -191,8 +191,7 @@ async def end_to_end_position_authentication(
     else:
         authenticity = Authenticity.unknown
 
-
-    logger.debug(
+    await logger.debug(
         {
             "host": host,
             "observationGEPid": obesrvation_gepid,

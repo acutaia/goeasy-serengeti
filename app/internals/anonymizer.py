@@ -57,7 +57,7 @@ async def store_user_in_the_anonengine(user_feed: bytes) -> None:
             )
     except httpx.RequestError as exc:
         # Something went wrong during the connection
-        logger.error(
+        await logger.error(
             {
                 "method": exc.request.method,
                 "url": exc.request.url,
@@ -86,7 +86,7 @@ async def extract_mobility(journey_id: str) -> str:
 
         except httpx.RequestError as exc:
             # Something went wrong during the connection
-            logger.error(
+            await logger.error(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -117,7 +117,7 @@ async def extract_details(journey_id: str) -> bytes:
 
         except httpx.RequestError as exc:
             # Something went wrong during the connection
-            logger.error(
+            await logger.error(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,

@@ -68,7 +68,7 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
             except httpx.HTTPStatusError as exc:
 
                 # Credentials Wrong
-                logger.error(
+                await logger.error(
                     {
                         "method": exc.request.method,
                         "url": exc.request.url,
@@ -88,7 +88,7 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
         except httpx.RequestError as exc:
 
             # Can't contact keycloack
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -145,7 +145,7 @@ async def get_galileo_message(
         except httpx.HTTPStatusError as exc:
 
             # Token is expired
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -168,7 +168,7 @@ async def get_galileo_message(
 
     except httpx.RequestError as exc:
         # Something went wrong during the connection
-        logger.error(
+        await logger.error(
             {
                 "method": exc.request.method,
                 "url": exc.request.url,
@@ -223,7 +223,7 @@ async def get_ublox_message(
         except httpx.HTTPStatusError as exc:
 
             # Token is expired
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -246,7 +246,7 @@ async def get_ublox_message(
 
     except httpx.RequestError as exc:
         # Something went wrong during the connection
-        logger.error(
+        await logger.error(
             {
                 "method": exc.request.method,
                 "url": exc.request.url,
@@ -318,7 +318,7 @@ async def get_galileo_message_list(
 
         except httpx.HTTPStatusError as exc:
             # Token is expired
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -342,7 +342,7 @@ async def get_galileo_message_list(
 
     except httpx.RequestError as exc:
         # Something went wrong during the connection
-        logger.error(
+        await logger.error(
             {
                 "method": exc.request.method,
                 "url": exc.request.url,
@@ -413,7 +413,7 @@ async def get_ublox_message_list(
 
         except httpx.HTTPStatusError as exc:
             # Token is expired
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -437,7 +437,7 @@ async def get_ublox_message_list(
 
     except httpx.RequestError as exc:
         # Something went wrong during the connection
-        logger.error(
+        await logger.error(
             {
                 "method": exc.request.method,
                 "url": exc.request.url,

@@ -60,7 +60,7 @@ async def get_iota_user(user: str) -> bytes:
             )
         except httpx.RequestError as exc:
             # Something went wrong during the connection
-            logger.debug(
+            await logger.debug(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
@@ -137,7 +137,7 @@ async def store_in_iota(
             )
         except httpx.RequestError as exc:
             # Something went wrong during the connection
-            logger.warning(
+            await logger.warning(
                 {
                     "method": exc.request.method,
                     "url": exc.request.url,
