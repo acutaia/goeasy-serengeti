@@ -33,10 +33,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 
 # Internal
+from ..internals.logger import get_logger
 from ..config import get_security_settings
 from ..models.security import Requester
 
-logger = JsonLogger.with_default_handlers(name="security", serializer_kwargs={"indent": 4})#, flatten=True)
 
 # ----------------------------------------------------------------------------------------
 
@@ -56,6 +56,7 @@ class Signature(HTTPBearer):
                 detail="Wrong authentication method"
             )
 
+        # Get Security settings
         jwt_token = credentials.credentials
         settings = get_security_settings()
 
@@ -76,6 +77,9 @@ class Signature(HTTPBearer):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="invalid_bearer_token"
             )
+
+        # Get Logger
+        logger = get_logger()
 
         # Token debug
         logger.debug(
