@@ -55,7 +55,8 @@ async def get_iota_user(user: str) -> bytes:
         try:
             response: httpx.AsyncClient() = await client.get(
                 f"{settings.accounting_ip}{settings.accounting_get_uri}",
-                params={"user": user}
+                params={"user": user},
+                timeout=25
             )
         except httpx.RequestError as exc:
             # Something went wrong during the connection
@@ -132,7 +133,8 @@ async def store_in_iota(
         try:
             await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
-                json=orjson.loads(data)
+                json=orjson.loads(data),
+                timeout=25
             )
 
         except httpx.RequestError as exc:
