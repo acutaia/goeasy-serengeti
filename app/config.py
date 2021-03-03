@@ -107,7 +107,7 @@ def get_accounting_manager_settings() -> AccountingManagerSettings:
 
 
 class GunicornSettings(BaseSettings):
-    log_level: str
+    loglevel: str
     cores_number: int
 
     class Config:

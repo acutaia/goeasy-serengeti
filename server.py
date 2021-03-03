@@ -60,10 +60,11 @@ class StandaloneApplication(BaseApplication):
 
 if __name__ == '__main__':
     settings = get_gunicorn_settings()
-    logging.root.setLevel(settings.log_level)
+
     options = {
         "bind": "0.0.0.0",
         "workers": (settings.cores_number * 2) + 1,
+        "loglevel": settings.loglevel,
         "accesslog": "-",
         "errorlog": "-",
         "worker_class": "uvicorn.workers.UvicornWorker",
