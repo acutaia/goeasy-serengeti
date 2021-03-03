@@ -29,6 +29,7 @@ import sys
 
 # Third Party
 from aiologger.loggers.json import JsonLogger
+from fastapi import HTTPException
 import httpx
 import orjson
 
@@ -91,14 +92,33 @@ async def end_to_end_position_authentication(
             for auth in position.galileo_auth:
 
                 galileo_auth_number += 1
-                galileo_data = await get_galileo_message(
-                    client,
-                    auth.svid,
-                    auth.time,
-                    ublox_token,
-                    ublox_api_settings,
-                    location
-                )
+                try:
+                    galileo_data = await get_galileo_message(
+                        client,
+                        auth.svid,
+                        auth.time,
+                        ublox_token,
+                        ublox_api_settings,
+                        location
+                    )
+                except HTTPException as exc:
+                    asyncio.create_task(
+                        store_in_iota(
+                            source_app=source_app,
+                            client_id=client_id,
+                            user_id=user_id,
+                            msg_id=journey_id,
+                            msg_size=0,
+                            msg_time=timestamp,
+                            msg_malicious_position=0,
+                            msg_authenticated_position=0,
+                            msg_unknown_position=0,
+                            msg_total_position=0,
+                            msg_error=True,
+                            msg_error_description=exc.detail
+                        )
+                    )
+                    raise exc
 
                 if galileo_data is None:
                     position.authenticity = Authenticity.unknown
@@ -112,15 +132,35 @@ async def end_to_end_position_authentication(
                 else:
                     position.authenticity = Authenticity.not_authentic
                     not_authentic_number += 1
-                    # Remake the request
-                    galileo_data_list = await get_galileo_message_list(
-                        client,
-                        auth.svid,
-                        auth.time,
-                        ublox_token,
-                        ublox_api_settings,
-                        location
-                    )
+
+                    try:
+                        # Remake the request
+                        galileo_data_list = await get_galileo_message_list(
+                            client,
+                            auth.svid,
+                            auth.time,
+                            ublox_token,
+                            ublox_api_settings,
+                            location
+                        )
+                    except HTTPException as exc:
+                        asyncio.create_task(
+                            store_in_iota(
+                                source_app=source_app,
+                                client_id=client_id,
+                                user_id=user_id,
+                                msg_id=journey_id,
+                                msg_size=0,
+                                msg_time=timestamp,
+                                msg_malicious_position=0,
+                                msg_authenticated_position=0,
+                                msg_unknown_position=0,
+                                msg_total_position=0,
+                                msg_error=True,
+                                msg_error_description=exc.detail
+                            )
+                        )
+                        raise exc
                     for data in galileo_data_list:
                         if data.raw_data == auth.data:
                             position.authenticity = Authenticity.authentic

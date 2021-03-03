@@ -31,6 +31,7 @@ import uuid
 
 # Third Party
 import httpx
+from fastapi import HTTPException
 from aiologger.loggers.json import JsonLogger
 
 # Internal
@@ -55,7 +56,8 @@ async def end_to_end_position_authentication(
         host: str,
         source_app: str,
         client_id: str,
-        user_id: str
+        user_id: str,
+        obesrvation_gepid: str
 ) -> IotOutput:
     """
     Contact Ublox-API and validate IoT data
@@ -66,6 +68,7 @@ async def end_to_end_position_authentication(
     :param source_app: app that made the request
     :param client_id: client_id expressed by the token
     :param user_id: user_id expressed by the token
+    :param obesrvation_gepid: uuid4 associated to the observation
     :return: data validated
     """
 
@@ -91,14 +94,34 @@ async def end_to_end_position_authentication(
     async with httpx.AsyncClient(verify=False) as client:
         for gnss in iot_input.result.gnss:
             galileo_auth_number += 1
-            galileo_data = await get_ublox_message(
-                client,
-                gnss.svid,
-                iot_time,
-                ublox_token,
-                ublox_api_settings,
-                location
-            )
+
+            try:
+                galileo_data = await get_ublox_message(
+                    client,
+                    gnss.svid,
+                    iot_time,
+                    ublox_token,
+                    ublox_api_settings,
+                    location
+                )
+            except HTTPException as exc:
+                asyncio.create_task(
+                    store_in_iota(
+                        source_app=source_app,
+                        client_id=client_id,
+                        user_id=user_id,
+                        msg_id=obesrvation_gepid,
+                        msg_size=0,
+                        msg_time=timestamp,
+                        msg_malicious_position=0,
+                        msg_authenticated_position=0,
+                        msg_unknown_position=0,
+                        msg_total_position=0,
+                        msg_error=True,
+                        msg_error_description=exc.detail
+                    )
+                )
+                raise exc
 
             if galileo_data is None:
                 unknown_number += 1
@@ -109,15 +132,36 @@ async def end_to_end_position_authentication(
             else:
                 not_authentic_number += 1
                 not_authentic = True
-                # Remake the request
-                galileo_data_list = await get_ublox_message_list(
-                    client,
-                    gnss.svid,
-                    iot_time,
-                    ublox_token,
-                    ublox_api_settings,
-                    location
-                )
+
+                try:
+                    # Remake the request
+                    galileo_data_list = await get_ublox_message_list(
+                        client,
+                        gnss.svid,
+                        iot_time,
+                        ublox_token,
+                        ublox_api_settings,
+                        location
+                    )
+                except HTTPException as exc:
+                    asyncio.create_task(
+                        store_in_iota(
+                            source_app=source_app,
+                            client_id=client_id,
+                            user_id=user_id,
+                            msg_id=obesrvation_gepid,
+                            msg_size=0,
+                            msg_time=timestamp,
+                            msg_malicious_position=0,
+                            msg_authenticated_position=0,
+                            msg_unknown_position=0,
+                            msg_total_position=0,
+                            msg_error=True,
+                            msg_error_description=exc.detail
+                        )
+                    )
+                    raise exc
+
                 for data in galileo_data_list:
                     if data.raw_data == gnss.raw_data:
                         authentic_number += 1
@@ -147,8 +191,6 @@ async def end_to_end_position_authentication(
     else:
         authenticity = Authenticity.unknown
 
-    # Generate GEPid
-    obesrvation_gepid = uuid.uuid4()
 
     logger.debug(
         {

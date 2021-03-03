@@ -23,6 +23,7 @@ IoTFeed router package
     limitations under the License.
 """
 # Standard Library
+import uuid
 from datetime import datetime
 
 # Third Party
@@ -65,12 +66,16 @@ async def iot_authentication(
     else:
         source_app = requester.client
 
+    # Generate GEPid
+    obesrvation_gepid = uuid.uuid4()
+
     return await end_to_end_position_authentication(
         iot_input,
         datetime.now(),
         request.client.host,
         source_app,
         requester.client,
-        str(requester.user)
+        str(requester.user),
+        str(obesrvation_gepid)
     )
 
