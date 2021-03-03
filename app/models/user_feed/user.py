@@ -31,10 +31,10 @@ from typing import List
 from pydantic import Field
 
 # Internal
-from .behaviour import Behaviour, BehaviourOutput
+from .behaviour import Behaviour
 from .position import PositionObject, PositionObjectInput
 from .sensor import SensorInformation
-from ..track import TypeOfTrack
+from ..track import TypeOfTrack, TrackSegments
 from ..model import OrjsonModel
 
 # ------------------------------------------------------------------------------------------------------
@@ -120,7 +120,27 @@ class UserFeedInput(UserFeed):
 
 
 class UserFeedOutput(OrjsonModel):
-    behaviour: BehaviourOutput = None
+    """UserFeed Output Model"""
+
+    app_defined_behaviour: TrackSegments = Field(
+        ...,
+        title="Application Defined Behaviour",
+        description="Mobile application standalone detection of mobility types and the segments within the journey",
+        example=[]
+    )
+    tpv_defined_behaviour: TrackSegments = Field(
+        ...,
+        title="Third Party Defined Behaviour",
+        description="Autonomous detection of mobility types and the segments within the journey",
+        example=[]
+    )
+    user_defined_behaviour: TrackSegments = Field(
+        ...,
+        title="User Defined Behaviour",
+        description="""The users specify through the mobile app the type of mobility
+                        (necessary to produce legitimate data to be used for the learning process of the third-party system)
+                        """
+    )
 
     company_code: str = Field(
         ...,
@@ -189,7 +209,7 @@ class UserFeedOutput(OrjsonModel):
         title="Trace Information",
         description="list of position objects, collected through the Galileo navigation system"
     )
-    source_app: str = Field(
+    sourceApp: str = Field(
         default="ApesMobility"
     )
 

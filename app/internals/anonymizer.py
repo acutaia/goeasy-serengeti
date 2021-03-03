@@ -46,9 +46,6 @@ async def store_user_in_the_anonengine(user_feed: str) -> None:
     # Get anonymizer settings
     anonymizer_settings = get_anonymizer_settings()
 
-    await logger.debug(
-        orjson.loads(user_feed)
-    )
     # Store data
     async with httpx.AsyncClient() as client:
         try:

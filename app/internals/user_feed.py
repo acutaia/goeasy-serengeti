@@ -23,7 +23,6 @@ UserFeed utilities package
     limitations under the License.
 """
 # Standard Library
-import asyncio
 import time
 import sys
 
@@ -38,7 +37,7 @@ from .position_alteration_detection import haversine
 from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_message_list
 from .anonymizer import store_user_in_the_anonengine
 from .accounting_manager import store_in_iota
-from ..models.user_feed.user import UserFeedInput
+from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
 from ..models.security import Authenticity
 from ..config import get_ublox_api_settings
 
@@ -241,16 +240,13 @@ async def store_android_data(
             client_id=client_id,
             user_id=user_id
         )
-
-        user_feed_output =orjson.dumps(
-            {
-                "behaviour": {
-                    "app_defined_behaviour": user_feed.behaviour.app_defined,
-                    "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
-                    "user_defined_behaviour": user_feed.behaviour.user_defined
-                },
+        user_feed_output = UserFeedOutput.construct(
+            **{
+                "app_defined_behaviour": user_feed.behaviour.app_defined,
+                "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
+                "user_defined_behaviour": user_feed.behaviour.user_defined,
                 "company_code": user_feed.company_code,
-                "company_trip_type": user_feed.company_trip_type.value,
+                "company_trip_type": user_feed.company_trip_type,
                 "deviceId": user_feed.id,
                 "journeyId": journey_id,
                 "startDate": user_feed.startDate,
@@ -258,22 +254,23 @@ async def store_android_data(
                 "distance": user_feed.distance,
                 "elapsedTime": user_feed.elapsedTime,
                 "positions": [
-                    {
-                        "authenticity": position.authenticity,
-                        "lat": position.lat,
-                        "lon": position.lon,
-                        "time": position.time,
-                        "partialDistance": position.partialDistance
-                    }
+                    PositionObject.construct(
+                        **{
+                            "authenticity": position.authenticity,
+                            "lat": position.lat,
+                            "lon": position.lon,
+                            "partialDistance": position.partialDistance,
+                            "time": position.time
+                        }
+                    )
                     for position in user_feed.trace_information
                 ],
                 "sensors": user_feed.sensors_information,
                 "mainTypeSpace": user_feed.mainTypeSpace,
                 "mainTypeTime": user_feed.mainTypeTime,
-                "source_app": source_app
-                }
-        ).decode()
-
-        await store_user_in_the_anonengine(user_feed_output)
+                "sourceApp": source_app
+            }
+        )
+        await store_user_in_the_anonengine(user_feed_output.json())
     finally:
         return

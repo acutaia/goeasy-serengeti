@@ -54,26 +54,3 @@ class Behaviour(OrjsonModel):
                     (necessary to produce legitimate data to be used for the learning process of the third-party system)
                     """
     )
-
-
-class BehaviourOutput(OrjsonModel):
-    """User Behaviour"""
-    app_defined_behaviour: TrackSegments = Field(
-        ...,
-        title="Application Defined Behaviour",
-        description="Mobile application standalone detection of mobility types and the segments within the journey",
-        example=[]
-    )
-    tpv_defined_behaviour: TrackSegments = Field(
-        ...,
-        title="Third Party Defined Behaviour",
-        description="Autonomous detection of mobility types and the segments within the journey",
-        example=[]
-    )
-    user_defined_behaviour: TrackSegments = Field(
-        ...,
-        title="User Defined Behaviour",
-        description="""The users specify through the mobile app the type of mobility
-                    (necessary to produce legitimate data to be used for the learning process of the third-party system)
-                    """
-    )
