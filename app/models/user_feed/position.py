@@ -82,7 +82,7 @@ class PositionObjectInput(PositionObject):
         description="Authorization"
     )
 
-    galileo_status: Union[GalileoStatus, OrjsonModel] = Field(
+    galileo_status: Union[Optional[GalileoStatus], OrjsonModel] = Field(
         description="Status of the galileo signal"
     )
 
