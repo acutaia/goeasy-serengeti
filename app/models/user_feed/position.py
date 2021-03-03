@@ -24,7 +24,7 @@ Position models
 """
 
 # Standard Library
-from typing import List, Optional
+from typing import List, Optional, Union
 
 # Third Party
 from pydantic import Field
@@ -82,7 +82,7 @@ class PositionObjectInput(PositionObject):
         description="Authorization"
     )
 
-    galileo_status: Optional[GalileoStatus] = Field(
+    galileo_status: Union[GalileoStatus, OrjsonModel] = Field(
         description="Status of the galileo signal"
     )
 
