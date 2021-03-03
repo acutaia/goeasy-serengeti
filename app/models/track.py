@@ -38,6 +38,7 @@ class TypeOfTrack(str, Enum):
     private = "private"
     commuting = "commuting"
     business_trip = "business trip"
+    any = ""
 
 
 class RequestType(str, Enum):

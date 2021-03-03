@@ -182,18 +182,18 @@ class UserFeedOutput(OrjsonModel):
         description="Anonymous UUID_V4 assigned to the track",
         example=uuid4()
     )
-    mainTypeSpace: str = Field(
-        ...,
-        title="Main Type Space",
-        description="Main type of mobility with respect to the space covered",
-        example="bicycle"
-    )
-    mainTypeTime: str = Field(
-        ...,
-        title="Main Type Time",
-        description="Main type of mobility with respect to time elapsed",
-        example="bicycle"
-    )
+#    mainTypeSpace: str = Field(
+#        ...,
+#        title="Main Type Space",
+#        description="Main type of mobility with respect to the space covered",
+#        example="bicycle"
+#    )
+#    mainTypeTime: str = Field(
+#        ...,
+#        title="Main Type Time",
+#        description="Main type of mobility with respect to time elapsed",
+#        example="bicycle"
+#    )
     startDate: int = Field(
         ...,
         title="Starting Date",
