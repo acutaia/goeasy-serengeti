@@ -51,7 +51,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/",
+    "",
     response_model=Resource,
     response_class=ORJSONResponse,
     summary="Authenticate User data and store them",

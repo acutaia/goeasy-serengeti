@@ -49,7 +49,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/",
+    "",
     response_class=ORJSONResponse,
     summary="Validate data from IoT devices",
 )
