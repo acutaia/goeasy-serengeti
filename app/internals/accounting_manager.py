@@ -111,7 +111,7 @@ async def store_in_iota(
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
-                f"{settings.accounting_ip}{settings.accounting_get_uri}",
+                f"{settings.accounting_ip}{settings.accounting_store_uri}",
                 data=orjson.dumps(
                     {
                         "target": source_app,
