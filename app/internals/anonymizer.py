@@ -35,7 +35,7 @@ from ..config import get_anonymizer_settings
 # --------------------------------------------------------------------------------------------
 
 
-async def store_user_in_the_anonengine(user_feed: bytes) -> None:
+async def store_user_in_the_anonengine(user_feed: str) -> None:
     """
     Store user info in the anonengine
 

@@ -101,8 +101,7 @@ async def end_to_end_position_authentication(
                     location
                 )
             except HTTPException as exc:
-                asyncio.create_task(
-                    store_in_iota(
+                await store_in_iota(
                         source_app=source_app,
                         client_id=client_id,
                         user_id=user_id,
@@ -116,7 +115,7 @@ async def end_to_end_position_authentication(
                         msg_error=True,
                         msg_error_description=exc.detail
                     )
-                )
+
                 raise exc
 
             if galileo_data is None:
@@ -140,8 +139,7 @@ async def end_to_end_position_authentication(
                         location
                     )
                 except HTTPException as exc:
-                    asyncio.create_task(
-                        store_in_iota(
+                    await store_in_iota(
                             source_app=source_app,
                             client_id=client_id,
                             user_id=user_id,
@@ -155,7 +153,6 @@ async def end_to_end_position_authentication(
                             msg_error=True,
                             msg_error_description=exc.detail
                         )
-                    )
                     raise exc
 
                 for data in galileo_data_list:

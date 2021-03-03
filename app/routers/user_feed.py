@@ -105,5 +105,6 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     return await end_to_end_position_authentication(
         user_feed=user_feed,
         timestamp=time.time(),
-        host=request.client.host
+        host=request.client.host,
+        test=True
     )

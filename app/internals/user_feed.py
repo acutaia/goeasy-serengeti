@@ -53,7 +53,8 @@ async def end_to_end_position_authentication(
         journey_id: str = "TEST",
         source_app: str = "TEST",
         client_id: str = "TEST",
-        user_id: str = "TEST"
+        user_id: str = "TEST",
+        test: bool = False
 ) -> UserFeedInput:
     """
     Contact Ublox-API and validate Android Data
@@ -65,6 +66,7 @@ async def end_to_end_position_authentication(
     :param source_app: app that made the request ("TEST" only for testing purposes)
     :param client_id: client_id expressed by the token ("TEST" only for testing purposes)
     :param user_id: user_id expressed by the token ("TEST" only for testing purposes)
+    :param test: True if is requested by the test endpoint
     :return: data validated
     """
 
@@ -101,22 +103,21 @@ async def end_to_end_position_authentication(
                         location
                     )
                 except HTTPException as exc:
-                    asyncio.create_task(
-                        store_in_iota(
-                            source_app=source_app,
-                            client_id=client_id,
-                            user_id=user_id,
-                            msg_id=journey_id,
-                            msg_size=0,
-                            msg_time=timestamp,
-                            msg_malicious_position=0,
-                            msg_authenticated_position=0,
-                            msg_unknown_position=0,
-                            msg_total_position=0,
-                            msg_error=True,
-                            msg_error_description=exc.detail
-                        )
-                    )
+                    if test is False:
+                        await store_in_iota(
+                                source_app=source_app,
+                                client_id=client_id,
+                                user_id=user_id,
+                                msg_id=journey_id,
+                                msg_size=0,
+                                msg_time=timestamp,
+                                msg_malicious_position=0,
+                                msg_authenticated_position=0,
+                                msg_unknown_position=0,
+                                msg_total_position=0,
+                                msg_error=True,
+                                msg_error_description=exc.detail
+                            )
                     raise exc
 
                 if galileo_data is None:
@@ -143,22 +144,21 @@ async def end_to_end_position_authentication(
                             location
                         )
                     except HTTPException as exc:
-                        asyncio.create_task(
-                            store_in_iota(
-                                source_app=source_app,
-                                client_id=client_id,
-                                user_id=user_id,
-                                msg_id=journey_id,
-                                msg_size=0,
-                                msg_time=timestamp,
-                                msg_malicious_position=0,
-                                msg_authenticated_position=0,
-                                msg_unknown_position=0,
-                                msg_total_position=0,
-                                msg_error=True,
-                                msg_error_description=exc.detail
-                            )
-                        )
+                        if test is False:
+                            await store_in_iota(
+                                    source_app=source_app,
+                                    client_id=client_id,
+                                    user_id=user_id,
+                                    msg_id=journey_id,
+                                    msg_size=0,
+                                    msg_time=timestamp,
+                                    msg_malicious_position=0,
+                                    msg_authenticated_position=0,
+                                    msg_unknown_position=0,
+                                    msg_total_position=0,
+                                    msg_error=True,
+                                    msg_error_description=exc.detail
+                                )
                         raise exc
                     for data in galileo_data_list:
                         if data.raw_data == auth.data:
@@ -192,19 +192,21 @@ async def end_to_end_position_authentication(
             "analysis_time": f"{time.time() - timestamp}"
         }
     )
-    await store_in_iota(
-            source_app=source_app,
-            client_id=client_id,
-            user_id=user_id,
-            msg_id=journey_id,
-            msg_size=sys.getsizeof(user_feed.json()),
-            msg_time=timestamp,
-            msg_malicious_position=not_authentic_number,
-            msg_authenticated_position=authentic_number,
-            msg_unknown_position=unknown_number,
-            msg_total_position=galileo_auth_number,
 
-        )
+    if test is False:
+        await store_in_iota(
+                source_app=source_app,
+                client_id=client_id,
+                user_id=user_id,
+                msg_id=journey_id,
+                msg_size=sys.getsizeof(user_feed.json()),
+                msg_time=timestamp,
+                msg_malicious_position=not_authentic_number,
+                msg_authenticated_position=authentic_number,
+                msg_unknown_position=unknown_number,
+                msg_total_position=galileo_auth_number,
+
+            )
 
     return user_feed
 
@@ -270,7 +272,8 @@ async def store_android_data(
                 "mainTypeTime": user_feed.mainTypeTime,
                 "source_app": source_app
                 }
-        )
+        ).decode()
+
         await store_user_in_the_anonengine(user_feed_output)
     finally:
         return
