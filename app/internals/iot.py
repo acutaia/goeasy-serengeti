@@ -25,7 +25,7 @@ IoT utilities package
 
 # Standard Library
 import asyncio
-from datetime import datetime, timezone
+import time
 import sys
 
 # Third Party
@@ -47,7 +47,7 @@ from ..config import get_ublox_api_settings
 
 async def end_to_end_position_authentication(
         iot_input: IotInput,
-        timestamp: datetime,
+        timestamp: float,
         host: str,
         source_app: str,
         client_id: str,
@@ -195,7 +195,7 @@ async def end_to_end_position_authentication(
             "authentic": authentic_number,
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
-            "analysis_time": f"{datetime.now(tz=timezone.utc) - timestamp}"
+            "analysis_time": f"{time.time() - timestamp}"
         }
     )
 

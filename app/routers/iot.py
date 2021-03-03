@@ -24,7 +24,7 @@ IoTFeed router package
 """
 # Standard Library
 import uuid
-from datetime import datetime, timezone
+import time
 
 # Third Party
 from fastapi import APIRouter, Body, Depends, Request
@@ -71,7 +71,7 @@ async def iot_authentication(
 
     return await end_to_end_position_authentication(
         iot_input,
-        datetime.now(tz=timezone.utc),
+        time.time(),
         request.client.host,
         source_app,
         requester.client,

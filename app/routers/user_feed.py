@@ -23,7 +23,7 @@ UserFeed router package
     limitations under the License.
 """
 # Standard Library
-from datetime import datetime, timezone
+import time
 import uuid
 
 # Third Party
@@ -79,7 +79,7 @@ async def authenticate(
     back_ground_tasks.add_task(
         store_android_data,
         user_feed,
-        datetime.now(),
+        time.time(),
         request.client.host,
         journey_id,
         source_app,
@@ -104,6 +104,6 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     """
     return await end_to_end_position_authentication(
         user_feed=user_feed,
-        timestamp=datetime.now(tz=timezone.utc),
+        timestamp=time.time(),
         host=request.client.host
     )

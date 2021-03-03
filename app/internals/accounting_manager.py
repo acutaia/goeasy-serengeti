@@ -33,6 +33,7 @@ import orjson
 
 # Internal
 from .logger import get_logger
+from ..models.accounting_manager import AccountingManager, AppObj
 from ..config import get_accounting_manager_settings
 
 # ----------------------------------------------------------------------------------------------------
@@ -108,33 +109,29 @@ async def store_in_iota(
 
     settings = get_accounting_manager_settings()
 
+    data = AccountingManager(
+        target=source_app,
+        data=AppObj(
+            client_id=client_id,
+            user_id=user_id,
+            msg_id=msg_id,
+            msg_size=msg_size,
+            msg_time=msg_time,
+            msg_malicious_position=msg_malicious_position,
+            msg_authenticated_position=msg_authenticated_position,
+            msg_unknown_position=msg_unknown_position,
+            msg_total_position=msg_total_position,
+            msg_error=msg_error,
+            msg_error_description=msg_error_description
+        )
+    )
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
-                data=orjson.dumps(
-                    {
-                        "target": source_app,
-                        "data": {
-                            "AppObj": {
-                                "client_id": client_id,
-                                "user_id": user_id,
-                                "msg_id": msg_id,
-                                "msg_size": msg_size,
-                                "msg_time": msg_time,
-                                "msg_malicious_position": msg_malicious_position,
-                                "msg_authenticated_position": msg_authenticated_position,
-                                "msg_unknown_position": msg_unknown_position,
-                                "msg_total_position": msg_total_position,
-                                "msg_error": msg_error,
-                                "msg_error_description": msg_error_description
-
-                            }
-                        },
-                        "private": True
-                    }
-                ).decode()
+                data=data.json()
             )
+
         except httpx.RequestError as exc:
             # Something went wrong during the connection
             await logger.warning(

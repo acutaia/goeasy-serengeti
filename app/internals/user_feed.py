@@ -24,7 +24,7 @@ UserFeed utilities package
 """
 # Standard Library
 import asyncio
-from datetime import datetime, timezone
+import time
 import sys
 
 # Third Party
@@ -48,7 +48,7 @@ from ..config import get_ublox_api_settings
 
 async def end_to_end_position_authentication(
         user_feed: UserFeedInput,
-        timestamp: datetime,
+        timestamp: float,
         host: str,
         journey_id: str = "TEST",
         source_app: str = "TEST",
@@ -189,7 +189,7 @@ async def end_to_end_position_authentication(
             "authentic": authentic_number,
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
-            "analysis_time": f"{datetime.now(tz=timezone.utc) - timestamp}"
+            "analysis_time": f"{time.time() - timestamp}"
         }
     )
     asyncio.create_task(
@@ -213,7 +213,7 @@ async def end_to_end_position_authentication(
 
 async def store_android_data(
         user_feed_input: UserFeedInput,
-        timestamp: datetime,
+        timestamp: float,
         host: str,
         journey_id: str,
         source_app: str,
