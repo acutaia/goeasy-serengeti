@@ -24,7 +24,7 @@ UserFeed utilities package
 """
 # Standard Library
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 # Third Party
@@ -189,7 +189,7 @@ async def end_to_end_position_authentication(
             "authentic": authentic_number,
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
-            "analysis_time": f"{datetime.now() - timestamp}"
+            "analysis_time": f"{datetime.now(tz=timezone.utc) - timestamp}"
         }
     )
     asyncio.create_task(

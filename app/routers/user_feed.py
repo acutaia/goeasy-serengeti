@@ -23,7 +23,7 @@ UserFeed router package
     limitations under the License.
 """
 # Standard Library
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 # Third Party
@@ -104,6 +104,6 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     """
     return await end_to_end_position_authentication(
         user_feed=user_feed,
-        timestamp=datetime.now(),
+        timestamp=datetime.now(tz=timezone.utc),
         host=request.client.host
     )

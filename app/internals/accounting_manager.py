@@ -118,7 +118,7 @@ async def store_in_iota(
                         "data": {
                             "AppObj": {
                                 "client_id": client_id,
-                                "user_id": str(user_id),
+                                "user_id": user_id,
                                 "msg_id": msg_id,
                                 "msg_size": msg_size,
                                 "msg_time": msg_time,
@@ -133,7 +133,7 @@ async def store_in_iota(
                         },
                         "private": True
                     }
-                )
+                ).decode()
             )
         except httpx.RequestError as exc:
             # Something went wrong during the connection
