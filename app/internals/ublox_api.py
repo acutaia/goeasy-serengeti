@@ -59,7 +59,8 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
                     "password": settings.password,
                     "grant_type": settings.grant_type,
                     "client_secret": settings.client_secret
-                }
+                },
+                timeout=25
             )
             try:
                 response.raise_for_status()
@@ -136,7 +137,8 @@ async def get_galileo_message(
             f"{url}/{svid}/{timestamp}",
             headers={
                 "Authorization": f"Bearer {ublox_token}"
-            }
+            },
+            timeout=10
         )
         try:
             # Check if the token is expired
@@ -163,7 +165,8 @@ async def get_galileo_message(
                 f"{url}/{svid}/{timestamp}",
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
-                }
+                },
+                timeout=10
             )
             return UbloxAPI.parse_raw(response.content).raw_data
 
@@ -217,7 +220,8 @@ async def get_ublox_message(
             f"{url}/{svid}/{timestamp}",
             headers={
                 "Authorization": f"Bearer {ublox_token}"
-            }
+            },
+            timeout=10
         )
         try:
             # Check if the token is expired
@@ -244,7 +248,8 @@ async def get_ublox_message(
                 f"{url}/{svid}/{timestamp}",
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
-                }
+                },
+                timeout=10
             )
             return UbloxAPI.parse_raw(response.content).raw_data
 
@@ -317,7 +322,8 @@ async def get_galileo_message_list(
             data=galileo_data_list_request,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
-            }
+            },
+            timeout=10
         )
         try:
             response.raise_for_status()
@@ -343,7 +349,8 @@ async def get_galileo_message_list(
                 data=galileo_data_list_request,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
-                }
+                },
+                timeout=10
             )
             return UbloxAPIList.parse_raw(response.content).info
 
@@ -414,7 +421,8 @@ async def get_ublox_message_list(
             data=galileo_data_list_request,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
-            }
+            },
+            timeout=10
         )
         try:
             response.raise_for_status()
@@ -440,7 +448,8 @@ async def get_ublox_message_list(
                 data=galileo_data_list_request,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
-                }
+                },
+                timeout=10
             )
             return UbloxAPIList.parse_raw(response.content).info
 

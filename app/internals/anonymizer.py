@@ -51,7 +51,8 @@ async def store_user_in_the_anonengine(user_feed: dict) -> None:
         try:
             response = await client.post(
                 anonymizer_settings.store_data_url,
-                json=user_feed
+                json=user_feed,
+                timeout=25
             )
             await logger.debug(orjson.loads(response.content))
         except httpx.RequestError as exc:
@@ -84,7 +85,7 @@ async def extract_mobility(journey_id: str) -> str:
 
     async with httpx.AsyncClient(verify=False) as client:
         try:
-            response = await client.get(f"{settings.get_mobility_url}/{journey_id}")
+            response = await client.get(f"{settings.get_mobility_url}/{journey_id}", timeout=25)
 
         except httpx.RequestError as exc:
             # Something went wrong during the connection
@@ -116,7 +117,7 @@ async def extract_details(journey_id: str) -> bytes:
 
     async with httpx.AsyncClient(verify=False) as client:
         try:
-            response = await client.get(f"{settings.get_details_url}/{journey_id}")
+            response = await client.get(f"{settings.get_details_url}/{journey_id}", timeout=25)
 
         except httpx.RequestError as exc:
             # Something went wrong during the connection

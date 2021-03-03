@@ -133,7 +133,9 @@ async def store_in_iota(
         try:
             await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
-                json=orjson.loads(data),
+                json=orjson.loads(
+                    data
+                ),
                 timeout=25
             )
 
