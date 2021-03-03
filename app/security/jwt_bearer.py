@@ -82,7 +82,7 @@ class Signature(HTTPBearer):
         logger = get_logger()
 
         # Token debug
-        logger.debug(
+        await logger.debug(
             {
                 "token_roles": token["realm_access"]["roles"]
             }
@@ -103,7 +103,7 @@ class Signature(HTTPBearer):
                 requester = Requester(client=token["azp"])
 
             # Requester debug
-            logger.debug(
+            await logger.debug(
                 {
                     "requester_client": requester.client,
                     "requester_user": requester.user
