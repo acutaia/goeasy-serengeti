@@ -32,7 +32,7 @@ from .model import OrjsonModel
 # --------------------------------------------------------------------------------------------
 
 
-class AppObj(OrjsonModel):
+class Obj(OrjsonModel):
     client_id: str
     user_id: str
     msg_id: str
@@ -46,9 +46,13 @@ class AppObj(OrjsonModel):
     msg_error_description: str
 
 
+class Data(OrjsonModel):
+    AppObj: Obj
+
+
 class AccountingManager(OrjsonModel):
     target: str
-    data: AppObj
+    data: Data
     private: bool = True
 
 # --------------------------------------------------------------------------------------------

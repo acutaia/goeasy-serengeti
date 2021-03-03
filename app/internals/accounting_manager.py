@@ -33,7 +33,7 @@ import orjson
 
 # Internal
 from .logger import get_logger
-from ..models.accounting_manager import AccountingManager, AppObj
+from ..models.accounting_manager import AccountingManager, Data, Obj
 from ..config import get_accounting_manager_settings
 
 # ----------------------------------------------------------------------------------------------------
@@ -111,26 +111,30 @@ async def store_in_iota(
 
     data = AccountingManager(
         target=source_app,
-        data=AppObj(
-            client_id=client_id,
-            user_id=user_id,
-            msg_id=msg_id,
-            msg_size=msg_size,
-            msg_time=msg_time,
-            msg_malicious_position=msg_malicious_position,
-            msg_authenticated_position=msg_authenticated_position,
-            msg_unknown_position=msg_unknown_position,
-            msg_total_position=msg_total_position,
-            msg_error=msg_error,
-            msg_error_description=msg_error_description
+        data=Data(
+            AppObj=Obj(
+                client_id=client_id,
+                user_id=user_id,
+                msg_id=msg_id,
+                msg_size=msg_size,
+                msg_time=msg_time,
+                msg_malicious_position=msg_malicious_position,
+                msg_authenticated_position=msg_authenticated_position,
+                msg_unknown_position=msg_unknown_position,
+                msg_total_position=msg_total_position,
+                msg_error=msg_error,
+                msg_error_description=msg_error_description
+            )
         )
     )
+
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(
+            await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
                 data=data.json()
             )
+
         except httpx.RequestError as exc:
             # Something went wrong during the connection
             await logger.warning(
