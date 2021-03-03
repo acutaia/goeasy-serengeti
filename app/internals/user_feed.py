@@ -192,8 +192,7 @@ async def end_to_end_position_authentication(
             "analysis_time": f"{time.time() - timestamp}"
         }
     )
-    asyncio.create_task(
-        store_in_iota(
+    await store_in_iota(
             source_app=source_app,
             client_id=client_id,
             user_id=user_id,
@@ -206,7 +205,6 @@ async def end_to_end_position_authentication(
             msg_total_position=galileo_auth_number,
 
         )
-    )
 
     return user_feed
 

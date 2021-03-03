@@ -199,12 +199,11 @@ async def end_to_end_position_authentication(
         }
     )
 
-    asyncio.create_task(
-        store_in_iota(
+    await store_in_iota(
             source_app=source_app,
             client_id=client_id,
             user_id=user_id,
-            msg_id=str(obesrvation_gepid),
+            msg_id=obesrvation_gepid,
             msg_size=sys.getsizeof(iot_input.json()),
             msg_time=timestamp,
             msg_malicious_position=not_authentic_number,
@@ -213,7 +212,6 @@ async def end_to_end_position_authentication(
             msg_total_position=galileo_auth_number
 
         )
-    )
 
     iot_input_dict = iot_input.dict()
     iot_input_dict["result"] = ResultOutput(
