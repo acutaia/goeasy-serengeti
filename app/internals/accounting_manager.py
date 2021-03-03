@@ -130,11 +130,12 @@ async def store_in_iota(
 
     async with httpx.AsyncClient() as client:
         try:
-            await client.post(
+            response = await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
                 data=data.json()
             )
 
+            await logger.debug(orjson.loads(response.content))
         except httpx.RequestError as exc:
             # Something went wrong during the connection
             await logger.warning(

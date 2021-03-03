@@ -45,13 +45,18 @@ async def store_user_in_the_anonengine(user_feed: str) -> None:
     logger = get_logger()
     # Get anonymizer settings
     anonymizer_settings = get_anonymizer_settings()
+
+    await logger.debug(
+        orjson.loads(user_feed)
+    )
     # Store data
     async with httpx.AsyncClient() as client:
         try:
-            await client.post(
+            response = await client.post(
                 anonymizer_settings.store_data_url,
                 data=user_feed
             )
+            await logger.debug(orjson.loads(response.content))
         except httpx.RequestError as exc:
             # Something went wrong during the connection
             await logger.error(
