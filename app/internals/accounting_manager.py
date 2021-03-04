@@ -110,32 +110,28 @@ async def store_in_iota(
 
     settings = get_accounting_manager_settings()
 
-    data = AccountingManager(
-        target=source_app,
-        data=Data(
-            AppObj=Obj(
-                client_id=client_id,
-                user_id=user_id,
-                msg_id=msg_id,
-                msg_size=msg_size,
-                msg_time=msg_time,
-                msg_malicious_position=msg_malicious_position,
-                msg_authenticated_position=msg_authenticated_position,
-                msg_unknown_position=msg_unknown_position,
-                msg_total_position=msg_total_position,
-                msg_error=msg_error,
-                msg_error_description=msg_error_description
-            )
-        )
-    ).json()
-
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
-                json=orjson.loads(
-                    data
-                ),
+                json=AccountingManager(
+                    target=source_app,
+                    data=Data(
+                        AppObj=Obj(
+                            client_id=client_id,
+                            user_id=user_id,
+                            msg_id=msg_id,
+                            msg_size=msg_size,
+                            msg_time=msg_time,
+                            msg_malicious_position=msg_malicious_position,
+                            msg_authenticated_position=msg_authenticated_position,
+                            msg_unknown_position=msg_unknown_position,
+                            msg_total_position=msg_total_position,
+                            msg_error=msg_error,
+                            msg_error_description=msg_error_description
+                        )
+                    )
+                ).jsonify(),
                 timeout=25
             )
 

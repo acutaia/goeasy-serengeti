@@ -19,6 +19,7 @@
       <w>goeasy</w>
       <w>gunicorn</w>
       <w>haversine</w>
+      <w>httpx</w>
       <w>iotauthenticate</w>
       <w>keycloack</w>
       <w>msgid</w>
