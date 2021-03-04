@@ -28,7 +28,6 @@ from typing import Optional, List
 # Third Party
 from fastapi import status, HTTPException
 import httpx
-import orjson
 
 # Internal
 from .logger import get_logger
@@ -299,12 +298,12 @@ async def get_galileo_message_list(
     else:
         url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_galileo_uri}"
 
-    galileo_data_list_request = orjson.dumps(
-        {
+    galileo_data_list_request = {
             "satellite_id": svid,
             "info": [
                 {
-                    "timestamp": time
+                    "timestamp": time,
+                    "raw_data": None
                 }
                 for time in range(
                     timestamp - settings.window,
@@ -314,12 +313,11 @@ async def get_galileo_message_list(
                 if time != timestamp
             ]
         }
-    )
 
     try:
         response = await client.post(
             url,
-            data=galileo_data_list_request,
+            json=galileo_data_list_request,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
             },
@@ -346,7 +344,7 @@ async def get_galileo_message_list(
             # Remake the request
             response = await client.post(
                 url,
-                data=galileo_data_list_request,
+                json=galileo_data_list_request,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
                 },
@@ -398,12 +396,12 @@ async def get_ublox_message_list(
     else:
         url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_uri}"
 
-    galileo_data_list_request = orjson.dumps(
-        {
+    galileo_data_list_request = {
             "satellite_id": svid,
             "info": [
                 {
-                    "timestamp": time
+                    "timestamp": time,
+                    "raw_data": None
                 }
                 for time in range(
                     timestamp - settings.window,
@@ -413,12 +411,11 @@ async def get_ublox_message_list(
                 if time != timestamp
             ]
         }
-    )
 
     try:
         response = await client.post(
             url,
-            data=galileo_data_list_request,
+            json=galileo_data_list_request,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
             },
@@ -445,7 +442,7 @@ async def get_ublox_message_list(
             # Remake the request
             response = await client.post(
                 url,
-                data=galileo_data_list_request,
+                json=galileo_data_list_request,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
                 },
