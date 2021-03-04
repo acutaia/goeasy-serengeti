@@ -55,7 +55,8 @@ router = APIRouter(
     dependencies=[Depends(inspect_auth)]
 )
 async def get_mobility(journey: DataInspection = Body(...)):
-    """This endpoint provides ways to let external users and applications to request for mobility
+    """
+    This endpoint provides ways to let external users and applications to request for mobility
     behaviour detection information with respect to a given track id.\n
     After the security framework approval, it parses and sanitize the provided input,
     forward the request within the Federated API provided by the Privacy Aware DBMS system.\n
@@ -63,8 +64,7 @@ async def get_mobility(journey: DataInspection = Body(...)):
     with the features provided by the Dependable LBS components and the mobility behaviour detection system.\n
     The values returned by the Data Access Manager are given back to the user through the https response
     within the timeout threshold of the standard.\n
-    The following diagram shows the final software design of the Mobility Behaviour Detection service
-    from the *SERENGETI* perspective.\n
+    The following diagram shows the final software design of the Mobility Behaviour Detection service.\n
     ![image](http:/static/get_mobility.png)
     """
     journey_id = str(journey.journey_id)
@@ -80,6 +80,8 @@ async def get_mobility(journey: DataInspection = Body(...)):
     dependencies=[Depends(extraction_auth)]
 )
 async def get_details(journey: DataInspection = Body(...)):
-    """"This endpoint provides ways to let external users and applications to request,
-    by specifing the id of the data of interest, the overall information collected on the platform."""
+    """
+    This endpoint provides ways to let external users and applications to request,
+    by specifing the id of the data of interest, the overall information collected on the platform.
+    """
     return await extract_details(str(journey.journey_id))

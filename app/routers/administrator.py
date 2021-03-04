@@ -51,7 +51,8 @@ router = APIRouter(
     dependencies=[Depends(admin_auth)]
 )
 async def extract_user(source_app: SourceApp):
-    """This endpoint provides ways to let administrators to request for accounting information collected
+    """
+    This endpoint provides ways to let administrators to request for accounting information collected
     by the platform on the IOTA network.\n
     This interface enables maintenance activities by allowing to monitor the platform usage,
     encountered anomalies and unauthorized services requests.\n

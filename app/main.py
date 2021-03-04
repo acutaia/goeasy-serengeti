@@ -103,7 +103,8 @@ async def get_statistics(
         realm_access_roles: List[str] = Depends(extraction_auth),
         extraction: InputJSONExtraction = Body(...),
 ):
-    """"This endpoint provides ways to let external users and applications to request for
+    """
+    This endpoint provides ways to let external users and applications to request for
     information collected on the platform.\n
     This interface enables external organization to gather aggregated meta-data on citizens mobility.\n
     Within the API boundaries, it is possible to parametrize requests by selecting timeframes, area of interests,
