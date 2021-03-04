@@ -58,7 +58,20 @@ async def iot_authentication(
         requester: Requester = Depends(iot_auth),
         iot_input: IotInput = Body(...)
 ):
-    """Checks if every position is authentic"""
+    """
+    This endpoint provides a unique point of access to let IoT devices and LBS applications to send standardized
+    data through a JSON payload via https POST requests.\n
+    It enables the authentication of positions collected by third-party applications.\n
+    After the security framework approval, it responds by embedding a unique, random, and anonymous id,
+    generated on the cloud, for the specific track provided.\n
+    Finally, the content of the message received is parsed and sanitized.\n
+    The logic developed enables the reception of a set of locations embedding Galileo raw data.\n
+    It requires the presence of the entire Galileo navigation messages received while the
+    external devices were computing their positions.\n
+    The latitude and longitude of the list of positions received are
+    extracted at run-time by the Reference System Manager library
+    and exploited for the proper selection of the U-Blox Reference System instance.
+    """
 
     # Analyze requester
     if requester.client == "get_token_client" and requester.user == "goeasy_bq_library":
