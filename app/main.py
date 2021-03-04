@@ -26,11 +26,12 @@ App main entry point
 from typing import List
 
 # Third Party
-from fastapi import FastAPI, Body, Depends, HTTPException, status
+from fastapi import FastAPI, Body, Depends, HTTPException, status, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import ORJSONResponse
+from fastapi.exceptions import RequestValidationError
 
 # Internal
 from .internals.logger import get_logger
@@ -67,6 +68,18 @@ async def configure_logger():
 async def shutdown_logger():
     logger = get_logger()
     await logger.shutdown()
+
+
+# Log Bad body in input
+@app.exception_handler(RequestValidationError)
+async def bad_request_body(request: Request, exc: RequestValidationError):
+    logger = get_logger()
+    await logger.debug(exc.body)
+    return ORJSONResponse(
+        {
+            "detail": exc.errors()
+        }, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+    )
 
 
 # Documentation end-point
@@ -110,7 +123,10 @@ async def get_statistics(
     if extraction.request == RequestType.stats_avg_space:
         pass
 
-    raise status.HTTP_425_TOO_EARLY
+    raise HTTPException(
+        status_code=status.HTTP_425_TOO_EARLY,
+        detail="The endpoint is still under development"
+    )
 
 
 # Cache and custom documentation
