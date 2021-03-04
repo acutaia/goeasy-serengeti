@@ -96,12 +96,26 @@ async def custom_redoc_ui_html():
 @app.post(
     "/api/v1/goeasy/statistics",
     response_class=ORJSONResponse,
+    summary="Obtain statistics from the collected data",
+    status_code=status.HTTP_425_TOO_EARLY,
 )
 async def get_statistics(
         realm_access_roles: List[str] = Depends(extraction_auth),
         extraction: InputJSONExtraction = Body(...),
 ):
-    """"Extract statistics info"""
+    """"This endpoint provides ways to let external users and applications to request for
+    information collected on the platform.\n
+    This interface enables external organization to gather aggregated meta-data on citizens mobility.\n
+    Within the API boundaries, it is possible to parametrize requests by selecting timeframes, area of interests,
+    mobility types and other details.\n
+    To preserve user’s privacy, it has been defined a lower threshold for the area selected.\n
+    In addition, it has been enabled the possibility to extract, with other requests,
+    the list of positions for the collected journeys.\n
+    Furthermore, external organization can exploit an embedded mechanism that limit the visibility
+    of their data with respect to the other users enabled to interact with the platform.\n
+    The following diagram shows the final software design of the data extraction service.\n
+    ![image](http:/static/get_statistics.png)
+    """
 
     if extraction.company_code:
         if extraction.company_code not in realm_access_roles:
