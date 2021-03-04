@@ -64,6 +64,7 @@ if __name__ == '__main__':
     options = {
         "bind": "0.0.0.0",
         "workers": (settings.cores_number * 2) + 1,
+        "keepalive": settings.keep_alive,
         "loglevel": settings.loglevel,
         "accesslog": "-",
         "errorlog": "-",

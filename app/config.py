@@ -109,6 +109,7 @@ def get_accounting_manager_settings() -> AccountingManagerSettings:
 class GunicornSettings(BaseSettings):
     loglevel: str
     cores_number: int
+    keep_alive: int
 
     class Config:
         env_file = ".env"
