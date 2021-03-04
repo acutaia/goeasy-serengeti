@@ -116,9 +116,7 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     without the exploitation of other GEP features, such as the persistent collection.\n
     The current feature is enabled for testing purposes and for those scenarios where data is already stored on
     the cloud, and the main interests are linked on providing additional information for data trustiness.\n
-    The following diagram shows the final software design of the authentication service from the *SERENGETI*
-    perspective.\n
-    It shows the main steps performed by the deployed software running on the cloud platform.\n
+    The following diagram shows the final software design of the authentication service.\n
     ![image](http:/static/user_feed_authenticate_test.png)
     """
     return await end_to_end_position_authentication(
