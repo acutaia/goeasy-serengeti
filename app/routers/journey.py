@@ -80,5 +80,6 @@ async def get_mobility(journey: DataInspection = Body(...)):
     dependencies=[Depends(extraction_auth)]
 )
 async def get_details(journey: DataInspection = Body(...)):
-    """"Extract details from the track of interest"""
+    """"This endpoint provides ways to let external users and applications to request,
+    by specifing the id of the data of interest, the overall information collected on the platform."""
     return await extract_details(str(journey.journey_id))
