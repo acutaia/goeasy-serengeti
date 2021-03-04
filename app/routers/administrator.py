@@ -47,10 +47,17 @@ router = APIRouter(
 @router.post(
     "/{source_app}",
     response_class=ORJSONResponse,
-    summary="Validate data from IoT devices",
+    summary="Extract Accounting Data",
     dependencies=[Depends(admin_auth)]
 )
 async def extract_user(source_app: SourceApp):
-    """Extract User information from the accounting manager"""
+    """This endpoint provides ways to let administrators to request for accounting information collected
+    by the platform on the IOTA network.\n
+    This interface enables maintenance activities by allowing to monitor the platform usage,
+    encountered anomalies and unauthorized services requests.\n
+    Within the API boundaries, it is possible to parametrize requests by selecting specific sources of interests.\n
+    The following diagram shows the final software design of the accounting data extraction service.\n
+    ![image](http:/static/administrator.png)
+    """
     return await get_iota_user(source_app.value)
 
