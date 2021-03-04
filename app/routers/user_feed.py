@@ -64,7 +64,19 @@ async def authenticate(
         user_feed: UserFeedInput = Body(...)
 ):
     """
-    Authenticate user data obtained from mobile
+    This endpoint provides a unique point of access to let external users and applications to send standardized data
+    through a JSON payload via https POST requests.
+    It enables the authentication of positions collected by third-party applications.\n
+    After the security framework approval, it responds by embedding a unique, random, and anonymous id,
+    generated on the cloud, for the specific track provided. Finally, the content of the message received
+    is parsed and sanitized.\n
+    The logic developed enables the reception of a set of locations embedding Galileo raw data.
+    It requires the presence of the entire Galileo navigation messages received while the external
+    devices were computing their positions.\n
+    The latitude and longitude of the list of positions received are extracted at run-time
+    by the Reference System Manager library and exploited for the proper selection of the
+    U-Blox Reference System instance.\n
+    ![image](http:/static/user_feed_authenticate.png)
     """
     # Analyze requester
     if requester.client == "get_token_client" and requester.user == "goeasy_bq_library":
