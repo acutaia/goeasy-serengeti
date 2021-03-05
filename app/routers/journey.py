@@ -65,7 +65,7 @@ async def get_mobility(journey: DataInspection = Body(...)):
     The values returned by the Data Access Manager are given back to the user through the https response
     within the timeout threshold of the standard.\n
     The following diagram shows the final software design of the Mobility Behaviour Detection service.\n
-    ![image](http:serengeti/static/get_mobility.png)
+    ![image](https:serengeti/static/get_mobility.png)
     """
     journey_id = str(journey.journey_id)
     mobility = await extract_mobility(journey_id)

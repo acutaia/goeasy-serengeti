@@ -115,7 +115,7 @@ async def get_statistics(
     Furthermore, external organization can exploit an embedded mechanism that limit the visibility
     of their data with respect to the other users enabled to interact with the platform.\n
     The following diagram shows the final software design of the data extraction service.\n
-    ![image](http:/serengeti/static/get_statistics.png)
+    ![image](https:/serengeti/static/get_statistics.png)
     """
 
     if extraction.company_code:
