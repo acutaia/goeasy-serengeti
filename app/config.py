@@ -57,7 +57,7 @@ class UbloxApiSettings(BaseSettings):
     client_secret: str
     ublox_api_italy_ip: str
     ublox_api_sweden_ip: str
-    ublox_api_uri: str
+    ublox_api_ublox_uri: str
     ublox_api_galileo_uri: str
     window: int
     window_step: int

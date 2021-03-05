@@ -210,10 +210,10 @@ async def get_ublox_message(
     logger = get_logger()
 
     if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_uri}"
+        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_ublox_uri}"
 
     else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_uri}"
+        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_ublox_uri}"
     try:
         response = await client.get(
             f"{url}/{svid}/{timestamp}",
@@ -391,10 +391,10 @@ async def get_ublox_message_list(
     logger = get_logger()
 
     if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_uri}"
+        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_ublox_uri}"
 
     else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_uri}"
+        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_ublox_uri}"
 
     galileo_data_list_request = {
             "satellite_id": svid,
