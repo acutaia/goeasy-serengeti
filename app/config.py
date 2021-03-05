@@ -110,6 +110,7 @@ class GunicornSettings(BaseSettings):
     loglevel: str
     cores_number: int
     keep_alive: int
+    server_port: int
 
     class Config:
         env_file = ".env"

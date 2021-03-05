@@ -62,7 +62,7 @@ if __name__ == '__main__':
     settings = get_gunicorn_settings()
 
     options = {
-        "bind": "0.0.0.0",
+        "bind": f"0.0.0.0:{settings.server_port}",
         "workers": (settings.cores_number * 2) + 1,
         "keepalive": settings.keep_alive,
         "loglevel": settings.loglevel,
