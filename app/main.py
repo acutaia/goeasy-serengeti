@@ -88,8 +88,8 @@ async def custom_redoc_ui_html():
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title="Serengeti",
-        redoc_js_url="/static/redoc.standalone.js",
-        redoc_favicon_url="/static/satellite.png",
+        redoc_js_url="/serengeti/static/redoc.standalone.js",
+        redoc_favicon_url="/serengeti/static/satellite.png",
     )
 
 
