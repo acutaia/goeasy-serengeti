@@ -86,7 +86,7 @@ async def bad_request_body(request: Request, exc: RequestValidationError):
 @app.get("/api/v1/docs", include_in_schema=False)
 async def custom_redoc_ui_html():
     return get_redoc_html(
-        openapi_url=f"serengeti",
+        openapi_url="serengeti",
         title="Serengeti",
         redoc_js_url="/static/redoc.standalone.js",
         redoc_favicon_url="/static/satellite.png",
