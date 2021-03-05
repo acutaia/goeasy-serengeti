@@ -88,8 +88,8 @@ async def custom_redoc_ui_html():
     return get_redoc_html(
         openapi_url=f"serengeti/{app.openapi_url}",
         title="Serengeti",
-        redoc_js_url="serengeti/static/redoc.standalone.js",
-        redoc_favicon_url="serengeti/static/satellite.png",
+        redoc_js_url="/static/redoc.standalone.js",
+        redoc_favicon_url="/static/satellite.png",
     )
 
 
@@ -115,7 +115,7 @@ async def get_statistics(
     Furthermore, external organization can exploit an embedded mechanism that limit the visibility
     of their data with respect to the other users enabled to interact with the platform.\n
     The following diagram shows the final software design of the data extraction service.\n
-    ![image](http:serengeti/static/get_statistics.png)
+    ![image](http:/serengeti/static/get_statistics.png)
     """
 
     if extraction.company_code:
@@ -154,7 +154,7 @@ def custom_openapi():
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
-        "url": "serengeti/static/logo_full.png"
+        "url": "/serengeti/static/logo_full.png"
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
