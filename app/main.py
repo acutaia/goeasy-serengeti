@@ -83,13 +83,13 @@ async def bad_request_body(request: Request, exc: RequestValidationError):
 
 
 # Documentation end-point
-@app.get("/api/v1/galileo/docs", include_in_schema=False)
+@app.get("/api/v1/docs", include_in_schema=False)
 async def custom_redoc_ui_html():
     return get_redoc_html(
-        openapi_url=app.openapi_url,
+        openapi_url=f"serengeti/{app.openapi_url}",
         title="Serengeti",
-        redoc_js_url="/static/redoc.standalone.js",
-        redoc_favicon_url="/static/satellite.png",
+        redoc_js_url="serengeti/static/redoc.standalone.js",
+        redoc_favicon_url="serengeti/static/satellite.png",
     )
 
 
@@ -115,7 +115,7 @@ async def get_statistics(
     Furthermore, external organization can exploit an embedded mechanism that limit the visibility
     of their data with respect to the other users enabled to interact with the platform.\n
     The following diagram shows the final software design of the data extraction service.\n
-    ![image](http:/static/get_statistics.png)
+    ![image](http:serengeti/static/get_statistics.png)
     """
 
     if extraction.company_code:
@@ -154,7 +154,7 @@ def custom_openapi():
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
-        "url": "/static/logo_full.png"
+        "url": "serengeti/static/logo_full.png"
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
