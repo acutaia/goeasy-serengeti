@@ -29,12 +29,11 @@ import sys
 # Third Party
 from fastapi import HTTPException
 import httpx
-import orjson
 
 # Internal
 from .logger import get_logger
 from .position_alteration_detection import haversine
-from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_message_list
+from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_messages_list
 from .anonymizer import store_user_in_the_anonengine
 from .accounting_manager import store_in_iota
 from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
@@ -134,7 +133,7 @@ async def end_to_end_position_authentication(
 
                     try:
                         # Remake the request
-                        galileo_data_list = await get_galileo_message_list(
+                        galileo_data_list = await get_galileo_messages_list(
                             client,
                             auth.svid,
                             auth.time,

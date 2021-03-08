@@ -36,7 +36,7 @@ from fastapi import HTTPException
 from .logger import get_logger
 from .accounting_manager import store_in_iota
 from .position_alteration_detection import haversine
-from .ublox_api import get_ublox_message, get_ublox_token, get_ublox_message_list
+from .ublox_api import get_ublox_message, get_ublox_token, get_ublox_messages_list
 from ..models.iot_feed.iot import IotInput, IotOutput, ResultOutput
 from ..models.security import Authenticity
 from ..config import get_ublox_api_settings
@@ -130,7 +130,7 @@ async def end_to_end_position_authentication(
 
                 try:
                     # Remake the request
-                    galileo_data_list = await get_ublox_message_list(
+                    galileo_data_list = await get_ublox_messages_list(
                         client,
                         gnss.svid,
                         iot_time,
