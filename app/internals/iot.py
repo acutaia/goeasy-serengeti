@@ -24,22 +24,20 @@ IoT utilities package
 """
 
 # Standard Library
-import asyncio
-import time
 import sys
+import time
 
 # Third Party
-import httpx
 from fastapi import HTTPException
+import httpx
 
 # Internal
-from .logger import get_logger
 from .accounting_manager import store_in_iota
+from .logger import get_logger
 from .position_alteration_detection import haversine
 from .ublox_api import get_ublox_message, get_ublox_token, get_ublox_messages_list
 from ..models.iot_feed.iot import IotInput, IotOutput, ResultOutput
 from ..models.security import Authenticity
-from ..config import get_ublox_api_settings
 
 
 # --------------------------------------------------------------------------------------------
@@ -68,9 +66,9 @@ async def end_to_end_position_authentication(
     """
     # Get Logger
     logger = get_logger()
-    # Get Ublox-APi token and settings
-    ublox_api_settings = get_ublox_api_settings()
-    ublox_token = await get_ublox_token(ublox_api_settings)
+
+    # Get Ublox-APi token
+    ublox_token = await get_ublox_token()
 
     # Extract timestamp
     iot_time = int(iot_input.phenomenonTime.timestamp()*1000)
@@ -97,7 +95,6 @@ async def end_to_end_position_authentication(
                     gnss.svid,
                     iot_time,
                     ublox_token,
-                    ublox_api_settings,
                     location
                 )
             except HTTPException as exc:
@@ -135,7 +132,6 @@ async def end_to_end_position_authentication(
                         gnss.svid,
                         iot_time,
                         ublox_token,
-                        ublox_api_settings,
                         location
                     )
                 except HTTPException as exc:

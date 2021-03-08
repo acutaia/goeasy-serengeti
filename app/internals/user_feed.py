@@ -23,22 +23,21 @@ UserFeed utilities package
     limitations under the License.
 """
 # Standard Library
-import time
 import sys
+import time
 
 # Third Party
 from fastapi import HTTPException
 import httpx
 
 # Internal
+from .accounting_manager import store_in_iota
+from .anonymizer import store_user_in_the_anonengine
 from .logger import get_logger
 from .position_alteration_detection import haversine
 from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_messages_list
-from .anonymizer import store_user_in_the_anonengine
-from .accounting_manager import store_in_iota
-from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
 from ..models.security import Authenticity
-from ..config import get_ublox_api_settings
+from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
 
 
 # --------------------------------------------------------------------------------------------
@@ -77,9 +76,8 @@ async def end_to_end_position_authentication(
     not_authentic_number = 0
     unknown_number = 0
 
-    # Get Ublox-APi token and settings
-    ublox_api_settings = get_ublox_api_settings()
-    ublox_token = await get_ublox_token(ublox_api_settings)
+    # Get Ublox-APi token
+    ublox_token = await get_ublox_token()
 
     # Contact Ublox-Api for every position
     async with httpx.AsyncClient(verify=False) as client:
@@ -97,7 +95,6 @@ async def end_to_end_position_authentication(
                         auth.svid,
                         auth.time,
                         ublox_token,
-                        ublox_api_settings,
                         location
                     )
                 except HTTPException as exc:
@@ -138,7 +135,6 @@ async def end_to_end_position_authentication(
                             auth.svid,
                             auth.time,
                             ublox_token,
-                            ublox_api_settings,
                             location
                         )
                     except HTTPException as exc:

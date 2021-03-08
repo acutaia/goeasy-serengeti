@@ -31,18 +31,34 @@ import httpx
 
 # Internal
 from .logger import get_logger
-from ..config import UbloxApiSettings
+from ..config import get_ublox_api_settings
 from ..models.security import Token
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
 
 # --------------------------------------------------------------------------------------------
 
+SETTINGS = get_ublox_api_settings()
+""" Ublox-Api settings """
 
-async def get_ublox_token(settings: UbloxApiSettings) -> str:
+URL_UBLOX = {
+    "Italy": f"{SETTINGS.ublox_api_italy_ip}{SETTINGS.ublox_api_ublox_uri}",
+    "Sweden": f"{SETTINGS.ublox_api_sweden_ip}{SETTINGS.ublox_api_ublox_uri}"
+}
+""" Italian and Swedish url for getting ublox messages """
+
+URL_GALILEO = {
+    "Italy": f"{SETTINGS.ublox_api_italy_ip}{SETTINGS.ublox_api_galileo_uri}",
+    "Sweden": f"{SETTINGS.ublox_api_sweden_ip}{SETTINGS.ublox_api_galileo_uri}"
+}
+""" Italian and Swedish url for getting galileo messages """
+
+# --------------------------------------------------------------------------------------------
+
+
+async def get_ublox_token() -> str:
     """
     Obtain a valid token to communicate with Ublox-Api
 
-    :param settings: UbloxApi settings
     :return: UbloxApi valid token
     """
     # Get Logger
@@ -51,13 +67,13 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                url=settings.token_request_url,
+                url=SETTINGS.token_request_url,
                 data={
-                    "client_id": settings.client_id,
-                    "username": settings.username_keycloak,
-                    "password": settings.password,
-                    "grant_type": settings.grant_type,
-                    "client_secret": settings.client_secret
+                    "client_id": SETTINGS.client_id,
+                    "username": SETTINGS.username_keycloak,
+                    "password": SETTINGS.password,
+                    "grant_type": SETTINGS.grant_type,
+                    "client_secret": SETTINGS.client_secret
                 },
                 timeout=25
             )
@@ -70,11 +86,11 @@ async def get_ublox_token(settings: UbloxApiSettings) -> str:
                     {
                         "method": exc.request.method,
                         "url": exc.request.url,
-                        "client_id": settings.client_id,
-                        "username": settings.username_keycloak,
-                        "password": settings.password,
-                        "grant_type": settings.grant_type,
-                        "client_secret": settings.client_secret,
+                        "client_id": SETTINGS.client_id,
+                        "username": SETTINGS.username_keycloak,
+                        "password": SETTINGS.password,
+                        "grant_type": SETTINGS.grant_type,
+                        "client_secret": SETTINGS.client_secret,
                         "status_code": exc.response.status_code,
                         "error": exc
                     }
@@ -109,7 +125,6 @@ async def _get_raw_data(
         timestamp: int,
         ublox_token: str,
         url: str,
-        settings: UbloxApiSettings
 ) -> Optional[str]:
     """
     Contacts Ublox-Api and extracts raw data from the given satellite id and timestamp.
@@ -119,7 +134,6 @@ async def _get_raw_data(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param url: Url of Ublox-Api server, it could be in Italy or Sweden
-    :param settings: Ublox-Api settings
     :return:  The message
     """
     # Get Logger
@@ -151,7 +165,7 @@ async def _get_raw_data(
                 }
             )
             # Get new Token
-            ublox_token = await get_ublox_token(settings)
+            ublox_token = await get_ublox_token()
 
             # Remake the request
             response = await client.get(
@@ -183,7 +197,6 @@ async def get_galileo_message(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        settings: UbloxApiSettings,
         location: str
 ) -> Optional[str]:
     """
@@ -193,24 +206,16 @@ async def get_galileo_message(
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
-    :param settings: Ublox Api settings
     :param location: Sweden or Italy
     :return: Galileo Message
     """
-
-    if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_galileo_uri}"
-
-    else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_galileo_uri}"
 
     return await _get_raw_data(
         client=client,
         svid=svid,
         timestamp=timestamp,
         ublox_token=ublox_token,
-        url=url,
-        settings=settings
+        url=URL_GALILEO[location],
     )
 
 
@@ -219,7 +224,6 @@ async def get_ublox_message(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        settings: UbloxApiSettings,
         location: str
 ) -> Optional[str]:
     """
@@ -229,24 +233,16 @@ async def get_ublox_message(
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
-    :param settings: Ublox Api settings
     :param location: Sweden or Italy
     :return: Galileo Message
     """
-
-    if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_ublox_uri}"
-
-    else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_ublox_uri}"
 
     return await _get_raw_data(
         client=client,
         svid=svid,
         timestamp=timestamp,
         ublox_token=ublox_token,
-        url=url,
-        settings=settings
+        url=URL_UBLOX[location],
     )
 
 # ---------------------------------------------------------------------------------------
@@ -257,7 +253,6 @@ async def _get_ublox_api_list(
         ublox_token: str,
         url: str,
         data: dict,
-        settings: UbloxApiSettings
 ) -> List[UbloxAPI]:
     """
     Contacts Ublox-Api and extracts a list of UbloxApi data format (timestamps and associated raw_data)
@@ -267,7 +262,6 @@ async def _get_ublox_api_list(
     :param ublox_token: Token to use with UbloxApi
     :param url: Url of Ublox-Api server, it could be in Italy or Sweden
     :param data: asked data
-    :param settings: Ublox-Api settings
     :return: list of UbloxApi objects
     """
 
@@ -299,7 +293,7 @@ async def _get_ublox_api_list(
                 }
             )
             # Get new Token
-            ublox_token = await get_ublox_token(settings)
+            ublox_token = await get_ublox_token()
 
             # Remake the request
             response = await client.post(
@@ -331,16 +325,12 @@ async def _get_ublox_api_list(
 def construct_request(
         svid: int,
         timestamp: int,
-        window: int,
-        window_step: int
 ) -> dict:
     """
     Constructs the dict of the request that will be made to Ublox-Api to retrieve the data of interest
 
     :param svid: Satellite Identifier
     :param timestamp: Timestamp associated to the measure
-    :param window: window of timestamp
-    :param window_step: step of the requested timestamps
     :return: Data to ask to Ublox-Api
     """
     return {
@@ -351,9 +341,9 @@ def construct_request(
                 "raw_data": None
             }
             for time in range(
-                timestamp - window,
-                timestamp + window + 1,
-                window_step
+                timestamp - SETTINGS.window,
+                timestamp + SETTINGS.window + 1,
+                SETTINGS.window_step
             )
             if time != timestamp
         ]
@@ -365,7 +355,6 @@ async def get_galileo_messages_list(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        settings: UbloxApiSettings,
         location: str
 ) -> List[UbloxAPI]:
     """
@@ -376,23 +365,15 @@ async def get_galileo_messages_list(
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
-    :param settings: Ublox Api settings
     :param location: Could be Italy or Sweden
     :return: A list of Galileo Messages
     """
 
-    if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_galileo_uri}"
-
-    else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_galileo_uri}"
-
     return await _get_ublox_api_list(
         client=client,
         ublox_token=ublox_token,
-        url=url,
-        data=construct_request(svid, timestamp, settings.window, settings.window_step),
-        settings=settings
+        url=URL_GALILEO[location],
+        data=construct_request(svid, timestamp)
     )
 
 
@@ -401,7 +382,6 @@ async def get_ublox_messages_list(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        settings: UbloxApiSettings,
         location: str
 ) -> List[UbloxAPI]:
     """
@@ -412,21 +392,13 @@ async def get_ublox_messages_list(
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
-    :param settings: Ublox Api settings
     :param location: Could be Italy or Sweden
     :return: A list of Ublox Messages
     """
 
-    if location == "Italy":
-        url = f"{settings.ublox_api_italy_ip}{settings.ublox_api_ublox_uri}"
-
-    else:
-        url = f"{settings.ublox_api_sweden_ip}{settings.ublox_api_ublox_uri}"
-
     return await _get_ublox_api_list(
         client=client,
         ublox_token=ublox_token,
-        url=url,
-        data=construct_request(svid, timestamp, settings.window, settings.window_step),
-        settings=settings
+        url=URL_UBLOX[location],
+        data=construct_request(svid, timestamp)
     )
