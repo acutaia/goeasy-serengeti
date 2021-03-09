@@ -28,7 +28,7 @@ from functools import lru_cache
 # Third Party
 from pydantic import BaseSettings
 
-# --------------------------------------------------------------
+# -------------------------------------------------------------------
 
 
 class SecuritySettings(BaseSettings):
@@ -46,7 +46,7 @@ def get_security_settings() -> SecuritySettings:
     return SecuritySettings()
 
 
-# --------------------------------------------------------------
+# -------------------------------------------------------------------
 
 class UbloxApiSettings(BaseSettings):
     token_request_url: str
@@ -71,7 +71,7 @@ def get_ublox_api_settings() -> UbloxApiSettings:
     return UbloxApiSettings()
 
 
-# --------------------------------------------------------------
+# -------------------------------------------------------------------
 
 
 class AnonymizerSettings(BaseSettings):
@@ -87,7 +87,7 @@ class AnonymizerSettings(BaseSettings):
 def get_anonymizer_settings() -> AnonymizerSettings:
     return AnonymizerSettings()
 
-# --------------------------------------------------------------
+# -------------------------------------------------------------------
 
 
 class AccountingManagerSettings(BaseSettings):
@@ -103,20 +103,4 @@ class AccountingManagerSettings(BaseSettings):
 def get_accounting_manager_settings() -> AccountingManagerSettings:
     return AccountingManagerSettings()
 
-# --------------------------------------------------------------
-
-
-class GunicornSettings(BaseSettings):
-    loglevel: str
-    cores_number: int
-    keep_alive: int
-    server_port: int
-
-    class Config:
-        env_file = ".env"
-
-
-@lru_cache(maxsize=1)
-def get_gunicorn_settings() -> GunicornSettings:
-    return GunicornSettings()
-
+# -------------------------------------------------------------------

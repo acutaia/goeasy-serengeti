@@ -23,15 +23,24 @@ Gunicorn App main entry point
     limitations under the License.
 """
 
-# Standard Library
-import logging
-
 # Third Party
 from gunicorn.app.base import BaseApplication
+from pydantic import BaseSettings
 
 # Internal
 from app.main import app
-from app.config import get_gunicorn_settings
+
+# -------------------------------------------------------------------------------
+
+
+class GunicornSettings(BaseSettings):
+    loglevel: str
+    cores_number: int
+    keep_alive: int
+    server_port: int
+
+    class Config:
+        env_file = ".env"
 
 # -------------------------------------------------------------------------------
 
@@ -59,7 +68,7 @@ class StandaloneApplication(BaseApplication):
 
 
 if __name__ == '__main__':
-    settings = get_gunicorn_settings()
+    settings = GunicornSettings()
 
     options = {
         "bind": f"0.0.0.0:{settings.server_port}",
