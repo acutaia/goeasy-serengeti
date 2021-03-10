@@ -63,12 +63,12 @@ from ..mock.ublox_api.get_token import (
 )
 from ..mock.ublox_api.get_raw_data import (
     correct_get_raw_data,
-    ublox_api_unreachable_get_raw_data,
+    unreachable_get_raw_data,
     token_expired_get_raw_data
 )
 from ..mock.ublox_api.get_ublox_api_list import (
     correct_get_ublox_api_list,
-    ublox_api_unreachable_get_ublox_api_list,
+    unreachable_get_ublox_api_list,
     token_expired_get_ublox_api_list
 )
 
@@ -147,7 +147,7 @@ class TestUbloxApi:
             assert raw_data == RaW_Galileo, "Raw Galileo data must be the same"
 
             # Mock the request
-            ublox_api_unreachable_get_raw_data(URL_GET_GALILEO)
+            unreachable_get_raw_data(URL_GET_GALILEO)
             # Check if raises an exception in case of unreachable host
             with pytest.raises(HTTPException):
                 await get_galileo_message(
@@ -190,7 +190,7 @@ class TestUbloxApi:
             assert raw_data == RaW_Ublox, "Raw Ublox data must be the same"
 
             # Mock the request
-            ublox_api_unreachable_get_raw_data(URL_GET_UBLOX)
+            unreachable_get_raw_data(URL_GET_UBLOX)
             # Check if raises an exception in case of unreachable host
             with pytest.raises(HTTPException):
                 await get_ublox_message(
@@ -261,7 +261,7 @@ class TestUbloxApi:
             ] == ublox_api_list, "List of UbloxApi data must be the same"
 
             # Mock the request
-            ublox_api_unreachable_get_ublox_api_list(url=URL_POST_GALILEO)
+            unreachable_get_ublox_api_list(url=URL_POST_GALILEO)
             with pytest.raises(HTTPException):
                 await get_galileo_messages_list(
                     client=client,
@@ -314,7 +314,7 @@ class TestUbloxApi:
                    ] == ublox_api_list, "List of UbloxApi data must be the same"
 
             # Mock the request
-            ublox_api_unreachable_get_ublox_api_list(url=URL_POST_UBLOX)
+            unreachable_get_ublox_api_list(url=URL_POST_UBLOX)
             with pytest.raises(HTTPException):
                 await get_ublox_messages_list(
                     client=client,

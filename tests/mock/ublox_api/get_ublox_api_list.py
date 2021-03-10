@@ -91,7 +91,7 @@ def token_expired_get_ublox_api_list(url: str, raw_data: Optional[str]):
     ]
 
 
-def ublox_api_unreachable_get_ublox_api_list(url: str):
+def unreachable_get_ublox_api_list(url: str):
     """
     Mock the behaviour in case of Ublox-Api is unreachable
 

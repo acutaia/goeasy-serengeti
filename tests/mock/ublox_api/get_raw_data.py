@@ -81,7 +81,7 @@ def token_expired_get_raw_data(url: str, raw_data: Optional[str]):
     ]
 
 
-def ublox_api_unreachable_get_raw_data(url: str):
+def unreachable_get_raw_data(url: str):
     """
     Mock the behaviour in case of Ublox-Api is unreachable
 
