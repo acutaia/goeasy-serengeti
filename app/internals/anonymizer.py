@@ -23,6 +23,9 @@ Anonymizer package
     limitations under the License.
 """
 
+# Standard library
+from typing import Any
+
 # Third Party
 from fastapi import status, HTTPException
 import httpx
@@ -72,20 +75,20 @@ async def store_user_in_the_anonengine(user_feed: dict) -> None:
 # --------------------------------------------------------------------------------------------
 
 
-async def extract_mobility(journey_id: str) -> str:
+async def _extract(url: str) -> Any:
     """
-    Extract mobility info from the anonengine
+    Extract info from the anonengine
 
-    :param journey_id: Requested journey id
+    :param url: requested info
+    :return: Info
     """
+
     # Get Logger
     logger = get_logger()
-    # Get settings
-    settings = get_anonymizer_settings()
 
     async with httpx.AsyncClient(verify=False) as client:
         try:
-            response = await client.get(f"{settings.get_mobility_url}/{journey_id}", timeout=25)
+            response = await client.get(url, timeout=25)
 
         except httpx.RequestError as exc:
             # Something went wrong during the connection
@@ -105,31 +108,23 @@ async def extract_mobility(journey_id: str) -> str:
 # --------------------------------------------------------------------------------------------
 
 
-async def extract_details(journey_id: str) -> bytes:
+async def extract_mobility(journey_id: str) -> Any:
+    """
+    Extract mobility info from the anonengine
+
+    :param journey_id: Requested journey id
+    """
+    settings = get_anonymizer_settings()
+    return await _extract(f"{settings.get_mobility_url}/{journey_id}")
+
+# --------------------------------------------------------------------------------------------
+
+
+async def extract_details(journey_id: str) -> Any:
     """
     Extract details from the anonengine
 
     :param journey_id: Requested journey id
     """
-    # Get Logger
-    logger = get_logger()
     settings = get_anonymizer_settings()
-
-    async with httpx.AsyncClient(verify=False) as client:
-        try:
-            response = await client.get(f"{settings.get_details_url}/{journey_id}", timeout=25)
-
-        except httpx.RequestError as exc:
-            # Something went wrong during the connection
-            await logger.error(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "error": exc
-                }
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Can't contact Anonymizer service"
-            )
-    return orjson.loads(response.content)
+    return await _extract(f"{settings.get_details_url}/{journey_id}")
