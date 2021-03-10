@@ -27,12 +27,21 @@ Haversine function
 # Standard c++ library
 from libc.math cimport sin, cos, asin, sqrt
 
+
 # -------------------------------------------------------------------------------------------
 
 # CONSTANTS
 cdef double ITALY_LAT, ITALY_LON, PHI_ITALY, THETA_ITALY
 cdef double SWEDEN_LAT, SWEDEN_LON, PHI_SWEDEN, THETA_SWEDEN
 cdef str ITALY, SWEDEN
+cdef long GPS_OFFSET,
+cdef int LEAP_OFFSET
+cdef long long GALILEO_OFFSET
+
+# SATELLITE
+GPS_OFFSET = 315964800000
+LEAP_OFFSET = 18000
+GALILEO_OFFSET = 935280000000
 
 # ITALY
 ITALY_LAT = 45.0781
@@ -52,8 +61,7 @@ SWEDEN = "Sweden"
 
 
 def haversine(double lat, double lon) -> str:
-    """Given two (lat, lng) tuples, returns the distance between them in
-    meters."""
+    """Given a lat and lng returns the name of the nearest nation"""
     cdef double lat1, lng1, ph1, theta1
     cdef double dphi_italy, dtheta_italy, a_italy, italy_distance
     cdef double dphi_sweden, dtheta_sweden , a_sweden, sweden_distance
@@ -80,3 +88,44 @@ def haversine(double lat, double lon) -> str:
         return ITALY
 
     return SWEDEN
+
+# -------------------------------------------------------------------------------------------
+
+
+def galileo_timestamp(fullbiasnano: int, timenano: int) -> int:
+    """
+    Calculate galileo timestamp from fullbiasnano and timenano
+
+    :param fullbiasnano:
+    :param timenano:
+    """
+
+    cdef signed long long int a
+    cdef signed long int b
+    cdef double conversion
+
+    a = fullbiasnano
+    b = timenano
+
+    conversion = (b - a) / 1000000
+
+    return  int ((b - a) / 1000000 + GALILEO_OFFSET)
+
+
+def gps_timestamp(fullbiasnano: int, timenano: int) -> int:
+    """
+    Calculate gps timestamp from fullbiasnano and timenano
+
+    :param fullbiasnano:
+    :param timenano:
+    """
+
+    cdef signed long long int a
+    cdef signed long int b
+    cdef double conversion
+
+    a = fullbiasnano
+    b = timenano
+    conversion = (b - a) / 1000000
+
+    return int( conversion + GPS_OFFSET + LEAP_OFFSET)
