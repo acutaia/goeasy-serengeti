@@ -1,0 +1,15 @@
+# App requirements
+fastapi[all]>=0.63.0
+httpx>=0.17.0
+python-jose[cryptography]
+gunicorn>=20.0.4
+Cython>=0.29.22
+aiologger>=0.6.0
+
+# Testing requirements
+codecov>=2.1.11
+pytest>=6.2.2
+pytest-asyncio>=0.14.0
+pytest-cov>=2.11.1
+respx>=0.16.3
+
