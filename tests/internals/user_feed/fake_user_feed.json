@@ -1,0 +1,134 @@
+{
+    "behaviour": {
+        "app_defined": [
+
+        ],
+        "tpv_defined": [
+
+        ],
+        "user_defined": [
+            {
+                "end": {
+                    "authenticity": -1,
+                    "galileo_auth": [
+
+                    ],
+                    "lat": 45.0747907,
+                    "lon": 7.4582242,
+                    "partialDistance": 2025,
+                    "time": 1611820525205
+                },
+                "meters": 1939,
+                "start": {
+                    "authenticity": -1,
+                    "galileo_auth": [
+
+                    ],
+                    "galileo_status": {
+
+                    },
+                    "lat": 45.0700976,
+                    "lon": 7.4728034,
+                    "partialDistance": 76,
+                    "time": 1611819579051
+                },
+                "type": "bicycle"
+            }
+        ]
+    },
+    "company_code": "",
+    "company_trip_type": "",
+    "distance": 1939,
+    "elapsedTime": "0:16:15",
+    "endDate": 1611820537461,
+    "id": "0",
+    "journey_id": "",
+    "mainTypeSpace": "bicycle",
+    "mainTypeTime": "bicycle",
+    "sensors_information": [
+        {
+            "data": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 8.0
+            },
+            "name": "accellerometer",
+            "time": 1611819561195
+        }
+    ],
+    "startDate": 1611819561552,
+    "trace_information": [
+        {
+            "authenticity": -1,
+            "galileo_auth": [
+                {
+                    "data": [
+                        2,
+                        27,
+                        5,
+                        -74,
+                        65,
+                        80,
+                        9,
+                        -71,
+                        -55,
+                        106,
+                        62,
+                        -36,
+                        -114,
+                        117,
+                        0,
+                        -122,
+                        126,
+                        88,
+                        -113,
+                        103,
+                        -110,
+                        -56,
+                        106,
+                        -86,
+                        -86,
+                        98,
+                        -68,
+                        76,
+                        127,
+                        64
+                    ],
+                    "fullbiasnano": -1295854774332368789,
+                    "msgauth": -1,
+                    "msgid": 24,
+                    "status": 1,
+                    "submsgid": 2,
+                    "svid": 12,
+                    "time": 1611819619151,
+                    "timenano": 58668000000,
+                    "type": 1537
+                }
+            ],
+            "galileo_status": {
+                "svinfo": {
+                    "iTOW": 0,
+                    "numSvs": 36,
+                    "reserved1": 0,
+                    "svs": [
+                        {
+                            "azim": 94,
+                            "cno": 24,
+                            "elev": 72,
+                            "flags": 67108864,
+                            "gnssId": 0,
+                            "prRes": 0,
+                            "svId": 7
+                        }
+                    ],
+                    "version": 0
+                }
+            },
+            "lat": 45.0704191,
+            "lon": 7.4716152,
+            "partialDistance": 283,
+            "time": 1611819619151
+        }
+    ]
+
+}
