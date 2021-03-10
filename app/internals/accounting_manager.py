@@ -39,7 +39,7 @@ from ..config import get_accounting_manager_settings
 # ----------------------------------------------------------------------------------------------------
 
 
-async def get_iota_user(user: str) -> bytes:
+async def get_iota_user(user: str) -> dict:
     """
     Extract user info from the accounting manager
 

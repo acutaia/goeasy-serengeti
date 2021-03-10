@@ -40,6 +40,7 @@
       <w>typetime</w>
       <w>ublox</w>
       <w>uvicorn</w>
+      <w>uvloop</w>
     </words>
   </dictionary>
 </component>
