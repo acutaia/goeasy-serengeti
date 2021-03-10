@@ -23,9 +23,6 @@ Tests app.internal.ublox_api module
     limitations under the License.
 """
 
-# Standard library
-import asyncio
-
 # Third Party
 import httpx
 
