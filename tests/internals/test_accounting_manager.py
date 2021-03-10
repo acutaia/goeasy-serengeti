@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests app.internal.accounting_manager module
+Tests app.internals.accounting_manager module
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia

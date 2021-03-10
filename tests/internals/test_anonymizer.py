@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests app.internal.anonymizer module
+Tests app.internals.anonymizer module
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia

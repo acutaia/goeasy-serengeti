@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests app.internal.position_alteration_detection module
+Tests app.internals.position_alteration_detection module
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests app.internal.ublox_api module
+Tests app.internals.ublox_api module
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
