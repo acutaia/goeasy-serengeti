@@ -1,0 +1,24 @@
+{
+  "resultTime": "2021-01-28T07:40:19.151000+00:00",
+  "Datastream": {
+    "@iot.id": 5
+  },
+  "FeatureOfInterest": {
+    "@iot.id": "1"
+  },
+  "phenomenonTime": "2021-01-28T07:40:19.151000+00:00",
+  "result": {
+    "gnss": "B56202133000000C00000A0102392A34C022408C238A04B389169EBC400E228044BFE80F43A8E604821235344582F90FD29628100086B197",
+    "valueType": "NO2",
+    "Position": {
+      "type": "Point",
+      "coordinate": [
+        59.338747,
+        18.067612
+      ]
+    },
+    "response": {
+      "value": 6.8
+    }
+  }
+}
