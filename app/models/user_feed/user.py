@@ -25,7 +25,7 @@ User models package
 
 # Standard Library
 from uuid import uuid4
-from typing import List
+from typing import List, Any
 
 # Third Party
 from pydantic import Field
@@ -34,7 +34,7 @@ from pydantic import Field
 from .behaviour import Behaviour
 from .position import PositionObject, PositionObjectInput
 from .sensor import SensorInformation
-from ..track import TypeOfTrack, TrackSegments
+from ..track import TypeOfTrack, TrackSegmentsOutput
 from ..model import OrjsonModel
 
 # ------------------------------------------------------------------------------------------------------
@@ -42,7 +42,10 @@ from ..model import OrjsonModel
 
 class UserFeed(OrjsonModel):
     """UserFeed Input model"""
-    behaviour: Behaviour = None
+    behaviour: Behaviour = Field(
+        ...,
+        description="Behaviour of the user"
+    )
     company_code: str = Field(
         ...,
         title="Company Code",
@@ -122,19 +125,19 @@ class UserFeedInput(UserFeed):
 class UserFeedOutput(OrjsonModel):
     """UserFeed Output Model"""
 
-    app_defined_behaviour: TrackSegments = Field(
+    app_defined_behaviour: Any = Field(
         ...,
         title="Application Defined Behaviour",
         description="Mobile application standalone detection of mobility types and the segments within the journey",
         example=[]
     )
-    tpv_defined_behaviour: TrackSegments = Field(
+    tpv_defined_behaviour: Any = Field(
         ...,
         title="Third Party Defined Behaviour",
         description="Autonomous detection of mobility types and the segments within the journey",
         example=[]
     )
-    user_defined_behaviour: TrackSegments = Field(
+    user_defined_behaviour: List[TrackSegmentsOutput] = Field(
         ...,
         title="User Defined Behaviour",
         description="""The users specify through the mobile app the type of mobility

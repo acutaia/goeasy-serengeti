@@ -27,10 +27,54 @@ Track Models
 from enum import Enum
 from typing import TypeVar, List, Optional, Any
 
+# Third Party
+from pydantic import Field
+
+# Internals
+from .model import OrjsonModel
+from app.models.user_feed.position import PositionObjectInput, PositionObject
+
 # --------------------------------------------------------------------------------------------
 
-TrackSegments = TypeVar("TrackSegments", bound=List[Optional[Any]])
-"""Track Segments list"""
+
+class TrackSegments(OrjsonModel):
+    """ Track Segments """
+
+    meters: int = Field(
+        ...,
+        example=10
+    )
+
+    type: str = Field(
+        ...,
+        example="walk"
+    )
+
+
+class TrackSegmentsInput(TrackSegments):
+    """ Track Segments Input"""
+    end: PositionObjectInput = Field(
+        ...,
+        description="End position"
+    )
+
+    start: PositionObjectInput = Field(
+        ...,
+        description="Start position"
+    )
+
+
+class TrackSegmentsOutput(TrackSegments):
+    """ Track Segments Output"""
+    end: PositionObject = Field(
+        ...,
+        description="End position"
+    )
+
+    start: PositionObject = Field(
+        ...,
+        description="Start position"
+    )
 
 
 class TypeOfTrack(str, Enum):

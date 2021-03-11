@@ -44,6 +44,8 @@ from app.models.user_feed.user import (
     PositionObject
 )
 
+from app.models.track import TrackSegmentsOutput
+
 from app.models.security import Authenticity
 
 from tests.mock.ublox_api.get_raw_data import (
@@ -196,7 +198,33 @@ class TestUserFeed:
         user_feed_output = {
                 "app_defined_behaviour": user_feed_validated.behaviour.app_defined,
                 "tpv_defined_behaviour": user_feed_validated.behaviour.tpv_defined,
-                "user_defined_behaviour": user_feed_validated.behaviour.user_defined,
+                "user_defined_behaviour": [
+                    TrackSegmentsOutput.parse_obj(
+                        {
+                            "start": PositionObject.parse_obj(
+                                {
+                                    "authenticity": behaviour.start.authenticity,
+                                    "lat": behaviour.start.lat,
+                                    "lon": behaviour.start.lon,
+                                    "partialDistance": behaviour.start.partialDistance,
+                                    "time": behaviour.start.time
+                                }
+                            ),
+                            "meters": behaviour.meters,
+                            "end": PositionObject.parse_obj(
+                                {
+                                    "authenticity": behaviour.end.authenticity,
+                                    "lat": behaviour.end.lat,
+                                    "lon": behaviour.end.lon,
+                                    "partialDistance": behaviour.end.partialDistance,
+                                    "time": behaviour.end.time
+                                }
+                            ),
+                            "type": behaviour.type,
+                        }
+                    )
+                    for behaviour in user_feed_validated.behaviour.user_defined
+                ],
                 "company_code": user_feed_validated.company_code,
                 "company_trip_type": user_feed_validated.company_trip_type,
                 "deviceId": user_feed_validated.id,

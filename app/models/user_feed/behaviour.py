@@ -23,11 +23,14 @@ Behaviour models package
     limitations under the License.
 """
 
+# Standard Library
+from typing import Any, List
+
 # Third Party
 from pydantic import Field
 
 # Internal
-from ..track import TrackSegments
+from ..track import TrackSegmentsInput
 from ..model import OrjsonModel
 
 # --------------------------------------------------------------------------------------------
@@ -35,19 +38,19 @@ from ..model import OrjsonModel
 
 class Behaviour(OrjsonModel):
     """User Behaviour"""
-    app_defined: TrackSegments = Field(
+    app_defined: Any = Field(
         ...,
         title="Application Defined Behaviour",
         description="Mobile application standalone detection of mobility types and the segments within the journey",
         example=[]
     )
-    tpv_defined: TrackSegments = Field(
+    tpv_defined: Any = Field(
         ...,
         title="Third Party Defined Behaviour",
         description="Autonomous detection of mobility types and the segments within the journey",
         example=[]
     )
-    user_defined: TrackSegments = Field(
+    user_defined: List[TrackSegmentsInput] = Field(
         ...,
         title="User Defined Behaviour",
         description="""The users specify through the mobile app the type of mobility

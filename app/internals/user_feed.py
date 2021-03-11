@@ -38,6 +38,7 @@ from .position_alteration_detection import haversine
 from .ublox_api import get_galileo_message, get_ublox_token, get_galileo_messages_list
 from ..models.security import Authenticity
 from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
+from ..models.track import TrackSegmentsOutput
 
 
 # --------------------------------------------------------------------------------------------
@@ -239,7 +240,33 @@ async def store_android_data(
             **{
                 "app_defined_behaviour": user_feed.behaviour.app_defined,
                 "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
-                "user_defined_behaviour": user_feed.behaviour.user_defined,
+                "user_defined_behaviour": [
+                    TrackSegmentsOutput.construct(
+                        **{
+                            "start": PositionObject.construct(
+                                **{
+                                    "authenticity": behaviour.start.authenticity,
+                                    "lat": behaviour.start.lat,
+                                    "lon": behaviour.start.lon,
+                                    "partialDistance": behaviour.start.partialDistance,
+                                    "time": behaviour.start.time
+                                }
+                            ),
+                            "meters": behaviour.meters,
+                            "end": PositionObject.construct(
+                                **{
+                                    "authenticity": behaviour.end.authenticity,
+                                    "lat": behaviour.end.lat,
+                                    "lon": behaviour.end.lon,
+                                    "partialDistance": behaviour.end.partialDistance,
+                                    "time": behaviour.end.time
+                                }
+                            ),
+                            "type": behaviour.type,
+                        }
+                    )
+                    for behaviour in user_feed.behaviour.user_defined
+                ],
                 "company_code": user_feed.company_code,
                 "company_trip_type": user_feed.company_trip_type,
                 "deviceId": user_feed.id,
