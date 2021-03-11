@@ -39,6 +39,14 @@ class InputJSONExtraction(OrjsonModel):
         description="Typology of request",
         example="Partial_Mobility"
     )
+    time_window_low: str = Field(
+        description="Left time boundary",
+        example="08:00"
+    )
+    time_window_high: str = Field(
+        description="Right time boundary",
+        example="08:15"
+    )
     start_time: int = Field(
         ...,
         description="Starting time in ms",
