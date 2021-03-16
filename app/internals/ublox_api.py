@@ -31,6 +31,7 @@ import httpx
 
 # Internal
 from .logger import get_logger
+from .session import get_keycloack_session, get_ublox_api_session
 from ..config import get_ublox_api_settings
 from ..models.security import Token
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
@@ -64,55 +65,55 @@ async def get_ublox_token() -> str:
     # Get Logger
     logger = get_logger()
 
-    async with httpx.AsyncClient() as client:
+    try:
+        client = get_keycloack_session()
+        response = await client.post(
+            url=SETTINGS.token_request_url,
+            data={
+                "client_id": SETTINGS.client_id,
+                "username": SETTINGS.username_keycloak,
+                "password": SETTINGS.password,
+                "grant_type": SETTINGS.grant_type,
+                "client_secret": SETTINGS.client_secret
+            },
+            timeout=25
+        )
         try:
-            response = await client.post(
-                url=SETTINGS.token_request_url,
-                data={
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+
+            # Credentials Wrong
+            await logger.error(
+                {
+                    "method": exc.request.method,
+                    "url": exc.request.url,
                     "client_id": SETTINGS.client_id,
                     "username": SETTINGS.username_keycloak,
                     "password": SETTINGS.password,
                     "grant_type": SETTINGS.grant_type,
-                    "client_secret": SETTINGS.client_secret
-                },
-                timeout=25
-            )
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError as exc:
-
-                # Credentials Wrong
-                await logger.error(
-                    {
-                        "method": exc.request.method,
-                        "url": exc.request.url,
-                        "client_id": SETTINGS.client_id,
-                        "username": SETTINGS.username_keycloak,
-                        "password": SETTINGS.password,
-                        "grant_type": SETTINGS.grant_type,
-                        "client_secret": SETTINGS.client_secret,
-                        "status_code": exc.response.status_code,
-                        "error": exc
-                    }
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Wrong credentials"
-                )
-        except httpx.RequestError as exc:
-
-            # Can't contact keycloack
-            await logger.warning(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
+                    "client_secret": SETTINGS.client_secret,
+                    "status_code": exc.response.status_code,
                     "error": exc
                 }
             )
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Can't contact Keycloack service"
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Wrong credentials"
             )
+    except httpx.RequestError as exc:
+
+        # Can't contact keycloack
+        await logger.warning(
+            {
+                "method": exc.request.method,
+                "url": exc.request.url,
+                "error": exc
+            }
+        )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Can't contact Keycloack service"
+        )
 
     return Token.parse_raw(response.content).access_token
 
@@ -120,7 +121,6 @@ async def get_ublox_token() -> str:
 
 
 async def _get_raw_data(
-        client: httpx.AsyncClient,
         svid: int,
         timestamp: int,
         ublox_token: str,
@@ -129,7 +129,6 @@ async def _get_raw_data(
     """
     Contacts Ublox-Api and extracts raw data from the given satellite id and timestamp.
 
-    :param client: Asynchronous Http client
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
@@ -140,6 +139,7 @@ async def _get_raw_data(
     logger = get_logger()
 
     try:
+        client = get_ublox_api_session()
         response = await client.get(
             f"{url}/{svid}/{timestamp}",
             headers={
@@ -193,7 +193,6 @@ async def _get_raw_data(
 
 
 async def get_galileo_message(
-        client: httpx.AsyncClient,
         svid: int,
         timestamp: int,
         ublox_token: str,
@@ -202,7 +201,6 @@ async def get_galileo_message(
     """
     Extract a Galileo Message from a specific Ublox-Api server situated in Italy or in Sweden
 
-    :param client: Asynchronous Http client
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
@@ -211,7 +209,6 @@ async def get_galileo_message(
     """
 
     return await _get_raw_data(
-        client=client,
         svid=svid,
         timestamp=timestamp,
         ublox_token=ublox_token,
@@ -220,7 +217,6 @@ async def get_galileo_message(
 
 
 async def get_ublox_message(
-        client: httpx.AsyncClient,
         svid: int,
         timestamp: int,
         ublox_token: str,
@@ -229,7 +225,6 @@ async def get_ublox_message(
     """
     Extract a Ublox Message from a specific Ublox-Api server situated in Italy or in Sweden
 
-    :param client: Asynchronous Http client
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
@@ -238,7 +233,6 @@ async def get_ublox_message(
     """
 
     return await _get_raw_data(
-        client=client,
         svid=svid,
         timestamp=timestamp,
         ublox_token=ublox_token,
@@ -249,7 +243,6 @@ async def get_ublox_message(
 
 
 async def _get_ublox_api_list(
-        client: httpx.AsyncClient,
         ublox_token: str,
         url: str,
         data: dict,
@@ -258,7 +251,6 @@ async def _get_ublox_api_list(
     Contacts Ublox-Api and extracts a list of UbloxApi data format (timestamps and associated raw_data)
     for a specific satellite.
 
-    :param client: Asynchronous Http client
     :param ublox_token: Token to use with UbloxApi
     :param url: Url of Ublox-Api server, it could be in Italy or Sweden
     :param data: asked data
@@ -269,6 +261,7 @@ async def _get_ublox_api_list(
     logger = get_logger()
 
     try:
+        client = get_ublox_api_session()
         response = await client.post(
             url,
             json=data,
@@ -351,7 +344,6 @@ def construct_request(
 
 
 async def get_galileo_messages_list(
-        client: httpx.AsyncClient,
         svid: int,
         timestamp: int,
         ublox_token: str,
@@ -361,7 +353,6 @@ async def get_galileo_messages_list(
     Extract a list of  Galileo Messages in a range of timestamps from a specific Ublox-Api
     server situated in Italy or in Sweden
 
-    :param client: Asynchronous Http client
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
@@ -370,7 +361,6 @@ async def get_galileo_messages_list(
     """
 
     return await _get_ublox_api_list(
-        client=client,
         ublox_token=ublox_token,
         url=URL_GALILEO[location],
         data=construct_request(svid, timestamp)
@@ -378,7 +368,6 @@ async def get_galileo_messages_list(
 
 
 async def get_ublox_messages_list(
-        client: httpx.AsyncClient,
         svid: int,
         timestamp: int,
         ublox_token: str,
@@ -388,7 +377,6 @@ async def get_ublox_messages_list(
     Extract a list of  Ublox Messages in a range of timestamps from a specific Ublox-Api
     server situated in Italy or in Sweden
 
-    :param client: Asynchronous Http client
     :param svid: Satellite identifier
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
@@ -397,7 +385,6 @@ async def get_ublox_messages_list(
     """
 
     return await _get_ublox_api_list(
-        client=client,
         ublox_token=ublox_token,
         url=URL_UBLOX[location],
         data=construct_request(svid, timestamp)

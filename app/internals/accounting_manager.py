@@ -23,9 +23,6 @@ Anonymizer package
     limitations under the License.
 """
 
-# Standard Library
-from datetime import datetime
-
 # Third Party
 from fastapi import status, HTTPException
 import httpx
@@ -33,6 +30,7 @@ import orjson
 
 # Internal
 from .logger import get_logger
+from .session import get_accounting_session
 from ..models.accounting_manager import AccountingManager, Data, Obj
 from ..config import get_accounting_manager_settings
 
@@ -51,27 +49,27 @@ async def get_iota_user(user: str) -> dict:
 
     settings = get_accounting_manager_settings()
 
-    async with httpx.AsyncClient() as client:
-        try:
-            response: httpx.AsyncClient() = await client.get(
-                f"{settings.accounting_ip}{settings.accounting_get_uri}",
-                params={"user": user},
-                timeout=25
-            )
-        except httpx.RequestError as exc:
-            # Something went wrong during the connection
-            await logger.debug(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "error": exc
-                }
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Can't contact IoTa service"
-            )
-        return orjson.loads(response.content)
+    try:
+        client = get_accounting_session()
+        response = await client.get(
+            f"{settings.accounting_ip}{settings.accounting_get_uri}",
+            params={"user": user},
+            timeout=25
+        )
+    except httpx.RequestError as exc:
+        # Something went wrong during the connection
+        await logger.debug(
+            {
+                "method": exc.request.method,
+                "url": exc.request.url,
+                "error": exc
+            }
+        )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Can't contact IoTa service"
+        )
+    return orjson.loads(response.content)
 
 
 async def store_in_iota(
@@ -110,40 +108,41 @@ async def store_in_iota(
 
     settings = get_accounting_manager_settings()
 
-    async with httpx.AsyncClient() as client:
-        try:
-            await client.post(
-                f"{settings.accounting_ip}{settings.accounting_store_uri}",
-                json=AccountingManager(
-                    target=source_app,
-                    data=Data(
-                        AppObj=Obj(
-                            client_id=client_id,
-                            user_id=user_id,
-                            msg_id=msg_id,
-                            msg_size=msg_size,
-                            msg_time=msg_time,
-                            msg_malicious_position=msg_malicious_position,
-                            msg_authenticated_position=msg_authenticated_position,
-                            msg_unknown_position=msg_unknown_position,
-                            msg_total_position=msg_total_position,
-                            msg_error=msg_error,
-                            msg_error_description=msg_error_description
-                        )
+    try:
+        client = get_accounting_session()
+        await client.post(
+            f"{settings.accounting_ip}{settings.accounting_store_uri}",
+            json=AccountingManager(
+                target=source_app,
+                data=Data(
+                    AppObj=Obj(
+                        client_id=client_id,
+                        user_id=user_id,
+                        msg_id=msg_id,
+                        msg_size=msg_size,
+                        msg_time=msg_time,
+                        msg_malicious_position=msg_malicious_position,
+                        msg_authenticated_position=msg_authenticated_position,
+                        msg_unknown_position=msg_unknown_position,
+                        msg_total_position=msg_total_position,
+                        msg_error=msg_error,
+                        msg_error_description=msg_error_description
                     )
-                ).jsonify(),
-                timeout=25
-            )
+                )
+            ).jsonify(),
+            timeout=25
+        )
 
-        except httpx.RequestError as exc:
-            # Something went wrong during the connection
-            await logger.warning(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "error": exc
-                }
-            )
-        finally:
-            return
+    except httpx.RequestError as exc:
+        # Something went wrong during the connection
+        await logger.warning(
+            {
+                "method": exc.request.method,
+                "url": exc.request.url,
+                "error": exc
+            }
+        )
+    finally:
+        return
+
 

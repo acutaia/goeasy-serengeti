@@ -29,7 +29,6 @@ import time
 
 # Third Party
 from fastapi import HTTPException
-import httpx
 
 # Internal
 from .accounting_manager import store_in_iota
@@ -85,13 +84,48 @@ async def end_to_end_position_authentication(
     not_authentic_number = 0
     unknown_number = 0
 
-    async with httpx.AsyncClient(verify=False) as client:
-        for gnss in iot_input.result.gnss:
-            galileo_auth_number += 1
+    # Check the positions
+    for gnss in iot_input.result.gnss:
+        galileo_auth_number += 1
+
+        try:
+            galileo_data = await get_ublox_message(
+                gnss.svid,
+                iot_time,
+                ublox_token,
+                location
+            )
+        except HTTPException as exc:
+            await store_in_iota(
+                source_app=source_app,
+                client_id=client_id,
+                user_id=user_id,
+                msg_id=obesrvation_gepid,
+                msg_size=0,
+                msg_time=timestamp,
+                msg_malicious_position=0,
+                msg_authenticated_position=0,
+                msg_unknown_position=0,
+                msg_total_position=0,
+                msg_error=True,
+                msg_error_description=exc.detail
+            )
+
+            raise exc
+
+        if galileo_data is None:
+            unknown_number += 1
+
+        elif galileo_data == gnss.raw_data:
+            authentic_number += 1
+
+        else:
+            not_authentic_number += 1
+            not_authentic = True
 
             try:
-                galileo_data = await get_ublox_message(
-                    client,
+                # Remake the request
+                galileo_data_list = await get_ublox_messages_list(
                     gnss.svid,
                     iot_time,
                     ublox_token,
@@ -99,79 +133,42 @@ async def end_to_end_position_authentication(
                 )
             except HTTPException as exc:
                 await store_in_iota(
-                        source_app=source_app,
-                        client_id=client_id,
-                        user_id=user_id,
-                        msg_id=obesrvation_gepid,
-                        msg_size=0,
-                        msg_time=timestamp,
-                        msg_malicious_position=0,
-                        msg_authenticated_position=0,
-                        msg_unknown_position=0,
-                        msg_total_position=0,
-                        msg_error=True,
-                        msg_error_description=exc.detail
-                    )
-
+                    source_app=source_app,
+                    client_id=client_id,
+                    user_id=user_id,
+                    msg_id=obesrvation_gepid,
+                    msg_size=0,
+                    msg_time=timestamp,
+                    msg_malicious_position=0,
+                    msg_authenticated_position=0,
+                    msg_unknown_position=0,
+                    msg_total_position=0,
+                    msg_error=True,
+                    msg_error_description=exc.detail
+                )
                 raise exc
 
-            if galileo_data is None:
-                unknown_number += 1
+            for data in galileo_data_list:
+                if data.raw_data == gnss.raw_data:
+                    authentic_number += 1
+                    not_authentic_number -= 1
+                    not_authentic = False
+                    break
 
-            elif galileo_data == gnss.raw_data:
-                authentic_number += 1
-
-            else:
-                not_authentic_number += 1
-                not_authentic = True
-
-                try:
-                    # Remake the request
-                    galileo_data_list = await get_ublox_messages_list(
-                        client,
-                        gnss.svid,
-                        iot_time,
-                        ublox_token,
-                        location
-                    )
-                except HTTPException as exc:
-                    await store_in_iota(
-                            source_app=source_app,
-                            client_id=client_id,
-                            user_id=user_id,
-                            msg_id=obesrvation_gepid,
-                            msg_size=0,
-                            msg_time=timestamp,
-                            msg_malicious_position=0,
-                            msg_authenticated_position=0,
-                            msg_unknown_position=0,
-                            msg_total_position=0,
-                            msg_error=True,
-                            msg_error_description=exc.detail
-                        )
-                    raise exc
-
-                for data in galileo_data_list:
-                    if data.raw_data == gnss.raw_data:
-                        authentic_number += 1
-                        not_authentic_number -= 1
-                        not_authentic = False
-                        break
-
-                if not_authentic:
-                    await logger.warning(
-                        {
-                            "message_timestamp": iot_time,
-                            "ublox_message": gnss.raw_data,
-                            "satellite_id": gnss.svid,
-                            "status": "Real Fake",
-                            "ublox_api_messages": [
-                                ublox_api.dict()
-                                for ublox_api in galileo_data_list
-                            ]
-                        }
-                    )
-                break
+            if not_authentic:
+                await logger.warning(
+                    {
+                        "message_timestamp": iot_time,
+                        "ublox_message": gnss.raw_data,
+                        "satellite_id": gnss.svid,
+                        "status": "Real Fake",
+                        "ublox_api_messages": [
+                            ublox_api.dict()
+                            for ublox_api in galileo_data_list
+                        ]
+                    }
+                )
+            break
 
     if not_authentic_number > 0:
         authenticity = Authenticity.not_authentic

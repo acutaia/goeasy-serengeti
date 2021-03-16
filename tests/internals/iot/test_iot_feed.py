@@ -24,7 +24,6 @@ Tests app.internals.iot module
 """
 
 # Standard Library
-import asyncio
 import os
 import time
 
@@ -58,18 +57,12 @@ from tests.mock.ublox_api.constants import (
 )
 
 from tests.mock.accounting_manager.iota import correct_store_in_iota
+from .constants import IOT_INPUT_PATH
 from ..logger import disable_logger
 
 # ---------------------------------------------------------------------------------------------
 
-with open(
-        os.path.join(
-            os.path.abspath(
-                os.path.dirname(__file__)
-            ), "fake_iot_feed.json"
-        ),
-        "r"
-) as fp:
+with open(IOT_INPUT_PATH, "r") as fp:
     IOT_INPUT = IotInput.parse_raw(fp.read())
     """IotInput Data"""
 

@@ -24,7 +24,6 @@ Tests app.internals.user_feed module
 """
 
 # Standard Library
-import os
 import time
 
 # Test
@@ -67,18 +66,12 @@ from tests.mock.ublox_api.constants import (
 
 from tests.mock.accounting_manager.iota import correct_store_in_iota
 from tests.mock.anonymizer.anonengine import correct_store_user_in_the_anonengine
+from .constants import USER_INPUT_PATH
 from ..logger import disable_logger
 
 # ---------------------------------------------------------------------------------------------
 
-with open(
-        os.path.join(
-            os.path.abspath(
-                os.path.dirname(__file__)
-            ), "fake_user_feed.json"
-        ),
-        "r"
-) as fp:
+with open(USER_INPUT_PATH, "r") as fp:
     USER_INPUT = UserFeedInput.parse_raw(fp.read())
     """UserFeedInput Data"""
 
