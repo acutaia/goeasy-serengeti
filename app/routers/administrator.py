@@ -58,7 +58,7 @@ async def extract_user(source_app: SourceApp):
     encountered anomalies and unauthorized services requests.\n
     Within the API boundaries, it is possible to parametrize requests by selecting specific sources of interests.\n
     The following diagram shows the final software design of the accounting data extraction service.\n
-    ![image](https:/static/administrator.png)
+    ![image](https:/serengeti//static/administrator.png)
     """
     return await get_iota_user(source_app.value)
 

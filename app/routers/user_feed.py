@@ -76,7 +76,7 @@ async def authenticate(
     The latitude and longitude of the list of positions received are extracted at run-time
     by the Reference System Manager library and exploited for the proper selection of the
     U-Blox Reference System instance.\n
-    ![image](https:/static/user_feed_authenticate.png)
+    ![image](https:/serengeti/static/user_feed_authenticate.png)
     """
     # Analyze requester
     if requester.client == "get_token_client" and requester.user == "goeasy_bq_library":
@@ -117,7 +117,7 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     The current feature is enabled for testing purposes and for those scenarios where data is already stored on
     the cloud, and the main interests are linked on providing additional information for data trustiness.\n
     The following diagram shows the final software design of the authentication service.\n
-    ![image](https:/static/user_feed_authenticate_test.png)
+    ![image](https:/serengeti/static/user_feed_authenticate_test.png)
     """
     return await end_to_end_position_authentication(
         user_feed=user_feed,
