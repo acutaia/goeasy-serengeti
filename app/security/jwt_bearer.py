@@ -27,7 +27,6 @@ jwt signature module
 from typing import List, Optional, Union
 
 # Third Party
-from aiologger.loggers.json import JsonLogger
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
@@ -36,7 +35,6 @@ from jose import jwt, JWTError
 from ..internals.logger import get_logger
 from ..config import get_security_settings
 from ..models.security import Requester
-
 
 # ----------------------------------------------------------------------------------------
 
