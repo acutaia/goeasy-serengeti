@@ -42,8 +42,9 @@ from app.internals.session import (
     get_accounting_session,
     get_ublox_api_session
 )
-from .internals.logger import disable_logger
 from .internals.iot.constants import IOT_INPUT_PATH
+from .internals.logger import disable_logger
+from .internals.user_feed.constants import USER_INPUT_PATH
 from .security.model import Azp, UserName, RolesEnum
 from .security.token import change_default_security_settings, generate_fake_token, generate_valid_token
 from .mock.accounting_manager.iota import correct_get_iota_user, correct_store_in_iota
@@ -175,7 +176,7 @@ class TestIoT:
         with TestClient(app) as client:
             # Try to use an invalid token
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getMobility",
+                "http://serengeti/api/v1/goeasy/IoTauthenticate",
                 headers={
                     "Authorization": f"Bearer {invalid_token}"
                 },
@@ -185,7 +186,7 @@ class TestIoT:
 
             # Try to use a valid token but without the requested role
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getMobility",
+                "http://serengeti/api/v1/goeasy/IoTauthenticate",
                 headers={
                     "Authorization": f"Bearer {valid_token_role_not_present}"
                 },
@@ -195,7 +196,7 @@ class TestIoT:
 
             # Try to use an invalid Authorization method in the header
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/IoTauthenticate",
+                "http://serengeti/api/v1/goeasy/IoTauthenticate",
                 headers={
                     "Authorization": f"FAKE {invalid_token}"
                 },
@@ -366,3 +367,169 @@ class TestJourney:
             valid_token_role_not_present=valid_token_role_not_present
         )
 
+
+class TestUser:
+    """Test User router"""
+
+    @respx.mock
+    def test_authenticate_test(self):
+        """Test the behaviour of  iot authentication endpoint"""
+
+        # Setup
+        clear_test()
+        with open(USER_INPUT_PATH, "r") as fp:
+            USER_INPUT = orjson.loads(fp.read())
+
+        # Mock the request
+        correct_get_blox_token()
+        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        #correct_store_in_iota()
+
+        # Obtain tokens
+        invalid_token = generate_fake_token()
+        valid_token = generate_valid_token(realm=RolesEnum.test)
+        valid_token_role_not_present = generate_valid_token(realm=RolesEnum.fake)
+
+        with TestClient(app) as client:
+            # Try to use an invalid token
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate/test",
+                headers={
+                    "Authorization": f"Bearer {invalid_token}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use a valid token but without the requested role
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token_role_not_present}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use an invalid Authorization method in the header
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate/test",
+                headers={
+                    "Authorization": f"FAKE {invalid_token}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+
+            # Use a valid token with the requester set to test
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_200_OK
+            # we don't check the response value cause we've already tested end_to_end authentication
+
+            # Use a valid token with a wrong body
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token}"
+                },
+                json={"Wrong": "Body"}
+            )
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        clear_test()
+
+    @respx.mock
+    def test_authenticate(self):
+        """Test the behaviour of the authenticate endpoint"""
+
+        # Setup
+        clear_test()
+        with open(USER_INPUT_PATH, "r") as fp:
+            USER_INPUT = orjson.loads(fp.read())
+
+        # Mock the request
+        correct_get_blox_token()
+        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_store_in_iota()
+        correct_store_user_in_the_anonengine()
+
+        # Obtain tokens
+        invalid_token = generate_fake_token()
+        valid_token_requester_test = generate_valid_token(realm=RolesEnum.user)
+        valid_token_requester_apes_mobility = generate_valid_token(
+            realm=RolesEnum.user,
+            client=Azp.get_token_client,
+            user_name=UserName.goeasy_bq_library
+        )
+        valid_token_role_not_present = generate_valid_token(realm=RolesEnum.fake)
+
+        with TestClient(app) as client:
+            # Try to use an invalid token
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"Bearer {invalid_token}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use a valid token but without the requested role
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"Bearer {valid_token_role_not_present}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use an invalid Authorization method in the header
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"FAKE {invalid_token}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+
+            # Use a valid token with the requester set to test
+            response = client.post(
+                f"http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"Bearer {valid_token_requester_test}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_200_OK
+            # we don't check the response value cause we've already tested end_to_end authentication
+
+            # Use a valid token with the requester set to apes_mobility
+            response = client.post(
+                f"http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"Bearer {valid_token_requester_apes_mobility}"
+                },
+                json=USER_INPUT
+            )
+            assert response.status_code == status.HTTP_200_OK
+            # we don't check the response value cause we've already tested end_to_end authentication
+
+            # Use a valid token with a wrong body
+            response = client.post(
+                f"http://serengeti/api/v1/goeasy/authenticate",
+                headers={
+                    "Authorization": f"Bearer {valid_token_requester_test}"
+                },
+                json={"Wrong": "Body"}
+            )
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        clear_test()
