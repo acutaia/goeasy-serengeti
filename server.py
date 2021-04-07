@@ -34,7 +34,7 @@ from app.main import app
 
 
 class GunicornSettings(BaseSettings):
-    loglevel: str
+    log_level: str
     cores_number: int
     keep_alive: int
     server_port: int
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         "bind": f"0.0.0.0:{settings.server_port}",
         "workers": (settings.cores_number * 2) + 1,
         "keepalive": settings.keep_alive,
-        "loglevel": settings.loglevel,
+        "loglevel": settings.log_level,
         "accesslog": "-",
         "errorlog": "-",
         "worker_class": "uvicorn.workers.UvicornWorker",

@@ -4,3 +4,4 @@ python-jose[cryptography]
 gunicorn>=20.0.4
 Cython>=0.29.22
 aiologger>=0.6.0
+aiohttp[speedups]

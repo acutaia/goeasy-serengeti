@@ -48,13 +48,27 @@ def get_security_settings() -> SecuritySettings:
 
 # -------------------------------------------------------------------
 
-class UbloxApiSettings(BaseSettings):
+class KeycloackSettings(BaseSettings):
     token_request_url: str
     client_id: str
     username_keycloak: str
     password: str
     grant_type: str
     client_secret: str
+
+    class Config:
+        env_file = ".env"
+
+
+@lru_cache(maxsize=1)
+def get_keycloack_settings() -> KeycloackSettings:
+    return KeycloackSettings()
+
+# -------------------------------------------------------------------
+
+
+class UbloxApiSettings(BaseSettings):
+    meaconing_threshold: int
     ublox_api_italy_ip: str
     ublox_api_sweden_ip: str
     ublox_api_ublox_uri: str
@@ -77,7 +91,8 @@ def get_ublox_api_settings() -> UbloxApiSettings:
 class AnonymizerSettings(BaseSettings):
     get_mobility_url: str
     get_details_url: str
-    store_data_url: str
+    store_user_data_url: str
+    store_iot_data_url: str
 
     class Config:
         env_file = ".env"
@@ -104,3 +119,10 @@ def get_accounting_manager_settings() -> AccountingManagerSettings:
     return AccountingManagerSettings()
 
 # -------------------------------------------------------------------
+
+
+class LoggerSettings(BaseSettings):
+    log_level: str
+
+    class Config:
+        env_file = ".env"

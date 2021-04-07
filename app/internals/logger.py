@@ -22,17 +22,31 @@ Logger package
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
 # Standard Library
 from functools import lru_cache
 
 # Third Party
-from aiologger.loggers.json import JsonLogger, Logger
+from aiologger.loggers.json import JsonLogger, Logger, LogLevel
+from pydantic import BaseSettings
+
+# ---------------------------------------------------------------------
+
+
+class LoggerSettings(BaseSettings):
+    log_level: str
+
+    class Config:
+        env_file = ".env"
 
 
 @lru_cache(maxsize=1)
 def get_logger() -> Logger:
     """Instantiate app logger"""
+    settings = LoggerSettings()
+
     return JsonLogger.with_default_handlers(
         name="serengeti",
-        serializer_kwargs={"indent": 4}
+        level=getattr(LogLevel, settings.log_level, LogLevel.DEBUG),
+        serializer_kwargs={"indent": 4},
     )

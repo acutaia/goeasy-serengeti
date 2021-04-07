@@ -3,6 +3,8 @@
     <words>
       <w>accellerometer</w>
       <w>accesslog</w>
+      <w>aioresponse</w>
+      <w>aioresponses</w>
       <w>andoid</w>
       <w>anonengine</w>
       <w>anonymizer</w>
@@ -26,6 +28,7 @@
       <w>httpx</w>
       <w>iotauthenticate</w>
       <w>keycloack</w>
+      <w>meaconing</w>
       <w>msgid</w>
       <w>obesrvation</w>
       <w>openapi</w>
