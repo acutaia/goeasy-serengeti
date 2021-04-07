@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Constants for mock Anonymizer http requests
+Constants for mock Keycloack http requests
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -24,25 +24,17 @@ Constants for mock Anonymizer http requests
 """
 
 # Internal
-from app.config import get_anonymizer_settings
+from app.internals.keycloak import get_keycloack_settings
 
 # ---------------------------------------------------------------------------------------
 
-SETTINGS = get_anonymizer_settings()
-""" Anonymizer Settings """
+SETTINGS = get_keycloack_settings()
+"""Keycloack Settings"""
 
+FAKE_TOKEN_FOR_TESTING = """eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFuZ2VsbyBDdXRhaWEiLCJpYXQiOjE1MTYyMzkwMjJ9.
+anXoSMyh61_O4KZXlffg6-09WkXzW18lrOAbxjol6Z4"""
+""" Token generated just for testing """
 
-URL_STORE_USER_DATA = SETTINGS.store_user_data_url
-""" Url to store user data in the anonymizer """
-
-URL_STORE_IOT_DATA = SETTINGS.store_iot_data_url
-""" Url to store user data in the anonymizer """
-
-URL_EXTRACT_MOBILITY = SETTINGS.get_mobility_url
-""" Url to extract mobility data from the anonymizer """
-
-URL_EXTRACT_DETAILS = SETTINGS.get_details_url
-""" Url to extract details from the anonymizer """
-
-MOCKED_RESPONSE = {"Foo": "Bar"}
-""" Mocked Response """
+TOKEN_REQUEST_URL = SETTINGS.token_request_url
+""" Url to request a token to keycloak"""

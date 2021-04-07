@@ -1,5 +1,5 @@
 """
-Mocked Ublox Api http requests
+Mocked keycloack http requests
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -23,9 +23,10 @@ Mocked Ublox Api http requests
 """
 
 # Third Party
+from aiohttp import ServerTimeoutError
+from aioresponses import aioresponses
 from fastapi import status
-from httpx import Response, RequestError
-import respx
+import orjson
 
 # Internal
 from .constants import FAKE_TOKEN_FOR_TESTING, TOKEN_REQUEST_URL
@@ -33,31 +34,46 @@ from .constants import FAKE_TOKEN_FOR_TESTING, TOKEN_REQUEST_URL
 # ----------------------------------------------------------------------------------------------
 
 
-def correct_get_blox_token():
+def correct_get_blox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
-    respx.post(TOKEN_REQUEST_URL).mock(
-        return_value=Response(
-            status_code=status.HTTP_200_OK,
-            json={
+    m.post(
+        TOKEN_REQUEST_URL,
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(
+            {
                 "access_token": FAKE_TOKEN_FOR_TESTING
             }
-        )
+        ).decode()
     )
 
 
-def unauthorized_get_ublox_token():
+def new_correct_get_blox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
-    respx.post(TOKEN_REQUEST_URL).mock(
-        return_value=Response(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+    m.post(
+        TOKEN_REQUEST_URL,
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(
+            {
+                "access_token": "NEW_TOKEN"
+            }
+        ).decode()
     )
 
 
-def unreachable_get_ublox_token():
+def unauthorized_get_ublox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
-    respx.post(TOKEN_REQUEST_URL).mock(side_effect=RequestError)
+
+    m.post(
+        TOKEN_REQUEST_URL,
+        status=status.HTTP_401_UNAUTHORIZED
+    )
 
 
+def unreachable_get_ublox_token(m: aioresponses):
+    """Mock the request made to keycloack to obtain a valid token"""
+    m.post(
+        TOKEN_REQUEST_URL,
+        exception=ServerTimeoutError("Timeout")
+    )
 
 

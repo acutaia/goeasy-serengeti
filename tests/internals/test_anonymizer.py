@@ -30,7 +30,7 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.anonymizer import store_user_in_the_anonengine, extract_details, extract_mobility
+from app.internals.anonymizer import store_in_the_anonengine, extract_details, extract_mobility
 from .logger import disable_logger
 from ..mock.anonymizer.constants import MOCKED_RESPONSE
 from ..mock.anonymizer.anonengine import (
@@ -70,12 +70,12 @@ class TestAnonengine:
 
         # Mock the request
         correct_store_user_in_the_anonengine()
-        assert await store_user_in_the_anonengine({"Foo": "Bar"}) is None, "We aren't interested in the response"
+        assert await store_in_the_anonengine({"Foo": "Bar"}, "store_user_data_url") is None, "We aren't interested in the response"
 
         with pytest.raises(HTTPException):
             # Mock the request
             unreachable_store_user_in_the_anonengine()
-            await store_user_in_the_anonengine({"Foo": "Bar"})
+            await store_in_the_anonengine({"Foo": "Bar"}, "store_user_data_url")
 
     @respx.mock
     @pytest.mark.asyncio

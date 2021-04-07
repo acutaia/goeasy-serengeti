@@ -26,13 +26,14 @@ Mocked Ublox Api http post requests
 from typing import Optional
 
 # Third Party
+from aioresponses import aioresponses
 from fastapi import status
 from httpx import Response, RequestError
 import respx
 
 # Internal
 from .constants import TIMESTAMP, SvID
-from .get_token import correct_get_blox_token
+from ..keycloack.keycloack import correct_get_blox_token
 
 # ----------------------------------------------------------------------------------------------
 
@@ -61,16 +62,17 @@ def correct_get_ublox_api_list(url: str, raw_data: Optional[str]):
     )
 
 
-def token_expired_get_ublox_api_list(url: str, raw_data: Optional[str]):
+def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Optional[str]):
     """
     Mock the behaviour in case of token expired
 
+    :param m: aioresponses mock
     :param url: Galileo or Ublox
     :param raw_data: data that we want to receive
     :return:
     """
 
-    correct_get_blox_token()
+    correct_get_blox_token(m)
     route = respx.post(url)
     route.side_effect = [
         Response(

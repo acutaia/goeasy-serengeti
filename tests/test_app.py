@@ -26,7 +26,9 @@ Test app
 import uuid
 
 # Test
+from aioresponses import aioresponses
 from fastapi.testclient import TestClient
+import pytest
 import respx
 
 # Third Party
@@ -37,7 +39,6 @@ from fastapi import status
 from app.main import app
 from app.models.admin import SourceApp
 from app.internals.session import (
-    get_keycloack_session,
     get_anonymizer_session,
     get_accounting_session,
     get_ublox_api_session
@@ -60,9 +61,15 @@ from .mock.ublox_api.constants import (
     URL_GET_GALILEO
 )
 from .mock.ublox_api.get_raw_data import correct_get_raw_data
-from .mock.ublox_api.get_token import correct_get_blox_token
+from .mock.keycloack.keycloack import correct_get_blox_token
 
 # ---------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def mock_aioresponse():
+    with aioresponses() as m:
+        yield m
 
 
 def clear_test():
@@ -70,7 +77,6 @@ def clear_test():
     disable_logger()
     change_default_security_settings()
     get_ublox_api_session.cache_clear()
-    get_keycloack_session.cache_clear()
     get_anonymizer_session.cache_clear()
     get_accounting_session.cache_clear()
 
@@ -150,7 +156,7 @@ class TestIoT:
     """Test IoT router"""
 
     @respx.mock
-    def test_iot_authentication(self):
+    def test_iot_authentication(self, mock_aioresponse):
         """Test the behaviour of  iot authentication endpoint"""
 
         # Setup
@@ -159,7 +165,7 @@ class TestIoT:
             IOT_INPUT = orjson.loads(fp.read())
 
         # Mock the request
-        correct_get_blox_token()
+        correct_get_blox_token(mock_aioresponse)
         correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
 
@@ -372,7 +378,7 @@ class TestUser:
     """Test User router"""
 
     @respx.mock
-    def test_authenticate_test(self):
+    def test_authenticate_test(self, mock_aioresponse):
         """Test the behaviour of  iot authentication endpoint"""
 
         # Setup
@@ -381,9 +387,8 @@ class TestUser:
             USER_INPUT = orjson.loads(fp.read())
 
         # Mock the request
-        correct_get_blox_token()
+        correct_get_blox_token(mock_aioresponse)
         correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
-        #correct_store_in_iota()
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -445,7 +450,7 @@ class TestUser:
         clear_test()
 
     @respx.mock
-    def test_authenticate(self):
+    def test_authenticate(self, mock_aioresponse):
         """Test the behaviour of the authenticate endpoint"""
 
         # Setup
@@ -454,7 +459,7 @@ class TestUser:
             USER_INPUT = orjson.loads(fp.read())
 
         # Mock the request
-        correct_get_blox_token()
+        correct_get_blox_token(mock_aioresponse)
         correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
         correct_store_user_in_the_anonengine()

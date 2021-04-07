@@ -29,13 +29,16 @@ import time
 
 # Third Party
 from fastapi import HTTPException
+import orjson
 
 # Internal
 from .accounting_manager import store_in_iota
+from .anonymizer import store_in_the_anonengine
+from .keycloak import KEYCLOACK
 from .logger import get_logger
 from .position_alteration_detection import haversine
-from .ublox_api import get_ublox_message, get_ublox_token, get_ublox_messages_list
-from ..models.iot_feed.iot import IotInput, IotOutput, ResultOutput
+from .ublox_api import get_ublox_message, get_ublox_messages_list
+from ..models.iot_feed.iot import IotInput
 from ..models.security import Authenticity
 
 
@@ -46,11 +49,12 @@ async def end_to_end_position_authentication(
         iot_input: IotInput,
         timestamp: float,
         host: str,
-        source_app: str,
-        client_id: str,
-        user_id: str,
-        obesrvation_gepid: str
-) -> IotOutput:
+        source_app: str = "TEST",
+        client_id: str = "TEST",
+        user_id: str = "TEST",
+        obesrvation_gepid: str = "TEST",
+        store: bool = False
+) -> dict:
     """
     Contact Ublox-API and validate IoT data
 
@@ -61,13 +65,14 @@ async def end_to_end_position_authentication(
     :param client_id: client_id expressed by the token
     :param user_id: user_id expressed by the token
     :param obesrvation_gepid: uuid4 associated to the observation
+    :param store: flag used to store data
     :return: data validated
     """
     # Get Logger
     logger = get_logger()
 
     # Get Ublox-APi token
-    ublox_token = await get_ublox_token()
+    ublox_token = await KEYCLOACK.get_ublox_token()
 
     # Extract timestamp
     iot_time = int(iot_input.phenomenonTime.timestamp()*1000)
@@ -96,20 +101,21 @@ async def end_to_end_position_authentication(
                 location
             )
         except HTTPException as exc:
-            await store_in_iota(
-                source_app=source_app,
-                client_id=client_id,
-                user_id=user_id,
-                msg_id=obesrvation_gepid,
-                msg_size=0,
-                msg_time=timestamp,
-                msg_malicious_position=0,
-                msg_authenticated_position=0,
-                msg_unknown_position=0,
-                msg_total_position=0,
-                msg_error=True,
-                msg_error_description=exc.detail
-            )
+            if store:
+                await store_in_iota(
+                    source_app=source_app,
+                    client_id=client_id,
+                    user_id=user_id,
+                    msg_id=obesrvation_gepid,
+                    msg_size=0,
+                    msg_time=timestamp,
+                    msg_malicious_position=0,
+                    msg_authenticated_position=0,
+                    msg_unknown_position=0,
+                    msg_total_position=0,
+                    msg_error=True,
+                    msg_error_description=exc.detail
+                )
 
             raise exc
 
@@ -132,20 +138,21 @@ async def end_to_end_position_authentication(
                     location
                 )
             except HTTPException as exc:
-                await store_in_iota(
-                    source_app=source_app,
-                    client_id=client_id,
-                    user_id=user_id,
-                    msg_id=obesrvation_gepid,
-                    msg_size=0,
-                    msg_time=timestamp,
-                    msg_malicious_position=0,
-                    msg_authenticated_position=0,
-                    msg_unknown_position=0,
-                    msg_total_position=0,
-                    msg_error=True,
-                    msg_error_description=exc.detail
-                )
+                if store:
+                    await store_in_iota(
+                        source_app=source_app,
+                        client_id=client_id,
+                        user_id=user_id,
+                        msg_id=obesrvation_gepid,
+                        msg_size=0,
+                        msg_time=timestamp,
+                        msg_malicious_position=0,
+                        msg_authenticated_position=0,
+                        msg_unknown_position=0,
+                        msg_total_position=0,
+                        msg_error=True,
+                        msg_error_description=exc.detail
+                    )
                 raise exc
 
             for data in galileo_data_list:
@@ -188,28 +195,62 @@ async def end_to_end_position_authentication(
             "analysis_time": f"{time.time() - timestamp}"
         }
     )
+    if store:
+        await store_in_iota(
+                source_app=source_app,
+                client_id=client_id,
+                user_id=user_id,
+                msg_id=obesrvation_gepid,
+                msg_size=sys.getsizeof(iot_input.json()),
+                msg_time=timestamp,
+                msg_malicious_position=not_authentic_number,
+                msg_authenticated_position=authentic_number,
+                msg_unknown_position=unknown_number,
+                msg_total_position=galileo_auth_number
 
-    await store_in_iota(
+            )
+
+    iot_output = iot_input.dict(exclude={"result": {"gnss"}})
+    iot_output["result"].update({"authenticity": authenticity})
+    iot_output.update({"observationGEPid": obesrvation_gepid})
+
+    return iot_output
+
+
+async def store_iot_data(
+        iot_input: IotInput,
+        timestamp: float,
+        host: str,
+        obesrvation_gepid: str,
+        source_app: str,
+        client_id: str,
+        user_id: str
+) -> None:
+    """
+    Store IoT data in the anonymizer
+
+    :param iot_input: data to validate
+    :param timestamp: when the request was received
+    :param host: who made the request
+    :param obesrvation_gepid: uuid4 associated to the request
+    :param source_app: app that made the request
+    :param client_id: client_id expressed by the token
+    :param user_id: user_id expressed by the token
+    """
+    try:
+        iot_output = await end_to_end_position_authentication(
+            iot_input=iot_input,
+            timestamp=timestamp,
+            host=host,
+            obesrvation_gepid=obesrvation_gepid,
             source_app=source_app,
             client_id=client_id,
             user_id=user_id,
-            msg_id=obesrvation_gepid,
-            msg_size=sys.getsizeof(iot_input.json()),
-            msg_time=timestamp,
-            msg_malicious_position=not_authentic_number,
-            msg_authenticated_position=authentic_number,
-            msg_unknown_position=unknown_number,
-            msg_total_position=galileo_auth_number
-
+            store=False
         )
 
-    iot_input_dict = iot_input.dict()
-    iot_input_dict["result"] = ResultOutput(
-        valueType=iot_input.result.valueType,
-        Position=iot_input.result.Position,
-        response=iot_input.result.response,
-        authenticity=authenticity
-    ).dict()
-    iot_input_dict.update({"observationGEPid": obesrvation_gepid})
+        await store_in_the_anonengine(orjson.dumps(iot_output).decode("utf-8"), "store_iot_data_url")
+    except Exception as ex:
+        print(ex)
+        return
 
-    return IotOutput.construct(**iot_input_dict)

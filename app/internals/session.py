@@ -40,12 +40,6 @@ def get_ublox_api_session() -> AsyncClient:
 
 
 @lru_cache(maxsize=1)
-def get_keycloack_session() -> AsyncClient:
-    """Instantiate KeycloackSession"""
-    return AsyncClient()
-
-
-@lru_cache(maxsize=1)
 def get_accounting_session() -> AsyncClient:
     """Instantiate AccountingSession"""
     return AsyncClient()
@@ -60,7 +54,6 @@ def get_anonymizer_session() -> AsyncClient:
 def instantiate_all_sessions():
     """instantiate all sessions included in serengeti"""
     get_ublox_api_session()
-    get_keycloack_session()
     get_accounting_session()
     get_anonymizer_session()
 
@@ -68,6 +61,5 @@ def instantiate_all_sessions():
 async def close_all_sessions():
     """Close all instantiated sessions"""
     await get_ublox_api_session().aclose()
-    await get_keycloack_session().aclose()
     await get_accounting_session().aclose()
     await get_anonymizer_session().aclose()

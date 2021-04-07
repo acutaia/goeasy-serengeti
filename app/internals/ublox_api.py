@@ -24,16 +24,17 @@ Ublox-Api package
 """
 # Standard Library
 from typing import Optional, List
+from time import time
 
 # Third Party
 from fastapi import status, HTTPException
 import httpx
 
 # Internal
+from .keycloak import KEYCLOACK
 from .logger import get_logger
-from .session import get_keycloack_session, get_ublox_api_session
+from .session import get_ublox_api_session
 from ..config import get_ublox_api_settings
-from ..models.security import Token
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
 
 # --------------------------------------------------------------------------------------------
@@ -52,70 +53,6 @@ URL_GALILEO = {
     "Sweden": f"{SETTINGS.ublox_api_sweden_ip}{SETTINGS.ublox_api_galileo_uri}"
 }
 """ Italian and Swedish url for getting galileo messages """
-
-# --------------------------------------------------------------------------------------------
-
-
-async def get_ublox_token() -> str:
-    """
-    Obtain a valid token to communicate with Ublox-Api
-
-    :return: UbloxApi valid token
-    """
-    # Get Logger
-    logger = get_logger()
-
-    try:
-        client = get_keycloack_session()
-        response = await client.post(
-            url=SETTINGS.token_request_url,
-            data={
-                "client_id": SETTINGS.client_id,
-                "username": SETTINGS.username_keycloak,
-                "password": SETTINGS.password,
-                "grant_type": SETTINGS.grant_type,
-                "client_secret": SETTINGS.client_secret
-            },
-            timeout=25
-        )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as exc:
-
-            # Credentials Wrong
-            await logger.error(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "client_id": SETTINGS.client_id,
-                    "username": SETTINGS.username_keycloak,
-                    "password": SETTINGS.password,
-                    "grant_type": SETTINGS.grant_type,
-                    "client_secret": SETTINGS.client_secret,
-                    "status_code": exc.response.status_code,
-                    "error": exc
-                }
-            )
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Wrong credentials"
-            )
-    except httpx.RequestError as exc:
-
-        # Can't contact keycloack
-        await logger.warning(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
-        )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Keycloack service"
-        )
-
-    return Token.parse_raw(response.content).access_token
 
 # --------------------------------------------------------------------------------------------
 
@@ -145,7 +82,7 @@ async def _get_raw_data(
             headers={
                 "Authorization": f"Bearer {ublox_token}"
             },
-            timeout=10
+            timeout=60
         )
         try:
             # Check if the token is expired
@@ -165,7 +102,7 @@ async def _get_raw_data(
                 }
             )
             # Get new Token
-            ublox_token = await get_ublox_token()
+            ublox_token = await KEYCLOACK.get_ublox_token()
 
             # Remake the request
             response = await client.get(
@@ -173,7 +110,7 @@ async def _get_raw_data(
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
                 },
-                timeout=10
+                timeout=60
             )
             return UbloxAPI.parse_raw(response.content).raw_data
 
@@ -268,7 +205,7 @@ async def _get_ublox_api_list(
             headers={
                 "Authorization": f"Bearer {ublox_token}",
             },
-            timeout=10
+            timeout=60
         )
         try:
             response.raise_for_status()
@@ -285,8 +222,9 @@ async def _get_ublox_api_list(
                     "error": exc
                 }
             )
+
             # Get new Token
-            ublox_token = await get_ublox_token()
+            ublox_token = await KEYCLOACK.get_ublox_token()
 
             # Remake the request
             response = await client.post(
@@ -295,7 +233,7 @@ async def _get_ublox_api_list(
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
                 },
-                timeout=10
+                timeout=60
             )
             return UbloxAPIList.parse_raw(response.content).info
 

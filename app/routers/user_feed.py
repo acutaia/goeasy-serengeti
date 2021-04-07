@@ -96,7 +96,7 @@ async def authenticate(
         journey_id,
         source_app,
         requester.client,
-        str(requester.user)
+        requester.user
     )
 
     # Return the id of the resource
@@ -123,5 +123,4 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
         user_feed=user_feed,
         timestamp=time.time(),
         host=request.client.host,
-        test=True
     )

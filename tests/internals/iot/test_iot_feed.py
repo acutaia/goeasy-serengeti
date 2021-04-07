@@ -24,10 +24,10 @@ Tests app.internals.iot module
 """
 
 # Standard Library
-import os
 import time
 
 # Test
+from aioresponses import aioresponses
 from fastapi import HTTPException
 import respx
 import pytest
@@ -35,7 +35,8 @@ import uvloop
 
 # Internal
 from app.internals.iot import end_to_end_position_authentication
-from app.models.iot_feed.iot import IotInput, IotOutput
+from app.internals.keycloak import KEYCLOACK
+from app.models.iot_feed.iot import IotInput
 
 from app.models.security import Authenticity
 
@@ -48,7 +49,7 @@ from tests.mock.ublox_api.get_ublox_api_list import (
     unreachable_get_ublox_api_list
 )
 
-from tests.mock.ublox_api.get_token import correct_get_blox_token
+from tests.mock.keycloack.keycloack import correct_get_blox_token
 
 from tests.mock.ublox_api.constants import (
     RaW_Ublox,
@@ -79,20 +80,28 @@ def event_loop():
     loop.close()
 
 
+@pytest.fixture
+def mock_aioresponse():
+    with aioresponses() as m:
+        yield m
+
+
 class TestIotFeed:
     """
     Test the iot module
     """
     @respx.mock
     @pytest.mark.asyncio
-    async def test_end_to_end_position_authentication(self):
+    async def test_end_to_end_position_authentication(self, mock_aioresponse):
         """ Test the behaviour of end_to_end_position_authentication """
 
         # Disable the logger of the app
         disable_logger()
 
-        # Mock the request
-        correct_get_blox_token()
+        # Setup Keycloack and mock the request
+        correct_get_blox_token(mock_aioresponse)
+        # during the setup we'll obtain a token that will be stored in cls.last_token
+        await KEYCLOACK.setup()
 
         # Position authentic
         correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
@@ -109,9 +118,7 @@ class TestIotFeed:
         )
 
         # Check if the object was generated well
-        iot_output = IotOutput.parse_obj(iot_output.dict())
-
-        assert iot_output.result.authenticity == Authenticity.authentic, "The position is authentic"
+        assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
 
         # Position Unknown
         correct_get_raw_data(url=URL_GET_UBLOX, raw_data=None)
@@ -127,8 +134,7 @@ class TestIotFeed:
         )
 
         # Check if the object was generated well
-        iot_output = IotOutput.parse_obj(iot_output.dict())
-        assert iot_output.result.authenticity == Authenticity.unknown, "The position is unknown"
+        assert iot_output["result"]["authenticity"] == Authenticity.unknown, "The position is unknown"
 
         # Position false fake
         correct_get_raw_data(url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
@@ -145,9 +151,7 @@ class TestIotFeed:
         )
 
         # Check if the object was generated well
-        iot_output = IotOutput.parse_obj(iot_output.dict())
-
-        assert iot_output.result.authenticity == Authenticity.authentic, "The position is authentic"
+        assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
 
         # Position real fake
         correct_get_raw_data(url=URL_GET_UBLOX, raw_data="FAKE")
@@ -164,9 +168,7 @@ class TestIotFeed:
         )
 
         # Check if the object was generated well
-        iot_output = IotOutput.parse_obj(iot_output.dict())
-
-        assert iot_output.result.authenticity == Authenticity.not_authentic, "The position is not authentic"
+        assert iot_output["result"]["authenticity"] == Authenticity.not_authentic, "The position is not authentic"
 
         # Something went wrong during the request of a single raw_data
         with pytest.raises(HTTPException):

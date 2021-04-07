@@ -76,19 +76,3 @@ class IotInput(OrjsonModel):
         title="Result",
         description="Result of the measurement"
     )
-
-
-class IotOutput(IotInput):
-    """
-    IOTFeed output
-    """
-    observationGEPid: str = Field(
-        ...,
-        description="Id of the observation",
-        example="3cca47cb-783f-4442-801a-af1c86806785"
-    )
-    result: ResultOutput = Field(
-        ...,
-        title="Result",
-        description="Result of the measurement"
-    )

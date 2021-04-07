@@ -29,19 +29,11 @@ from app.internals.ublox_api import SETTINGS, URL_UBLOX, URL_GALILEO
 # ---------------------------------------------------------------------------------------
 
 
-FAKE_TOKEN_FOR_TESTING = """eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFuZ2VsbyBDdXRhaWEiLCJpYXQiOjE1MTYyMzkwMjJ9.
-anXoSMyh61_O4KZXlffg6-09WkXzW18lrOAbxjol6Z4"""
-""" Token generated just for testing """
-
 TIMESTAMP = 1611819619151
 """ Timestamp of the message of interest"""
 
 SvID = 12
 """ Satellite id of the message of interest """
-
-TOKEN_REQUEST_URL = SETTINGS.token_request_url
-""" Url to request a token to keycloak"""
 
 URL_GET_UBLOX = f"{URL_UBLOX['Italy']}/{SvID}/{TIMESTAMP}"
 """ Url to get a ublox raw message """

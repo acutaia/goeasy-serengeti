@@ -22,19 +22,16 @@ App main entry point
     See the License for the specific language governing permissions and
     limitations under the License.
 """
-# Standard Library
-from typing import List
 
 # Third Party
-from fastapi import FastAPI, status, Request
+from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import ORJSONResponse
-from fastapi.exceptions import RequestValidationError
 
 # Internal
 from .internals.logger import get_logger
+from .internals.keycloak import KEYCLOACK
 from .internals.session import instantiate_all_sessions, close_all_sessions
 from .routers import user_feed, journey, iot, administrator, statistics
 
@@ -58,6 +55,7 @@ app.include_router(statistics.router)
 @app.on_event("startup")
 async def startup_logger_and_sessions():
     get_logger()
+    await KEYCLOACK.setup()
     instantiate_all_sessions()
 
 
@@ -67,18 +65,6 @@ async def shutdown_logger_and_sessions():
     logger = get_logger()
     await close_all_sessions()
     await logger.shutdown()
-
-
-# Log Bad body in input
-@app.exception_handler(RequestValidationError)
-async def bad_request_body(request: Request, exc: RequestValidationError):
-    logger = get_logger()
-    await logger.debug(exc.body)
-    return ORJSONResponse(
-        {
-            "detail": exc.errors()
-        }, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-    )
 
 
 # Documentation end-point

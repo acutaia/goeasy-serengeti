@@ -23,22 +23,25 @@ IoTFeed router package
     limitations under the License.
 """
 # Standard Library
+import asyncio
 import uuid
 import time
 
 # Third Party
-from fastapi import APIRouter, Body, Depends, Request
+from fastapi import APIRouter, Body, Depends, Request, BackgroundTasks
 from fastapi.responses import ORJSONResponse
 
 # Internal
 from ..models.iot_feed.iot import IotInput
+from ..models.iot_feed.response_class import Resource
 from ..models.security import Requester
 from ..security.jwt_bearer import Signature
-from ..internals.iot import end_to_end_position_authentication
+from ..internals.iot import end_to_end_position_authentication, store_iot_data
 
 # --------------------------------------------------------------------------------------------
 
 # JWT Signature
+test_auth = Signature(realm_access="Test")
 iot_auth = Signature(realm_access="IoTFeed", return_requester=True)
 
 # Instantiate router
@@ -54,6 +57,7 @@ router = APIRouter(
     summary="Validate data from IoT devices",
 )
 async def iot_authentication(
+        back_ground_tasks: BackgroundTasks,
         request: Request,
         requester: Requester = Depends(iot_auth),
         iot_input: IotInput = Body(...)
@@ -80,15 +84,39 @@ async def iot_authentication(
         source_app = requester.client
 
     # Generate GEPid
-    obesrvation_gepid = uuid.uuid4()
+    obesrvation_gepid = str(uuid.uuid4())
 
-    return await end_to_end_position_authentication(
+    back_ground_tasks.add_task(
+        store_iot_data,
         iot_input,
         time.time(),
         request.client.host,
+        obesrvation_gepid,
         source_app,
         requester.client,
-        str(requester.user),
-        str(obesrvation_gepid)
+        requester.user
     )
+    return Resource(observationGEPid=obesrvation_gepid)
 
+
+@router.post(
+    "/test",
+    response_class=ORJSONResponse,
+    summary="Test the authentication of User Data",
+    response_description="Input with verified data",
+    dependencies=[Depends(test_auth)]
+)
+async def authenticate_test(request: Request, iot_feed: IotInput = Body(...)):
+    """
+    This endpoint provides ways to let users and applications to request for position data authentication services
+    without the exploitation of other GEP features, such as the persistent collection.\n
+    The current feature is enabled for testing purposes and for those scenarios where data is already stored on
+    the cloud, and the main interests are linked on providing additional information for data trustiness.\n
+    The following diagram shows the final software design of the authentication service.\n
+    ![image](https:/serengeti/static/user_feed_authenticate_test.png)
+    """
+    return await end_to_end_position_authentication(
+        iot_input=iot_feed,
+        timestamp=time.time(),
+        host=request.client.host,
+    )

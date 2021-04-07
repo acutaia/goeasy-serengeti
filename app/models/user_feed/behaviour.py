@@ -24,13 +24,13 @@ Behaviour models package
 """
 
 # Standard Library
-from typing import Any, List
+from typing import List, Optional
 
 # Third Party
 from pydantic import Field
 
 # Internal
-from ..track import TrackSegmentsInput
+from ..track import TrackSegmentsOutput
 from ..model import OrjsonModel
 
 # --------------------------------------------------------------------------------------------
@@ -38,19 +38,19 @@ from ..model import OrjsonModel
 
 class Behaviour(OrjsonModel):
     """User Behaviour"""
-    app_defined: Any = Field(
+    app_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="Application Defined Behaviour",
         description="Mobile application standalone detection of mobility types and the segments within the journey",
         example=[]
     )
-    tpv_defined: Any = Field(
+    tpv_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="Third Party Defined Behaviour",
         description="Autonomous detection of mobility types and the segments within the journey",
         example=[]
     )
-    user_defined: List[TrackSegmentsInput] = Field(
+    user_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="User Defined Behaviour",
         description="""The users specify through the mobile app the type of mobility

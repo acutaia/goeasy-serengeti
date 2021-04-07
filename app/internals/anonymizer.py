@@ -39,24 +39,24 @@ from ..config import get_anonymizer_settings
 # --------------------------------------------------------------------------------------------
 
 
-async def store_user_in_the_anonengine(user_feed: dict) -> None:
+async def store_in_the_anonengine(data: dict, url: str) -> None:
     """
     Store user info in the anonengine
 
-    :param user_feed: User information to store in the anonengine
+    :param data: User information to store in the anonengine
+    :param url: could be iot or user
     """
     # Get Logger
     logger = get_logger()
     # Get anonymizer settings
     anonymizer_settings = get_anonymizer_settings()
-
     # Store data
     try:
         client = get_anonymizer_session()
         response = await client.post(
-            anonymizer_settings.store_data_url,
-            json=user_feed,
-            timeout=25
+            getattr(anonymizer_settings, url),
+            data=data,
+            timeout=10
         )
         await logger.debug(orjson.loads(response.content))
     except httpx.RequestError as exc:
