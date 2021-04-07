@@ -48,6 +48,7 @@ from .internals.logger import disable_logger
 from .internals.user_feed.constants import USER_INPUT_PATH
 from .security.model import Azp, UserName, RolesEnum
 from .security.token import change_default_security_settings, generate_fake_token, generate_valid_token
+from .mock.keycloack.keycloack import correct_get_blox_token
 from .mock.accounting_manager.iota import correct_get_iota_user, correct_store_in_iota
 from .mock.anonymizer.anonengine import (
     correct_extract_details,
@@ -61,7 +62,6 @@ from .mock.ublox_api.constants import (
     URL_GET_GALILEO
 )
 from .mock.ublox_api.get_raw_data import correct_get_raw_data
-from .mock.keycloack.keycloack import correct_get_blox_token
 
 # ---------------------------------------------------------------------------------------------
 
@@ -81,13 +81,15 @@ def clear_test():
     get_accounting_session.cache_clear()
 
 
-def test_docs_and_startup_shutdown():
+def test_docs_and_startup_shutdown(mock_aioresponse):
     """Test docs and startup and shutdown events"""
 
     # Load the cache of the documentation
     app.openapi_schema = None
     app.openapi()
     app.openapi()
+
+    correct_get_blox_token(mock_aioresponse)
 
     with TestClient(app) as client:
         response = client.get("/api/v1/docs")
@@ -100,7 +102,7 @@ class TestAdmin:
     """Test administrator router"""
 
     @respx.mock
-    def test_administrator(self):
+    def test_administrator(self, mock_aioresponse):
         """Test the behaviour of administrator router"""
 
         clear_test()
@@ -110,6 +112,8 @@ class TestAdmin:
         invalid_token = generate_fake_token()
         valid_token = generate_valid_token(realm=RolesEnum.admin)
         valid_token_role_not_present = generate_valid_token(realm=RolesEnum.fake)
+
+        correct_get_blox_token(mock_aioresponse)
 
         with TestClient(app) as client:
             # Try to use an invalid token
@@ -258,11 +262,13 @@ class TestJourney:
             url: str,
             invalid_token: str,
             valid_token: str,
-            valid_token_role_not_present: str
+            valid_token_role_not_present: str,
+            mocked: aioresponses
     ):
         """
         Inner function used to test both endpoints
         """
+        correct_get_blox_token(mocked)
         with TestClient(app) as client:
             # Try to use an invalid token
             response = client.post(
@@ -326,7 +332,7 @@ class TestJourney:
         clear_test()
 
     @respx.mock
-    def test_get_mobility(self):
+    def test_get_mobility(self, mock_aioresponse):
         """Test the behaviour of get_mobility endpoint"""
 
         # Setup
@@ -346,11 +352,12 @@ class TestJourney:
             url="http://serengeti/api/v1/goeasy/getMobility",
             invalid_token=invalid_token,
             valid_token=valid_token,
-            valid_token_role_not_present=valid_token_role_not_present
+            valid_token_role_not_present=valid_token_role_not_present,
+            mocked=mock_aioresponse
         )
 
     @respx.mock
-    def test_get_details(self):
+    def test_get_details(self, mock_aioresponse):
         """Test the behaviour of get_details endpoint"""
 
         # Setup
@@ -370,7 +377,8 @@ class TestJourney:
             url="http://serengeti/api/v1/goeasy/getDetails",
             invalid_token=invalid_token,
             valid_token=valid_token,
-            valid_token_role_not_present=valid_token_role_not_present
+            valid_token_role_not_present=valid_token_role_not_present,
+            mocked=mock_aioresponse
         )
 
 
