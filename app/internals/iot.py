@@ -246,7 +246,7 @@ async def store_iot_data(
             source_app=source_app,
             client_id=client_id,
             user_id=user_id,
-            store=False
+            store=True
         )
 
         await store_in_the_anonengine(orjson.dumps(iot_output).decode("utf-8"), "store_iot_data_url")

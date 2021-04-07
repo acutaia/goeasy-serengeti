@@ -217,12 +217,6 @@ class TestIotFeed:
         correct_store_in_iota()
         correct_store_iot_in_the_anonengine()
 
-        iot_feed_validated = await end_to_end_position_authentication(
-            iot_input=IOT_INPUT,
-            timestamp=time.time(),
-            host="localhost"
-        )
-
         # Check if everything went ok
         await store_iot_data(
             iot_input=IOT_INPUT,
