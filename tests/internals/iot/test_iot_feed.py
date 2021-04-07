@@ -34,7 +34,7 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.iot import end_to_end_position_authentication
+from app.internals.iot import end_to_end_position_authentication, store_iot_data
 from app.internals.keycloak import KEYCLOACK
 from app.models.iot_feed.iot import IotInput
 
@@ -49,8 +49,8 @@ from tests.mock.ublox_api.get_ublox_api_list import (
     unreachable_get_ublox_api_list
 )
 
+from tests.mock.anonymizer.anonengine import correct_store_iot_in_the_anonengine
 from tests.mock.keycloack.keycloack import correct_get_blox_token
-
 from tests.mock.ublox_api.constants import (
     RaW_Ublox,
     URL_GET_UBLOX,
@@ -198,3 +198,38 @@ class TestIotFeed:
                 user_id="TEST",
                 obesrvation_gepid="TEST"
             )
+
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_store_iot_data(self, mock_aioresponse):
+        """ Test the behaviour of store_iot_data """
+
+        # Disable the logger of the app
+        disable_logger()
+
+        # Setup Keycloack and mock the request
+        correct_get_blox_token(mock_aioresponse)
+        # during the setup we'll obtain a token that will be stored in cls.last_token
+        await KEYCLOACK.setup()
+
+        # Mock the other requests
+        correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+        correct_store_in_iota()
+        correct_store_iot_in_the_anonengine()
+
+        iot_feed_validated = await end_to_end_position_authentication(
+            iot_input=IOT_INPUT,
+            timestamp=time.time(),
+            host="localhost"
+        )
+
+        # Check if everything went ok
+        await store_iot_data(
+            iot_input=IOT_INPUT,
+            timestamp=time.time(),
+            host="localhost",
+            obesrvation_gepid="TEST",
+            source_app="TEST",
+            client_id="TEST",
+            user_id="TEST"
+        )
