@@ -25,7 +25,6 @@ Ublox-Api session package
 
 # Standard Library
 from __future__ import annotations
-import asyncio
 from dataclasses import dataclass
 from functools import lru_cache
 
