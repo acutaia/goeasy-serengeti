@@ -26,10 +26,10 @@ Mocked Ublox Api http post requests
 from typing import Optional
 
 # Third Party
+from aiohttp import ServerTimeoutError
 from aioresponses import aioresponses
 from fastapi import status
-from httpx import Response, RequestError
-import respx
+import orjson
 
 # Internal
 from .constants import TIMESTAMP, SvID
@@ -38,18 +38,20 @@ from ..keycloack.keycloack import correct_get_blox_token
 # ----------------------------------------------------------------------------------------------
 
 
-def correct_get_ublox_api_list(url: str, raw_data: Optional[str]):
+def correct_get_ublox_api_list(m: aioresponses, url: str, raw_data: Optional[str]):
     """
     Mock the request made to obtain a list of of UbloxApi data
 
+    :param m: aioresponses mock
     :param url: Galileo or Ublox
     :param raw_data: data that we want to receive
     :return:
     """
-    respx.post(url).mock(
-        return_value=Response(
-            status_code=status.HTTP_200_OK,
-            json={
+    m.post(
+        url,
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(
+            {
                 "satellite_id": SvID,
                 "info": [
                     {
@@ -58,7 +60,7 @@ def correct_get_ublox_api_list(url: str, raw_data: Optional[str]):
                     }
                 ]
             }
-        )
+        ).decode()
     )
 
 
@@ -73,14 +75,12 @@ def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Option
     """
 
     correct_get_blox_token(m)
-    route = respx.post(url)
-    route.side_effect = [
-        Response(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        ),
-        Response(
-            status_code=status.HTTP_200_OK,
-            json={
+    m.post(url, status=status.HTTP_401_UNAUTHORIZED)
+    m.post(
+        url,
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(
+            {
                 "satellite_id": SvID,
                 "info": [
                     {
@@ -89,19 +89,19 @@ def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Option
                     }
                 ]
             }
-        )
-    ]
+        ).decode()
+    )
 
 
-def unreachable_get_ublox_api_list(url: str):
+def unreachable_get_ublox_api_list(m: aioresponses,url: str):
     """
     Mock the behaviour in case of Ublox-Api is unreachable
 
+    :param m: aioresponses mock
     :param url: Galileo or Ublox
     :return:
     """
-    respx.post(url).mock(side_effect=RequestError)
-
+    m.post(url, exception=ServerTimeoutError("Timeout"))
 
 
 

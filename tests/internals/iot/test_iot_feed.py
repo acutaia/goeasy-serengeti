@@ -37,6 +37,7 @@ import uvloop
 # Internal
 from app.internals.iot import end_to_end_position_authentication, store_iot_data
 from app.internals.keycloak import KEYCLOACK
+from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.models.iot_feed.iot import IotInput
 
 from app.models.security import Authenticity
@@ -99,13 +100,17 @@ class TestIotFeed:
         # Disable the logger of the app
         disable_logger()
 
+        # Obtain a Ublox-Api session
+        get_ublox_api_session.cache_clear()
+        session = get_ublox_api_session()
+
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
         await KEYCLOACK.setup()
 
         # Position authentic
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
 
         iot_output = await end_to_end_position_authentication(
@@ -122,7 +127,7 @@ class TestIotFeed:
         assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
 
         # Position Unknown
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data=None)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=None)
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -138,8 +143,8 @@ class TestIotFeed:
         assert iot_output["result"]["authenticity"] == Authenticity.unknown, "The position is unknown"
 
         # Position false fake
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
-        correct_get_ublox_api_list(url=URL_POST_UBLOX, raw_data=RaW_Ublox)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
+        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox)
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -155,8 +160,8 @@ class TestIotFeed:
         assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
 
         # Position real fake
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data="FAKE")
-        correct_get_ublox_api_list(url=URL_POST_UBLOX, raw_data="REAL_FAKE")
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FAKE")
+        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data="REAL_FAKE")
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -174,7 +179,7 @@ class TestIotFeed:
         # Something went wrong during the request of a single raw_data
         with pytest.raises(HTTPException):
             # Mock the request
-            unreachable_get_raw_data(url=URL_GET_UBLOX)
+            unreachable_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX)
             await end_to_end_position_authentication(
                 iot_input=IOT_INPUT,
                 timestamp=time.time(),
@@ -188,8 +193,8 @@ class TestIotFeed:
         # Something went wrong during the request of a List[UbloxApi]
         with pytest.raises(HTTPException):
             # Mock the requests
-            correct_get_raw_data(url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
-            unreachable_get_ublox_api_list(url=URL_POST_UBLOX)
+            correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
+            unreachable_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX)
             await end_to_end_position_authentication(
                 iot_input=IOT_INPUT,
                 timestamp=time.time(),
@@ -202,6 +207,8 @@ class TestIotFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
+        # Close ublox-session
+        await session.close()
 
     @respx.mock
     @pytest.mark.asyncio
@@ -211,13 +218,17 @@ class TestIotFeed:
         # Disable the logger of the app
         disable_logger()
 
+        # Obtain a Ublox-Api session
+        get_ublox_api_session.cache_clear()
+        session = get_ublox_api_session()
+
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
         await KEYCLOACK.setup()
 
         # Mock the other requests
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
         correct_store_iot_in_the_anonengine()
 
@@ -235,3 +246,5 @@ class TestIotFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
+        # Close Ublox-Api session
+        await session.close()

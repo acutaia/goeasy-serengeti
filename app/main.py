@@ -64,6 +64,7 @@ async def startup_logger_and_sessions():
 async def shutdown_logger_and_sessions():
     logger = get_logger()
     await close_all_sessions()
+    await KEYCLOACK.close()
     await logger.shutdown()
 
 

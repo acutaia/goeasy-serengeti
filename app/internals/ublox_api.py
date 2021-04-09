@@ -24,16 +24,15 @@ Ublox-Api package
 """
 # Standard Library
 from typing import Optional, List
-from time import time
 
 # Third Party
+from aiohttp import ClientSession, ClientResponseError, ServerTimeoutError
 from fastapi import status, HTTPException
-import httpx
+import orjson
 
 # Internal
 from .keycloak import KEYCLOACK
 from .logger import get_logger
-from .session import get_ublox_api_session
 from ..config import get_ublox_api_settings
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
 
@@ -62,6 +61,7 @@ async def _get_raw_data(
         timestamp: int,
         ublox_token: str,
         url: str,
+        session: ClientSession,
 ) -> Optional[str]:
     """
     Contacts Ublox-Api and extracts raw data from the given satellite id and timestamp.
@@ -70,56 +70,62 @@ async def _get_raw_data(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param url: Url of Ublox-Api server, it could be in Italy or Sweden
+    :param session: Aiohttp session
     :return:  The message
     """
     # Get Logger
     logger = get_logger()
 
     try:
-        client = get_ublox_api_session()
-        response = await client.get(
-            f"{url}/{svid}/{timestamp}",
-            headers={
-                "Authorization": f"Bearer {ublox_token}"
-            },
-            timeout=60
-        )
-        try:
-            # Check if the token is expired
-            response.raise_for_status()
-            return UbloxAPI.parse_raw(response.content).raw_data
-
-        except httpx.HTTPStatusError as exc:
-
-            # Token is expired
-            await logger.warning(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "token": ublox_token,
-                    "status_code": exc.response.status_code,
-                    "error": exc
-                }
-            )
-            # Get new Token
-            ublox_token = await KEYCLOACK.get_ublox_token()
-
-            # Remake the request
-            response = await client.get(
+        async with session.get(
                 f"{url}/{svid}/{timestamp}",
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
-                },
-                timeout=60
-            )
-            return UbloxAPI.parse_raw(response.content).raw_data
+                }
+        ) as resp:
+            # Return RawData
+            return UbloxAPI.parse_obj(
+                await resp.json(
+                    encoding="utf-8",
+                    loads=orjson.loads,
+                    content_type=None
+                )
+            ).raw_data
 
-    except httpx.RequestError as exc:
-        # Something went wrong during the connection
-        await logger.error(
+    except ClientResponseError as exc:
+        # Token is expired
+        await logger.warning(
             {
-                "method": exc.request.method,
-                "url": exc.request.url,
+                "method": exc.request_info.method,
+                "url": exc.request_info.url,
+                "token": ublox_token,
+                "status_code": exc.status,
+                "error": exc.message
+            }
+        )
+        # Get new Token
+        ublox_token = await KEYCLOACK.get_ublox_token()
+
+        # Remake the request
+        async with session.get(
+                f"{url}/{svid}/{timestamp}",
+                headers={
+                    "Authorization": f"Bearer {ublox_token}"
+                }
+        ) as resp:
+            # Return RawData
+            return UbloxAPI.parse_obj(
+                await resp.json(
+                    encoding="utf-8",
+                    loads=orjson.loads,
+                    content_type=None
+                )
+            ).raw_data
+
+    except ServerTimeoutError as exc:
+        # Can't contact Ublox-Api
+        await logger.warning(
+            {
                 "error": exc
             }
         )
@@ -133,7 +139,8 @@ async def get_galileo_message(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        location: str
+        location: str,
+        session: ClientSession,
 ) -> Optional[str]:
     """
     Extract a Galileo Message from a specific Ublox-Api server situated in Italy or in Sweden
@@ -142,6 +149,7 @@ async def get_galileo_message(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param location: Sweden or Italy
+    :param session: Aiohttp session
     :return: Galileo Message
     """
 
@@ -150,6 +158,7 @@ async def get_galileo_message(
         timestamp=timestamp,
         ublox_token=ublox_token,
         url=URL_GALILEO[location],
+        session=session
     )
 
 
@@ -157,7 +166,8 @@ async def get_ublox_message(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        location: str
+        location: str,
+        session: ClientSession
 ) -> Optional[str]:
     """
     Extract a Ublox Message from a specific Ublox-Api server situated in Italy or in Sweden
@@ -166,6 +176,7 @@ async def get_ublox_message(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param location: Sweden or Italy
+    :param session: Aiohttp session
     :return: Galileo Message
     """
 
@@ -174,6 +185,7 @@ async def get_ublox_message(
         timestamp=timestamp,
         ublox_token=ublox_token,
         url=URL_UBLOX[location],
+        session=session
     )
 
 # ---------------------------------------------------------------------------------------
@@ -183,6 +195,7 @@ async def _get_ublox_api_list(
         ublox_token: str,
         url: str,
         data: dict,
+        session: ClientSession
 ) -> List[UbloxAPI]:
     """
     Contacts Ublox-Api and extracts a list of UbloxApi data format (timestamps and associated raw_data)
@@ -191,6 +204,7 @@ async def _get_ublox_api_list(
     :param ublox_token: Token to use with UbloxApi
     :param url: Url of Ublox-Api server, it could be in Italy or Sweden
     :param data: asked data
+    :param session: Aiohttp session
     :return: list of UbloxApi objects
     """
 
@@ -198,52 +212,59 @@ async def _get_ublox_api_list(
     logger = get_logger()
 
     try:
-        client = get_ublox_api_session()
-        response = await client.post(
-            url,
+        async with session.post(
+            url=url,
             json=data,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
-            },
-            timeout=60
+            }
+        ) as resp:
+            # Return Info requested
+            return UbloxAPIList.parse_obj(
+                await resp.json(
+
+                    encoding="utf-8",
+                    loads=orjson.loads,
+                    content_type=None
+                )
+            ).info
+
+    except ClientResponseError as exc:
+        # Token is expired
+        await logger.warning(
+            {
+                "method": exc.request_info.method,
+                "url": exc.request_info.url,
+                "token": ublox_token,
+                "status_code": exc.status,
+                "error": exc.message
+            }
         )
-        try:
-            response.raise_for_status()
-            return UbloxAPIList.parse_raw(response.content).info
+        # Get new Token
+        ublox_token = await KEYCLOACK.get_ublox_token()
 
-        except httpx.HTTPStatusError as exc:
-            # Token is expired
-            await logger.warning(
-                {
-                    "method": exc.request.method,
-                    "url": exc.request.url,
-                    "token": ublox_token,
-                    "status_code": exc.response.status_code,
-                    "error": exc
-                }
-            )
-
-            # Get new Token
-            ublox_token = await KEYCLOACK.get_ublox_token()
-
-            # Remake the request
-            response = await client.post(
-                url,
+        # Remake the request
+        async with session.post(
+                url=url,
                 json=data,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
-                },
-                timeout=60
-            )
-            return UbloxAPIList.parse_raw(response.content).info
+                }
+        ) as resp:
+            # Return Info requested
+            return UbloxAPIList.parse_obj(
+                await resp.json(
 
-    except httpx.RequestError as exc:
-        # Something went wrong during the connection
-        await logger.error(
+                    encoding="utf-8",
+                    loads=orjson.loads,
+                    content_type=None
+                )
+            ).info
+
+    except ServerTimeoutError as exc:
+        # Can't contact Ublox-Api
+        await logger.warning(
             {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "token": ublox_token,
                 "error": exc
             }
         )
@@ -285,7 +306,8 @@ async def get_galileo_messages_list(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        location: str
+        location: str,
+        session: ClientSession,
 ) -> List[UbloxAPI]:
     """
     Extract a list of  Galileo Messages in a range of timestamps from a specific Ublox-Api
@@ -295,13 +317,15 @@ async def get_galileo_messages_list(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param location: Could be Italy or Sweden
+    :param session: Aiohttp session
     :return: A list of Galileo Messages
     """
 
     return await _get_ublox_api_list(
         ublox_token=ublox_token,
         url=URL_GALILEO[location],
-        data=construct_request(svid, timestamp)
+        data=construct_request(svid, timestamp),
+        session=session
     )
 
 
@@ -309,7 +333,8 @@ async def get_ublox_messages_list(
         svid: int,
         timestamp: int,
         ublox_token: str,
-        location: str
+        location: str,
+        session: ClientSession
 ) -> List[UbloxAPI]:
     """
     Extract a list of  Ublox Messages in a range of timestamps from a specific Ublox-Api
@@ -319,11 +344,13 @@ async def get_ublox_messages_list(
     :param timestamp: Requested timestamp
     :param ublox_token: Token to use with UbloxApi
     :param location: Could be Italy or Sweden
+    :param session: Aiohttp session
     :return: A list of Ublox Messages
     """
 
     return await _get_ublox_api_list(
         ublox_token=ublox_token,
         url=URL_UBLOX[location],
-        data=construct_request(svid, timestamp)
+        data=construct_request(svid, timestamp),
+        session=session
     )

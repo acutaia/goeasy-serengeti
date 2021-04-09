@@ -36,6 +36,7 @@ from .accounting_manager import store_in_iota
 from .anonymizer import store_in_the_anonengine
 from .keycloak import KEYCLOACK
 from .logger import get_logger
+from .sessions.ublox_api import get_ublox_api_session
 from .position_alteration_detection import haversine
 from .ublox_api import get_ublox_message, get_ublox_messages_list
 from ..models.iot_feed.iot import IotInput
@@ -84,6 +85,9 @@ async def end_to_end_position_authentication(
     not_authentic_number = 0
     unknown_number = 0
 
+    # Get Ublox-Api session
+    session = get_ublox_api_session()
+
     # Get Ublox-APi token
     ublox_token = await KEYCLOACK.get_ublox_token()
 
@@ -100,6 +104,7 @@ async def end_to_end_position_authentication(
                 iot_time,
                 ublox_token,
                 location,
+                session
             )
         except HTTPException as exc:
             if store:
@@ -137,6 +142,7 @@ async def end_to_end_position_authentication(
                     iot_time,
                     ublox_token,
                     location,
+                    session
                 )
             except HTTPException as exc:
                 if store:

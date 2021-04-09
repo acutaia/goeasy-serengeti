@@ -25,18 +25,14 @@ Session package
 
 # Standard Library
 from functools import lru_cache
-from typing import NewType
 
 # Third Party
 from httpx import AsyncClient
 
+# Internal
+from .sessions.ublox_api import get_ublox_api_session
+
 # ----------------------------------------------------------------------------
-
-
-@lru_cache(maxsize=1)
-def get_ublox_api_session() -> AsyncClient:
-    """Instantiate UbloxApiSession"""
-    return AsyncClient(verify=False)
 
 
 @lru_cache(maxsize=1)
@@ -60,6 +56,6 @@ def instantiate_all_sessions():
 
 async def close_all_sessions():
     """Close all instantiated sessions"""
-    await get_ublox_api_session().aclose()
+    await get_ublox_api_session().close()
     await get_accounting_session().aclose()
     await get_anonymizer_session().aclose()

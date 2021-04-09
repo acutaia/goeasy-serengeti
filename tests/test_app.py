@@ -170,7 +170,7 @@ class TestIoT:
 
         # Mock the request
         correct_get_blox_token(mock_aioresponse)
-        correct_get_raw_data(url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
 
         # Obtain tokens
@@ -396,7 +396,7 @@ class TestUser:
 
         # Mock the request
         correct_get_blox_token(mock_aioresponse)
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -468,7 +468,7 @@ class TestUser:
 
         # Mock the request
         correct_get_blox_token(mock_aioresponse)
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
         correct_store_user_in_the_anonengine()
 

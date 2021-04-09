@@ -36,6 +36,7 @@ import uvloop
 
 # Internal
 from app.internals.keycloak import KEYCLOACK
+from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.internals.user_feed import (
     end_to_end_position_authentication,
     store_android_data
@@ -109,13 +110,17 @@ class TestUserFeed:
         # Disable the logger of the app
         disable_logger()
 
+        # Obtain a Ublox-Api session
+        get_ublox_api_session.cache_clear()
+        session = get_ublox_api_session()
+
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
         await KEYCLOACK.setup()
 
         # Position authentic
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
 
         user_feed_validated = await end_to_end_position_authentication(
@@ -126,7 +131,7 @@ class TestUserFeed:
         assert user_feed_validated.trace_information[0].authenticity == Authenticity.authentic, "The position is authentic"
 
         # Position Unknown
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=None)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=None)
 
         user_feed_validated = await end_to_end_position_authentication(
             user_feed=USER_INPUT,
@@ -136,8 +141,8 @@ class TestUserFeed:
         assert user_feed_validated.trace_information[0].authenticity == Authenticity.unknown, "The position is unknown"
 
         # Position false fake
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data="FALSE_FAKE")
-        correct_get_ublox_api_list(url=URL_POST_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data="FALSE_FAKE")
+        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo)
 
         user_feed_validated = await end_to_end_position_authentication(
             user_feed=USER_INPUT,
@@ -147,8 +152,8 @@ class TestUserFeed:
         assert user_feed_validated.trace_information[0].authenticity == Authenticity.authentic, "The position is authentic"
 
         # Position real fake
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data="FAKE")
-        correct_get_ublox_api_list(url=URL_POST_GALILEO, raw_data="REAL_FAKE")
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data="FAKE")
+        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO, raw_data="REAL_FAKE")
 
         user_feed_validated = await end_to_end_position_authentication(
             user_feed=USER_INPUT,
@@ -160,7 +165,7 @@ class TestUserFeed:
         # Something went wrong during the request of a single raw_data
         with pytest.raises(HTTPException):
             # Mock the request
-            unreachable_get_raw_data(url=URL_GET_GALILEO)
+            unreachable_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO)
             await end_to_end_position_authentication(
                 user_feed=USER_INPUT,
                 timestamp=time.time(),
@@ -170,8 +175,8 @@ class TestUserFeed:
         # Something went wrong during the request of a List[UbloxApi]
         with pytest.raises(HTTPException):
             # Mock the requests
-            correct_get_raw_data(url=URL_GET_GALILEO, raw_data="FALSE_FAKE")
-            unreachable_get_ublox_api_list(url=URL_POST_GALILEO)
+            correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data="FALSE_FAKE")
+            unreachable_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO)
             await end_to_end_position_authentication(
                 user_feed=USER_INPUT,
                 timestamp=time.time(),
@@ -180,6 +185,8 @@ class TestUserFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
+        # Close Ublox-Api session
+        await session.close()
 
     @respx.mock
     @pytest.mark.asyncio
@@ -189,13 +196,17 @@ class TestUserFeed:
         # Disable the logger of the app
         disable_logger()
 
+        # Obtain a Ublox-Api session
+        get_ublox_api_session.cache_clear()
+        session = get_ublox_api_session()
+
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
         await KEYCLOACK.setup()
 
         # Mock the other requests
-        correct_get_raw_data(url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
         correct_store_user_in_the_anonengine()
 
@@ -278,6 +289,8 @@ class TestUserFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
+        # Close Ublox-Api session
+        await session.close()
 
 
 

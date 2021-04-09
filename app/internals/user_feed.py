@@ -36,6 +36,7 @@ from .anonymizer import store_in_the_anonengine
 from .keycloak import KEYCLOACK
 from .logger import get_logger
 from .position_alteration_detection import haversine
+from .sessions.ublox_api import get_ublox_api_session
 from .ublox_api import get_galileo_message, get_galileo_messages_list
 from ..config import get_ublox_api_settings
 from ..models.security import Authenticity
@@ -82,6 +83,9 @@ async def end_to_end_position_authentication(
     fullbiasnano = None
     timenano = None
 
+    # Get Ublox-APi session
+    session = get_ublox_api_session()
+
     # Get Ublox-APi token
     ublox_token = await KEYCLOACK.get_ublox_token()
 
@@ -125,6 +129,7 @@ async def end_to_end_position_authentication(
                         auth.time,
                         ublox_token,
                         location,
+                        session
                     )
                 except HTTPException as exc:
                     if store:
@@ -164,6 +169,7 @@ async def end_to_end_position_authentication(
                             auth.time,
                             ublox_token,
                             location,
+                            session
                         )
                     except HTTPException as exc:
                         if store:
