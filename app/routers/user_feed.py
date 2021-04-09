@@ -31,6 +31,7 @@ from fastapi import APIRouter, Body, Depends, BackgroundTasks, Request
 from fastapi.responses import ORJSONResponse
 
 # Internal
+from ..concurrency.user_feed import test_semaphore, store_semaphore
 from ..internals.user_feed import end_to_end_position_authentication, store_android_data
 from ..models.user_feed.user import UserFeedInput
 from ..models.security import Requester
@@ -96,7 +97,8 @@ async def authenticate(
         journey_id,
         source_app,
         requester.client,
-        requester.user
+        requester.user,
+        store_semaphore()
     )
 
     # Return the id of the resource
@@ -119,8 +121,25 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     The following diagram shows the final software design of the authentication service.\n
     ![image](https:/serengeti/static/user_feed_authenticate_test.png)
     """
-    return await end_to_end_position_authentication(
-        user_feed=user_feed,
-        timestamp=time.time(),
-        host=request.client.host,
+
+    # Get a semaphore to synchronize this request and prevent starvation
+    semaphore = test_semaphore()
+    async with semaphore:
+        user_feed_test = await end_to_end_position_authentication(
+            user_feed=user_feed,
+            timestamp=time.time(),
+            host=request.client.host,
+        )
+
+    user_feed_internal = user_feed_test.dict(
+        exclude={
+            "trace_information": {
+                "__all__": {
+                    "galileo_auth",
+                    "galileo_status"
+                }
+            }
+        }
     )
+    user_feed_internal.update({"source_app": "TEST", "journey_id": "TEST"})
+    return user_feed_internal

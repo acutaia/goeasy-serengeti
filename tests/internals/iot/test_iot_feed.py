@@ -24,6 +24,7 @@ Tests app.internals.iot module
 """
 
 # Standard Library
+from asyncio import Semaphore
 import time
 
 # Test
@@ -199,6 +200,9 @@ class TestIotFeed:
                 obesrvation_gepid="TEST"
             )
 
+        # Close Keycloack session
+        await KEYCLOACK.close()
+
     @respx.mock
     @pytest.mark.asyncio
     async def test_store_iot_data(self, mock_aioresponse):
@@ -225,5 +229,9 @@ class TestIotFeed:
             obesrvation_gepid="TEST",
             source_app="TEST",
             client_id="TEST",
-            user_id="TEST"
+            user_id="TEST",
+            semaphore=Semaphore(2)
         )
+
+        # Close Keycloack session
+        await KEYCLOACK.close()

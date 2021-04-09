@@ -64,7 +64,7 @@ class _Keycloak:
         # timeout to obtain  token
         timeout = ClientTimeout(total=10)
         # connection options
-        connector = TCPConnector(ttl_dns_cache=300, limit=1, verify_ssl=False)
+        connector = TCPConnector(ttl_dns_cache=300, limit=1, ssl=False)
 
         # Instantiate a session
         self.session = ClientSession(

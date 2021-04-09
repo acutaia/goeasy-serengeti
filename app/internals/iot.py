@@ -24,12 +24,12 @@ IoT utilities package
 """
 
 # Standard Library
+from asyncio import Semaphore
 import sys
 import time
 
 # Third Party
 from fastapi import HTTPException
-import orjson
 
 # Internal
 from .accounting_manager import store_in_iota
@@ -70,13 +70,8 @@ async def end_to_end_position_authentication(
     """
     # Get Logger
     logger = get_logger()
-
-    # Get Ublox-APi token
-    ublox_token = await KEYCLOACK.get_ublox_token()
-
-    # Extract timestamp
-    iot_time = int(iot_input.phenomenonTime.timestamp()*1000)
-
+    # start analysis time
+    start_analysis = time.time()
     # Extract position location
     location = haversine(
         iot_input.result.Position.coordinate[0],
@@ -89,6 +84,12 @@ async def end_to_end_position_authentication(
     not_authentic_number = 0
     unknown_number = 0
 
+    # Get Ublox-APi token
+    ublox_token = await KEYCLOACK.get_ublox_token()
+
+    # Calculate timestamp
+    iot_time = int(iot_input.phenomenonTime.timestamp() * 1000)
+
     # Check the positions
     for gnss in iot_input.result.gnss:
         galileo_auth_number += 1
@@ -98,7 +99,7 @@ async def end_to_end_position_authentication(
                 gnss.svid,
                 iot_time,
                 ublox_token,
-                location
+                location,
             )
         except HTTPException as exc:
             if store:
@@ -135,7 +136,7 @@ async def end_to_end_position_authentication(
                     gnss.svid,
                     iot_time,
                     ublox_token,
-                    location
+                    location,
                 )
             except HTTPException as exc:
                 if store:
@@ -192,23 +193,24 @@ async def end_to_end_position_authentication(
             "authentic": authentic_number,
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
-            "analysis_time": f"{time.time() - timestamp}"
+            "analysis_time": f"{time.time() - start_analysis}",
+            "request_procession_time": f"{time.time() - timestamp}"
         }
     )
     if store:
         await store_in_iota(
-                source_app=source_app,
-                client_id=client_id,
-                user_id=user_id,
-                msg_id=obesrvation_gepid,
-                msg_size=sys.getsizeof(iot_input.json()),
-                msg_time=timestamp,
-                msg_malicious_position=not_authentic_number,
-                msg_authenticated_position=authentic_number,
-                msg_unknown_position=unknown_number,
-                msg_total_position=galileo_auth_number
+            source_app=source_app,
+            client_id=client_id,
+            user_id=user_id,
+            msg_id=obesrvation_gepid,
+            msg_size=sys.getsizeof(iot_input.json()),
+            msg_time=timestamp,
+            msg_malicious_position=not_authentic_number,
+            msg_authenticated_position=authentic_number,
+            msg_unknown_position=unknown_number,
+            msg_total_position=galileo_auth_number
 
-            )
+        )
 
     iot_output = iot_input.dict(exclude={"result": {"gnss"}})
     iot_output["result"].update({"authenticity": authenticity})
@@ -224,7 +226,8 @@ async def store_iot_data(
         obesrvation_gepid: str,
         source_app: str,
         client_id: str,
-        user_id: str
+        user_id: str,
+        semaphore: Semaphore
 ) -> None:
     """
     Store IoT data in the anonymizer
@@ -236,21 +239,22 @@ async def store_iot_data(
     :param source_app: app that made the request
     :param client_id: client_id expressed by the token
     :param user_id: user_id expressed by the token
+    :param semaphore: synchronize the requests and prevent starvation
     """
     try:
-        iot_output = await end_to_end_position_authentication(
-            iot_input=iot_input,
-            timestamp=timestamp,
-            host=host,
-            obesrvation_gepid=obesrvation_gepid,
-            source_app=source_app,
-            client_id=client_id,
-            user_id=user_id,
-            store=True
-        )
+        async with semaphore:
+            iot_output = await end_to_end_position_authentication(
+                iot_input=iot_input,
+                timestamp=timestamp,
+                host=host,
+                obesrvation_gepid=obesrvation_gepid,
+                source_app=source_app,
+                client_id=client_id,
+                user_id=user_id,
+                store=False
+            )
 
-        await store_in_the_anonengine(orjson.dumps(iot_output).decode("utf-8"), "store_iot_data_url")
-    except Exception as ex:
-        print(ex)
+        await store_in_the_anonengine(iot_output, "store_iot_data_url")
+    finally:
         return
 

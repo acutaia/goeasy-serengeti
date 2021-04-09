@@ -22,8 +22,8 @@ IoTFeed router package
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
 # Standard Library
-import asyncio
 import uuid
 import time
 
@@ -32,6 +32,7 @@ from fastapi import APIRouter, Body, Depends, Request, BackgroundTasks
 from fastapi.responses import ORJSONResponse
 
 # Internal
+from ..concurrency.iot import test_semaphore, store_semaphore
 from ..models.iot_feed.iot import IotInput
 from ..models.iot_feed.response_class import Resource
 from ..models.security import Requester
@@ -94,7 +95,8 @@ async def iot_authentication(
         obesrvation_gepid,
         source_app,
         requester.client,
-        requester.user
+        requester.user,
+        store_semaphore()
     )
     return Resource(observationGEPid=obesrvation_gepid)
 
@@ -115,8 +117,13 @@ async def authenticate_test(request: Request, iot_feed: IotInput = Body(...)):
     The following diagram shows the final software design of the authentication service.\n
     ![image](https:/serengeti/static/user_feed_authenticate_test.png)
     """
-    return await end_to_end_position_authentication(
-        iot_input=iot_feed,
-        timestamp=time.time(),
-        host=request.client.host,
-    )
+
+    # Get a semaphore to synchronize this request and prevent starvation
+    semaphore = test_semaphore()
+    async with semaphore:
+        iot_feed_test = await end_to_end_position_authentication(
+            iot_input=iot_feed,
+            timestamp=time.time(),
+            host=request.client.host,
+        )
+    return iot_feed_test

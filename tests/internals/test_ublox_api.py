@@ -134,6 +134,8 @@ class TestUbloxApi:
                 ublox_token=FAKE_TOKEN_FOR_TESTING
             )
 
+        await KEYCLOACK.close()
+
     @respx.mock
     @pytest.mark.asyncio
     async def test_get_ublox_message(self, mock_aioresponse):
@@ -174,6 +176,8 @@ class TestUbloxApi:
                 location=LOCATION,
                 ublox_token=FAKE_TOKEN_FOR_TESTING
             )
+
+        await KEYCLOACK.close()
 
     def test_construct_request(self):
         """ Test the construction of the body of the request made to Ublox-Api """
@@ -242,6 +246,8 @@ class TestUbloxApi:
                 location=LOCATION
             )
 
+        await KEYCLOACK.close()
+
     @respx.mock
     @pytest.mark.asyncio
     async def test_get_ublox_messages_list(self, mock_aioresponse):
@@ -292,3 +298,5 @@ class TestUbloxApi:
                 ublox_token=FAKE_TOKEN_FOR_TESTING,
                 location=LOCATION
             )
+
+        await KEYCLOACK.close()

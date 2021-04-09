@@ -23,10 +23,6 @@ Tests app.internals.keycloack module
     limitations under the License.
 """
 
-# Standard Library
-import asyncio
-from time import time
-
 # Test
 from aioresponses import aioresponses
 from fastapi import HTTPException
@@ -36,7 +32,6 @@ import uvloop
 # Internal
 from app.internals.keycloak import KEYCLOACK
 from .logger import disable_logger
-from ..mock.keycloack.constants import FAKE_TOKEN_FOR_TESTING
 from ..mock.keycloack.keycloack import (
     correct_get_blox_token,
     new_correct_get_blox_token,
@@ -103,3 +98,5 @@ class TestKeycloack:
             # Mock the request
             unauthorized_get_ublox_token(mock_aioresponse)
             await KEYCLOACK.get_ublox_token()
+
+        await KEYCLOACK.close()

@@ -23,6 +23,7 @@ UserFeed utilities package
     limitations under the License.
 """
 # Standard Library
+from asyncio import Semaphore
 import sys
 import time
 
@@ -123,7 +124,7 @@ async def end_to_end_position_authentication(
                         auth.svid,
                         auth.time,
                         ublox_token,
-                        location
+                        location,
                     )
                 except HTTPException as exc:
                     if store:
@@ -162,7 +163,7 @@ async def end_to_end_position_authentication(
                             auth.svid,
                             auth.time,
                             ublox_token,
-                            location
+                            location,
                         )
                     except HTTPException as exc:
                         if store:
@@ -239,7 +240,8 @@ async def store_android_data(
         journey_id: str,
         source_app: str,
         client_id: str,
-        user_id: str
+        user_id: str,
+        semaphore: Semaphore
 ) -> None:
     """
     Store UserFeed data in the anonymizer in a correct format
@@ -251,18 +253,20 @@ async def store_android_data(
     :param source_app: app that made the request
     :param client_id: client_id expressed by the token
     :param user_id: user_id expressed by the token
+    :param semaphore: synchronize the requests and prevent starvation
     """
     try:
-        user_feed = await end_to_end_position_authentication(
-            user_feed=user_feed_input,
-            timestamp=timestamp,
-            host=host,
-            journey_id=journey_id,
-            source_app=source_app,
-            client_id=client_id,
-            user_id=user_id,
-            store=True
-        )
+        async with semaphore:
+            user_feed = await end_to_end_position_authentication(
+                user_feed=user_feed_input,
+                timestamp=timestamp,
+                host=host,
+                journey_id=journey_id,
+                source_app=source_app,
+                client_id=client_id,
+                user_id=user_id,
+                store=False
+            )
         user_feed_output = UserFeedOutput.construct(
             **{
                 "app_defined_behaviour": user_feed.behaviour.app_defined,
