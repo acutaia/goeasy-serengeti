@@ -248,6 +248,78 @@ class TestIoT:
 
         clear_test()
 
+    @respx.mock
+    def test_authenticate_test(self, mock_aioresponse):
+        """Test the behaviour of  iot authentication endpoint"""
+
+        # Setup
+        clear_test()
+        with open(IOT_INPUT_PATH, "r") as fp:
+            IOT_INPUT = orjson.loads(fp.read())
+
+        # Mock the request
+        correct_get_blox_token(mock_aioresponse)
+        correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+
+        # Obtain tokens
+        invalid_token = generate_fake_token()
+        valid_token = generate_valid_token(realm=RolesEnum.test)
+        valid_token_role_not_present = generate_valid_token(realm=RolesEnum.fake)
+
+        with TestClient(app) as client:
+            # Try to use an invalid token
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/IoTauthenticate/test",
+                headers={
+                    "Authorization": f"Bearer {invalid_token}"
+                },
+                json=IOT_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use a valid token but without the requested role
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/IoTauthenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token_role_not_present}"
+                },
+                json=IOT_INPUT
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            # Try to use an invalid Authorization method in the header
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/IoTauthenticate/test",
+                headers={
+                    "Authorization": f"FAKE {invalid_token}"
+                },
+                json=IOT_INPUT
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+
+            # Use a valid token with the requester set to test
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/IoTauthenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token}"
+                },
+                json=IOT_INPUT
+            )
+            assert response.status_code == status.HTTP_200_OK
+            # we don't check the response value cause we've already tested end_to_end authentication
+
+            # Use a valid token with a wrong body
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/IoTauthenticate/test",
+                headers={
+                    "Authorization": f"Bearer {valid_token}"
+                },
+                json={"Wrong": "Body"}
+            )
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        clear_test()
+
 
 class TestJourney:
     """Test Journey Router"""
