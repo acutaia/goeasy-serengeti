@@ -22,8 +22,10 @@ Mocked keycloack http requests
     limitations under the License.
 """
 
+# Standard Library
+from asyncio import TimeoutError
+
 # Third Party
-from aiohttp import ServerTimeoutError
 from aioresponses import aioresponses
 from fastapi import status
 import orjson
@@ -73,7 +75,7 @@ def unreachable_get_ublox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
     m.post(
         TOKEN_REQUEST_URL,
-        exception=ServerTimeoutError("Timeout")
+        exception=TimeoutError("Timeout")
     )
 
 

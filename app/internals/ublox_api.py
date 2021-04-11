@@ -22,11 +22,13 @@ Ublox-Api package
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
 # Standard Library
+from asyncio import TimeoutError
 from typing import Optional, List
 
 # Third Party
-from aiohttp import ClientSession, ClientResponseError, ServerTimeoutError
+from aiohttp import ClientSession, ClientResponseError
 from fastapi import status, HTTPException
 import orjson
 
@@ -81,7 +83,8 @@ async def _get_raw_data(
                 f"{url}/{svid}/{timestamp}",
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
-                }
+                },
+                timeout=1.5
         ) as resp:
             # Return RawData
             return UbloxAPI.parse_obj(
@@ -111,7 +114,8 @@ async def _get_raw_data(
                 f"{url}/{svid}/{timestamp}",
                 headers={
                     "Authorization": f"Bearer {ublox_token}"
-                }
+                },
+                timeout=1.5
         ) as resp:
             # Return RawData
             return UbloxAPI.parse_obj(
@@ -122,16 +126,16 @@ async def _get_raw_data(
                 )
             ).raw_data
 
-    except ServerTimeoutError as exc:
-        # Can't contact Ublox-Api
+    except TimeoutError:
+        # Ublox-Api is in starvation
         await logger.warning(
             {
-                "error": exc
+                "error": "Ublox-Api is in starvation"
             }
         )
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Ublox-Api service"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Ublox-Api service unavailable"
         )
 
 
@@ -217,7 +221,8 @@ async def _get_ublox_api_list(
             json=data,
             headers={
                 "Authorization": f"Bearer {ublox_token}",
-            }
+            },
+            timeout=1.5
         ) as resp:
             # Return Info requested
             return UbloxAPIList.parse_obj(
@@ -249,7 +254,8 @@ async def _get_ublox_api_list(
                 json=data,
                 headers={
                     "Authorization": f"Bearer {ublox_token}",
-                }
+                },
+                timeout=1.5
         ) as resp:
             # Return Info requested
             return UbloxAPIList.parse_obj(
@@ -261,16 +267,16 @@ async def _get_ublox_api_list(
                 )
             ).info
 
-    except ServerTimeoutError as exc:
-        # Can't contact Ublox-Api
+    except TimeoutError:
+        # Ublox-Api is in starvation
         await logger.warning(
             {
-                "error": exc
+                "error": "Ublox-Api is in starvation"
             }
         )
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Ublox-Api service"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Ublox-Api service unavailable"
         )
 
 

@@ -23,10 +23,10 @@ Mocked Ublox Api http get requests
 """
 
 # Standard Library
+from asyncio import TimeoutError
 from typing import Optional
 
 # Third Party
-from aiohttp import ServerTimeoutError
 from aioresponses import aioresponses
 from fastapi import status
 import orjson
@@ -94,7 +94,7 @@ def unreachable_get_raw_data(m: aioresponses, url: str):
     :param url: Galileo or Ublox
     :return:
     """
-    m.get(url, exception=ServerTimeoutError("Timeout"))
+    m.get(url, exception=TimeoutError("Timeout"))
 
 
 

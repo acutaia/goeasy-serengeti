@@ -24,13 +24,13 @@ Keycloack package
 """
 
 # Standard Library
-from asyncio import Lock
+from asyncio import Lock, TimeoutError
 from functools import lru_cache
 import time
 
 # Third Party
 from fastapi import status, HTTPException
-from aiohttp import ClientSession, ClientResponseError, ClientTimeout, ServerTimeoutError, TCPConnector
+from aiohttp import ClientSession, ClientResponseError, ClientTimeout, TCPConnector
 import orjson
 
 # Internal
@@ -128,19 +128,19 @@ class _Keycloak:
             )
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Wrong credentials"
+                detail="Wrong keycloack credentials"
             )
-        except ServerTimeoutError as exc:
-            # Can't contact keycloack
+        except TimeoutError:
+            # Keycloack is in starvation
             await logger.warning(
                 {
                     "url": settings.token_request_url,
-                    "error": exc
+                    "error": "Keycloack is in starvation"
                 }
             )
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Can't contact Keycloack service"
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Keycloack service not available"
             )
 
     async def get_ublox_token(self):

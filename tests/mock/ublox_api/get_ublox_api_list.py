@@ -23,10 +23,10 @@ Mocked Ublox Api http post requests
 """
 
 # Standard Library
+from asyncio import TimeoutError
 from typing import Optional
 
 # Third Party
-from aiohttp import ServerTimeoutError
 from aioresponses import aioresponses
 from fastapi import status
 import orjson
@@ -93,7 +93,7 @@ def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Option
     )
 
 
-def unreachable_get_ublox_api_list(m: aioresponses,url: str):
+def unreachable_get_ublox_api_list(m: aioresponses, url: str):
     """
     Mock the behaviour in case of Ublox-Api is unreachable
 
@@ -101,7 +101,7 @@ def unreachable_get_ublox_api_list(m: aioresponses,url: str):
     :param url: Galileo or Ublox
     :return:
     """
-    m.post(url, exception=ServerTimeoutError("Timeout"))
+    m.post(url, exception=TimeoutError("Timeout"))
 
 
 
