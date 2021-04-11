@@ -24,8 +24,8 @@ Tests app.internals.anonymizer module
 """
 
 # Test
+from aioresponses import aioresponses
 from fastapi import HTTPException
-import respx
 import pytest
 import uvloop
 
@@ -59,64 +59,68 @@ def event_loop():
     loop.close()
 
 
+@pytest.fixture
+def mock_aioresponse():
+    with aioresponses() as m:
+        yield m
+
+
 class TestAnonengine:
     """
     Test the anonymizer module
     """
 
-    @respx.mock
     @pytest.mark.asyncio
-    async def test_store_user_in_the_anonengine(self):
+    async def test_store_user_in_the_anonengine(self, mock_aioresponse):
         """ Test the behaviour of store_user_in_the_anonengine """
 
         # Disable the logger of the app
         disable_logger()
 
         # Mock the request
-        correct_store_user_in_the_anonengine()
+        correct_store_user_in_the_anonengine(mock_aioresponse)
         assert (
             await store_in_the_anonengine({"Foo": "Bar"}) is None
         ), "We aren't interested in the response"
 
-        with pytest.raises(HTTPException):
-            # Mock the request
-            unreachable_store_user_in_the_anonengine()
-            await store_in_the_anonengine({"Foo": "Bar"})
+        # Mock the request
+        unreachable_store_user_in_the_anonengine(mock_aioresponse)
+        assert (
+            await store_in_the_anonengine({"Foo": "Bar"}) is None
+        ), "We aren't interested in the response"
 
-    @respx.mock
     @pytest.mark.asyncio
-    async def test_extract_details(self):
+    async def test_extract_details(self, mock_aioresponse):
         """ Test the behaviour of correct_extract_details """
 
         # Disable the logger of the app
         disable_logger()
 
         # Mock the request
-        correct_extract_details(journey_id="TEST")
+        correct_extract_details(mock_aioresponse, journey_id="TEST")
         assert (
             await extract_details(journey_id="TEST") == MOCKED_RESPONSE
         ), "Response must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
-            unreachable_extract_details(journey_id="TEST")
+            unreachable_extract_details(mock_aioresponse, journey_id="TEST")
             await extract_details(journey_id="TEST")
 
-    @respx.mock
     @pytest.mark.asyncio
-    async def test_extract_mobility(self):
+    async def test_extract_mobility(self, mock_aioresponse):
         """ Test the behaviour of correct_extract_details """
 
         # Disable the logger of the app
         disable_logger()
 
         # Mock the request
-        correct_extract_mobility(journey_id="TEST")
+        correct_extract_mobility(mock_aioresponse, journey_id="TEST")
         assert (
             await extract_mobility(journey_id="TEST") == MOCKED_RESPONSE
         ), "Response must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
-            unreachable_extract_mobility(journey_id="TEST")
+            unreachable_extract_mobility(mock_aioresponse, journey_id="TEST")
             await extract_mobility(journey_id="TEST")

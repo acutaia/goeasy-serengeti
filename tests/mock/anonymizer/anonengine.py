@@ -23,10 +23,13 @@ Anonymizer mocked Http requests
     limitations under the License.
 """
 
+# Standard Library
+from asyncio import TimeoutError
+
 # Third Party
+from aioresponses import aioresponses
 from fastapi import status
-from httpx import Response, RequestError
-import respx
+import orjson
 
 # Internal
 from .constants import (
@@ -39,37 +42,43 @@ from .constants import (
 # ----------------------------------------------------------------------------------------------
 
 
-def correct_store_user_in_the_anonengine():
-    respx.post(URL_STORE_DATA).mock(
-        return_value=Response(status_code=status.HTTP_200_OK, json=MOCKED_RESPONSE)
+def correct_store_user_in_the_anonengine(m: aioresponses):
+    m.post(
+        URL_STORE_DATA,
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(MOCKED_RESPONSE).decode(),
     )
 
 
-def unreachable_store_user_in_the_anonengine():
-    respx.post(URL_STORE_DATA).mock(side_effect=RequestError)
+def unreachable_store_user_in_the_anonengine(m: aioresponses):
+    m.post(URL_STORE_DATA, exception=TimeoutError("Timeout"))
 
 
 # ----------------------------------------------------------------------------------------------
 
 
-def correct_extract_mobility(journey_id: str):
-    respx.get(f"{URL_EXTRACT_MOBILITY}/{journey_id}").mock(
-        return_value=Response(status_code=status.HTTP_200_OK, json=MOCKED_RESPONSE)
+def correct_extract_mobility(m: aioresponses, journey_id: str):
+    m.get(
+        f"{URL_EXTRACT_MOBILITY}/{journey_id}",
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(MOCKED_RESPONSE).decode(),
     )
 
 
-def unreachable_extract_mobility(journey_id: str):
-    respx.get(f"{URL_EXTRACT_MOBILITY}/{journey_id}").mock(side_effect=RequestError)
+def unreachable_extract_mobility(m: aioresponses, journey_id: str):
+    m.get(f"{URL_EXTRACT_MOBILITY}/{journey_id}", exception=TimeoutError("Timeout"))
 
 
 # ----------------------------------------------------------------------------------------------
 
 
-def correct_extract_details(journey_id: str):
-    respx.get(f"{URL_EXTRACT_DETAILS}/{journey_id}").mock(
-        return_value=Response(status_code=status.HTTP_200_OK, json=MOCKED_RESPONSE)
+def correct_extract_details(m: aioresponses, journey_id: str):
+    m.get(
+        f"{URL_EXTRACT_DETAILS}/{journey_id}",
+        status=status.HTTP_200_OK,
+        body=orjson.dumps(MOCKED_RESPONSE).decode(),
     )
 
 
-def unreachable_extract_details(journey_id: str):
-    respx.get(f"{URL_EXTRACT_DETAILS}/{journey_id}").mock(side_effect=RequestError)
+def unreachable_extract_details(m: aioresponses, journey_id: str):
+    m.get(f"{URL_EXTRACT_DETAILS}/{journey_id}", exception=TimeoutError("Timeout"))

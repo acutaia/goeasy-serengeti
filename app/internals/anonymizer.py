@@ -24,16 +24,17 @@ Anonymizer package
 """
 
 # Standard library
+from asyncio import TimeoutError
 from typing import Any
 
 # Third Party
+from aiohttp import ClientError
 from fastapi import status, HTTPException
-import httpx
 import orjson
 
 # Internal
 from .logger import get_logger
-from .session import get_anonymizer_session
+from .sessions.anonymizer import get_anonengine_session
 from ..config import get_anonymizer_settings
 
 # --------------------------------------------------------------------------------------------
@@ -51,20 +52,18 @@ async def store_in_the_anonengine(data: dict) -> None:
     anonymizer_settings = get_anonymizer_settings()
     try:
         # Store data
-        client = get_anonymizer_session()
-        response = await client.post(
-            anonymizer_settings.store_data_url, data=data, timeout=1
-        )
-        await logger.debug(orjson.loads(response.content))
-    except httpx.RequestError as exc:
+        session = get_anonengine_session()
+        async with session.post(
+            anonymizer_settings.store_data_url, json=data, timeout=1
+        ):
+            pass
+
+    except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
-        await logger.error(
-            {"method": exc.request.method, "url": exc.request.url, "error": exc}
+        await logger.warning(
+            {"url": anonymizer_settings.store_data_url, "error": repr(str(exc))}
         )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Anonymizer service",
-        )
+        return
 
 
 # --------------------------------------------------------------------------------------------
@@ -82,19 +81,19 @@ async def _extract(url: str) -> Any:
     logger = get_logger()
 
     try:
-        client = get_anonymizer_session()
-        response = await client.get(url, timeout=25)
+        session = get_anonengine_session()
+        async with session.get(url, timeout=20) as resp:
+            return await resp.json(
+                encoding="utf-8", loads=orjson.loads, content_type=None
+            )
 
-    except httpx.RequestError as exc:
+    except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
-        await logger.error(
-            {"method": exc.request.method, "url": exc.request.url, "error": exc}
-        )
+        await logger.warning({"url": url, "error": repr(str(exc))})
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Can't contact Anonymizer service",
         )
-    return orjson.loads(response.content)
 
 
 # --------------------------------------------------------------------------------------------

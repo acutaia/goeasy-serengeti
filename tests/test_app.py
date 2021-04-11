@@ -375,7 +375,7 @@ class TestJourney:
         journey_id = TestJourney.setup()
 
         # Mock the request
-        correct_extract_mobility(journey_id=journey_id)
+        correct_extract_mobility(mock_aioresponse, journey_id=journey_id)
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -400,7 +400,7 @@ class TestJourney:
         journey_id = TestJourney.setup()
 
         # Mock the request
-        correct_extract_details(journey_id=journey_id)
+        correct_extract_details(mock_aioresponse, journey_id=journey_id)
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -500,7 +500,7 @@ class TestUser:
             mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo
         )
         correct_store_in_iota()
-        correct_store_user_in_the_anonengine()
+        correct_store_user_in_the_anonengine(mock_aioresponse)
         correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_USER_DATA)
 
         # Obtain tokens

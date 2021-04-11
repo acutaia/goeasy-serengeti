@@ -220,7 +220,7 @@ class TestUserFeed:
         )
         correct_store_in_iota()
         correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_USER_DATA)
-        correct_store_user_in_the_anonengine()
+        correct_store_user_in_the_anonengine(mock_aioresponse)
 
         user_feed_validated = await end_to_end_position_authentication(
             user_feed=USER_INPUT, timestamp=time.time(), host="localhost"
