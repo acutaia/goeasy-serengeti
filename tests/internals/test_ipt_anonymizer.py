@@ -73,22 +73,16 @@ class TestIPTAnonymizer:
         for url in (URL_STORE_USER_DATA, URL_STORE_IOT_DATA):
             # Mock the request
             correct_store_in_ipt_anonymizer(mock_aioresponse, url)
-            assert await store_in_the_anonymizer(
-                {"Foo": "Bar"}, url
-            ) is None, "We aren't interested in the response"
+            assert (
+                await store_in_the_anonymizer({"Foo": "Bar"}, url) is None
+            ), "We aren't interested in the response"
 
             with pytest.raises(HTTPException):
                 # Mock the request
                 unreachable_store_in_ipt_anonymizer(mock_aioresponse, url)
-                await store_in_the_anonymizer(
-                    {"Foo": "Bar"},
-                    URL_STORE_USER_DATA
-                )
+                await store_in_the_anonymizer({"Foo": "Bar"}, URL_STORE_USER_DATA)
 
             with pytest.raises(HTTPException):
                 # Mock the request
                 starvation_store_in_ipt_anonymizer(mock_aioresponse, url)
-                await store_in_the_anonymizer(
-                    {"Foo": "Bar"},
-                    URL_STORE_USER_DATA
-                )
+                await store_in_the_anonymizer({"Foo": "Bar"}, URL_STORE_USER_DATA)

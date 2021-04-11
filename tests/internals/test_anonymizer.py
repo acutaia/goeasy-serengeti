@@ -30,7 +30,11 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.anonymizer import store_in_the_anonengine, extract_details, extract_mobility
+from app.internals.anonymizer import (
+    store_in_the_anonengine,
+    extract_details,
+    extract_mobility,
+)
 from .logger import disable_logger
 from ..mock.anonymizer.constants import MOCKED_RESPONSE
 from ..mock.anonymizer.anonengine import (
@@ -39,7 +43,7 @@ from ..mock.anonymizer.anonengine import (
     correct_extract_details,
     unreachable_extract_details,
     correct_extract_mobility,
-    unreachable_extract_mobility
+    unreachable_extract_mobility,
 )
 
 # ------------------------------------------------------------------------------
@@ -70,7 +74,9 @@ class TestAnonengine:
 
         # Mock the request
         correct_store_user_in_the_anonengine()
-        assert await store_in_the_anonengine({"Foo": "Bar"}) is None, "We aren't interested in the response"
+        assert (
+            await store_in_the_anonengine({"Foo": "Bar"}) is None
+        ), "We aren't interested in the response"
 
         with pytest.raises(HTTPException):
             # Mock the request
@@ -87,7 +93,9 @@ class TestAnonengine:
 
         # Mock the request
         correct_extract_details(journey_id="TEST")
-        assert await extract_details(journey_id="TEST") == MOCKED_RESPONSE, "Response must be the same"
+        assert (
+            await extract_details(journey_id="TEST") == MOCKED_RESPONSE
+        ), "Response must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
@@ -104,11 +112,11 @@ class TestAnonengine:
 
         # Mock the request
         correct_extract_mobility(journey_id="TEST")
-        assert await extract_mobility(journey_id="TEST") == MOCKED_RESPONSE, "Response must be the same"
+        assert (
+            await extract_mobility(journey_id="TEST") == MOCKED_RESPONSE
+        ), "Response must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
             unreachable_extract_mobility(journey_id="TEST")
             await extract_mobility(journey_id="TEST")
-
-

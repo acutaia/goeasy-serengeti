@@ -50,12 +50,7 @@ def correct_get_raw_data(m: aioresponses, url: str, raw_data: Optional[str]):
     m.get(
         url,
         status=status.HTTP_200_OK,
-        body=orjson.dumps(
-            {
-                "timestamp": TIMESTAMP,
-                "raw_data": raw_data
-            }
-        ).decode()
+        body=orjson.dumps({"timestamp": TIMESTAMP, "raw_data": raw_data}).decode(),
     )
 
 
@@ -70,19 +65,11 @@ def token_expired_get_raw_data(m: aioresponses, url: str, raw_data: Optional[str
     """
 
     correct_get_blox_token(m)
-    m.get(
-        url,
-        status=status.HTTP_401_UNAUTHORIZED
-    )
+    m.get(url, status=status.HTTP_401_UNAUTHORIZED)
     m.get(
         url,
         status=status.HTTP_200_OK,
-        body=orjson.dumps(
-            {
-                "timestamp": TIMESTAMP,
-                "raw_data": raw_data
-            }
-        ).decode()
+        body=orjson.dumps({"timestamp": TIMESTAMP, "raw_data": raw_data}).decode(),
     )
 
 
@@ -95,8 +82,3 @@ def unreachable_get_raw_data(m: aioresponses, url: str):
     :return:
     """
     m.get(url, exception=TimeoutError("Timeout"))
-
-
-
-
-

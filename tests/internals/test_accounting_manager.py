@@ -39,7 +39,7 @@ from ..mock.accounting_manager.iota import (
     correct_get_iota_user,
     correct_store_in_iota,
     unreachable_get_iota_user,
-    unreachable_store_in_iota
+    unreachable_store_in_iota,
 )
 
 # ------------------------------------------------------------------------------
@@ -70,7 +70,9 @@ class TestAccountingManager:
 
         # Mock the request
         correct_get_iota_user(user="TEST")
-        assert await get_iota_user(user="TEST") == {"user": "TEST"}, "User must be the same"
+        assert await get_iota_user(user="TEST") == {
+            "user": "TEST"
+        }, "User must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
@@ -87,32 +89,37 @@ class TestAccountingManager:
 
         # Mock the request
         correct_store_in_iota()
-        assert await store_in_iota(
-            source_app="TEST",
-            client_id="TEST",
-            user_id="TEST",
-            msg_id="TEST",
-            msg_size=0,
-            msg_time=time.time(),
-            msg_total_position=0,
-            msg_authenticated_position=0,
-            msg_unknown_position=0,
-            msg_malicious_position=0
-        ) is None, "We aren't interested in the response"
+        assert (
+            await store_in_iota(
+                source_app="TEST",
+                client_id="TEST",
+                user_id="TEST",
+                msg_id="TEST",
+                msg_size=0,
+                msg_time=time.time(),
+                msg_total_position=0,
+                msg_authenticated_position=0,
+                msg_unknown_position=0,
+                msg_malicious_position=0,
+            )
+            is None
+        ), "We aren't interested in the response"
 
         # Mock the request
         unreachable_store_in_iota()
         # The exceptions in store in iota are ignored, they are only logged
-        assert await store_in_iota(
-            source_app="TEST",
-            client_id="TEST",
-            user_id="TEST",
-            msg_id="TEST",
-            msg_size=0,
-            msg_time=time.time(),
-            msg_total_position=0,
-            msg_authenticated_position=0,
-            msg_unknown_position=0,
-            msg_malicious_position=0
-        ) is None, "We aren't interested in the response"
-
+        assert (
+            await store_in_iota(
+                source_app="TEST",
+                client_id="TEST",
+                user_id="TEST",
+                msg_id="TEST",
+                msg_size=0,
+                msg_time=time.time(),
+                msg_total_position=0,
+                msg_authenticated_position=0,
+                msg_unknown_position=0,
+                msg_malicious_position=0,
+            )
+            is None
+        ), "We aren't interested in the response"

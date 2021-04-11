@@ -38,22 +38,23 @@ from ..model import OrjsonModel
 
 class Behaviour(OrjsonModel):
     """User Behaviour"""
+
     app_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="Application Defined Behaviour",
         description="Mobile application standalone detection of mobility types and the segments within the journey",
-        example=[]
+        example=[],
     )
     tpv_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="Third Party Defined Behaviour",
         description="Autonomous detection of mobility types and the segments within the journey",
-        example=[]
+        example=[],
     )
     user_defined: List[Optional[TrackSegmentsOutput]] = Field(
         ...,
         title="User Defined Behaviour",
         description="""The users specify through the mobile app the type of mobility
                     (necessary to produce legitimate data to be used for the learning process of the third-party system)
-                    """
+                    """,
     )

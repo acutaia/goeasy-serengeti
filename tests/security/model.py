@@ -72,16 +72,12 @@ class Token(OrjsonModel):
     aud: str = AUDIENCE
     sub: str = str(uuid.uuid4())
     typ: str = "Bearer"
-    azp: str = Field(
-        ...
-    )
+    azp: str = Field(...)
     auth_time: int = 0
     session_state: str = str(uuid.uuid4())
     acr: int = 1
     client_session: str = str(uuid.uuid4())
     allowed_origins: list = []
     realm_access: Roles
-    resource_access: dict = {
-        "roles": ["Testing"]
-    }
+    resource_access: dict = {"roles": ["Testing"]}
     name: str = ""

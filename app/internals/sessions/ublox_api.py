@@ -50,7 +50,7 @@ class UbloxApiSession:
                 timeout=timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=True,
-                connector_owner=True
+                connector_owner=True,
             )
         )
         return self

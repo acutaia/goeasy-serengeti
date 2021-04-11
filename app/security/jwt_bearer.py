@@ -40,7 +40,12 @@ from ..models.security import Requester
 
 
 class Signature(HTTPBearer):
-    def __init__(self, realm_access: str, return_realm_access_list: bool = False, return_requester: bool = False):
+    def __init__(
+        self,
+        realm_access: str,
+        return_realm_access_list: bool = False,
+        return_requester: bool = False,
+    ):
         super().__init__()
         self.realm_access = realm_access
         self.return_realm_access_list = return_realm_access_list
@@ -51,7 +56,7 @@ class Signature(HTTPBearer):
         if not credentials.scheme == "Bearer":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Wrong authentication method"
+                detail="Wrong authentication method",
             )
 
         # Get Security settings
@@ -63,7 +68,8 @@ class Signature(HTTPBearer):
                 jwt_token,
                 f"-----BEGIN PUBLIC KEY-----\n"
                 f"{settings.realm_public_key}"
-                f"\n-----END PUBLIC KEY-----""",
+                f"\n-----END PUBLIC KEY-----"
+                "",
                 settings.algorithm,
                 issuer=settings.issuer,
                 options={
@@ -72,24 +78,18 @@ class Signature(HTTPBearer):
             )
         except JWTError:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="invalid_bearer_token"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_bearer_token"
             )
 
         # Get Logger
         logger = get_logger()
 
         # Token debug
-        await logger.debug(
-            {
-                "token_roles": token["realm_access"]["roles"]
-            }
-        )
+        await logger.debug({"token_roles": token["realm_access"]["roles"]})
 
         if self.realm_access not in token["realm_access"]["roles"]:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="invalid_bearer_token"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_bearer_token"
             )
         if self.return_realm_access_list:
             return token["realm_access"]["roles"]
@@ -102,10 +102,7 @@ class Signature(HTTPBearer):
 
             # Requester debug
             await logger.debug(
-                {
-                    "requester_client": requester.client,
-                    "requester_user": requester.user
-                }
+                {"requester_client": requester.client, "requester_user": requester.user}
             )
 
             return requester

@@ -42,42 +42,32 @@ class Response(OrjsonModel):
     """
     Telemetry
     """
-    value: float = Field(
-        ...,
-        description="Value sensed",
-        example=6.8
-    )
+
+    value: float = Field(..., description="Value sensed", example=6.8)
 
 
 class Result(OrjsonModel):
     """
     Result of the measurement
     """
+
     valueType: Literal["NO2"] = Field(
-        ...,
-        title="NO2",
-        description="Type of measurement",
-        example="NO2"
+        ..., title="NO2", description="Type of measurement", example="NO2"
     )
-    Position: Point = Field(
-        ...,
-        description="Position where the measurement occurred"
-    )
-    response: Response = Field(
-        ...,
-        description="Measurement"
-    )
+    Position: Point = Field(..., description="Position where the measurement occurred")
+    response: Response = Field(..., description="Measurement")
 
 
 class ResultInput(Result):
     """
     Input of the result measurement
     """
+
     gnss: Gnss = Field(
         ...,
         title="Gnss",
         description="Raw Galileo Navigation Message",
-        example="B56202133000000C00000A0102392A34C022408C238A04B389169EBC400E228044BFE80F43A8E604821235344582F90FD29628100086B197B56202133000001800000A0602392A34C022408C238A04B389169EBC400E228044BFE80F43A8E604821235344582F90FD29628100086C2A2B56202133000001900000A0502392A34C022408C238A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F1670110086AE66B56202133000001300000A0402392A34C0223A8C230A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F167011008621C9B56202133000000F00000A0302392A34C022408C238A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F1670110086A23A"
+        example="B56202133000000C00000A0102392A34C022408C238A04B389169EBC400E228044BFE80F43A8E604821235344582F90FD29628100086B197B56202133000001800000A0602392A34C022408C238A04B389169EBC400E228044BFE80F43A8E604821235344582F90FD29628100086C2A2B56202133000001900000A0502392A34C022408C238A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F1670110086AE66B56202133000001300000A0402392A34C0223A8C230A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F167011008621C9B56202133000000F00000A0302392A34C022408C238A90B48916CFBB80133EC0433FF21043A8FD0E8092BF27458235259F1670110086A23A",
     )
 
 
@@ -85,6 +75,7 @@ class ResultOutput(Result):
     """
     Output of the result measurement
     """
+
     authenticity: Authenticity = Field(
         ...,
         title="Authenticity of the data",
@@ -93,5 +84,5 @@ class ResultOutput(Result):
                        1     | Authentic     | Input raw data are authentic
                        -1    | Unknown       | Input raw data aren't present or impossible to authenticate 
                        0     | Not Authentic | Input raw data aren't authentic""",
-        example=1
+        example=1,
     )

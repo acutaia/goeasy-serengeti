@@ -44,21 +44,17 @@ from app.models.security import Authenticity
 
 from tests.mock.ublox_api.get_raw_data import (
     correct_get_raw_data,
-    unreachable_get_raw_data
+    unreachable_get_raw_data,
 )
 from tests.mock.ublox_api.get_ublox_api_list import (
     correct_get_ublox_api_list,
-    unreachable_get_ublox_api_list
+    unreachable_get_ublox_api_list,
 )
 
 from tests.mock.anonymizer.constants import URL_STORE_IOT_DATA
 from tests.mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
 from tests.mock.keycloack.keycloack import correct_get_blox_token
-from tests.mock.ublox_api.constants import (
-    RaW_Ublox,
-    URL_GET_UBLOX,
-    URL_POST_UBLOX
-)
+from tests.mock.ublox_api.constants import RaW_Ublox, URL_GET_UBLOX, URL_POST_UBLOX
 
 from tests.mock.accounting_manager.iota import correct_store_in_iota
 from .constants import IOT_INPUT_PATH
@@ -93,6 +89,7 @@ class TestIotFeed:
     """
     Test the iot module
     """
+
     @respx.mock
     @pytest.mark.asyncio
     async def test_end_to_end_position_authentication(self, mock_aioresponse):
@@ -121,11 +118,13 @@ class TestIotFeed:
             source_app="TEST",
             client_id="TEST",
             user_id="TEST",
-            obesrvation_gepid="TEST"
+            obesrvation_gepid="TEST",
         )
 
         # Check if the object was generated well
-        assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
+        assert (
+            iot_output["result"]["authenticity"] == Authenticity.authentic
+        ), "The position is authentic"
 
         # Position Unknown
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=None)
@@ -137,15 +136,19 @@ class TestIotFeed:
             source_app="TEST",
             client_id="TEST",
             user_id="TEST",
-            obesrvation_gepid="TEST"
+            obesrvation_gepid="TEST",
         )
 
         # Check if the object was generated well
-        assert iot_output["result"]["authenticity"] == Authenticity.unknown, "The position is unknown"
+        assert (
+            iot_output["result"]["authenticity"] == Authenticity.unknown
+        ), "The position is unknown"
 
         # Position false fake
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
-        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox)
+        correct_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox
+        )
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -154,15 +157,19 @@ class TestIotFeed:
             source_app="TEST",
             client_id="TEST",
             user_id="TEST",
-            obesrvation_gepid="TEST"
+            obesrvation_gepid="TEST",
         )
 
         # Check if the object was generated well
-        assert iot_output["result"]["authenticity"] == Authenticity.authentic, "The position is authentic"
+        assert (
+            iot_output["result"]["authenticity"] == Authenticity.authentic
+        ), "The position is authentic"
 
         # Position real fake
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FAKE")
-        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data="REAL_FAKE")
+        correct_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_UBLOX, raw_data="REAL_FAKE"
+        )
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -171,11 +178,13 @@ class TestIotFeed:
             source_app="TEST",
             client_id="TEST",
             user_id="TEST",
-            obesrvation_gepid="TEST"
+            obesrvation_gepid="TEST",
         )
 
         # Check if the object was generated well
-        assert iot_output["result"]["authenticity"] == Authenticity.not_authentic, "The position is not authentic"
+        assert (
+            iot_output["result"]["authenticity"] == Authenticity.not_authentic
+        ), "The position is not authentic"
 
         # Something went wrong during the request of a single raw_data
         with pytest.raises(HTTPException):
@@ -188,13 +197,15 @@ class TestIotFeed:
                 source_app="TEST",
                 client_id="TEST",
                 user_id="TEST",
-                obesrvation_gepid="TEST"
+                obesrvation_gepid="TEST",
             )
 
         # Something went wrong during the request of a List[UbloxApi]
         with pytest.raises(HTTPException):
             # Mock the requests
-            correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data="FALSE_FAKE")
+            correct_get_raw_data(
+                mock_aioresponse, url=URL_GET_UBLOX, raw_data="FALSE_FAKE"
+            )
             unreachable_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX)
             await end_to_end_position_authentication(
                 iot_input=IOT_INPUT,
@@ -203,7 +214,7 @@ class TestIotFeed:
                 source_app="TEST",
                 client_id="TEST",
                 user_id="TEST",
-                obesrvation_gepid="TEST"
+                obesrvation_gepid="TEST",
             )
 
         # Close Keycloack session
@@ -242,7 +253,7 @@ class TestIotFeed:
             source_app="TEST",
             client_id="TEST",
             user_id="TEST",
-            semaphore=Semaphore(2)
+            semaphore=Semaphore(2),
         )
 
         # Close Keycloack session

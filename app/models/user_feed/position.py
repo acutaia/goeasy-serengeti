@@ -47,43 +47,31 @@ class PositionObject(OrjsonModel):
                          1   | Authentic     | Input raw data are authentic
                         -1   | Unknown       | Input raw data aren't present or impossible to authenticate 
                          0   | Not Authentic | Input raw data aren't authentic""",
-        example=1
+        example=1,
     )
 
     lat: float = Field(
-        ...,
-        title="Latitude",
-        description="Position latitude",
-        example=45.0700976
+        ..., title="Latitude", description="Position latitude", example=45.0700976
     )
 
     lon: float = Field(
-        ...,
-        title="Longitude",
-        description="Position longitude",
-        example=7.4728034
+        ..., title="Longitude", description="Position longitude", example=7.4728034
     )
     partialDistance: int = Field(
         ...,
         title="Partial Distance",
         description="Partial distance covered from the starting point to that position (meters)",
-        example=76
+        example=76,
     )
-    time: int = Field(
-        ...,
-        description="UTC Unix time in ms",
-        example=1611819579051
-    )
+    time: int = Field(..., description="UTC Unix time in ms", example=1611819579051)
 
 
 class PositionObjectInput(PositionObject):
-    galileo_auth: List[Optional[GalileoAuth]] = Field(
-        ...,
-        description="Authorization"
-    )
+    galileo_auth: List[Optional[GalileoAuth]] = Field(..., description="Authorization")
 
     galileo_status: Union[Optional[GalileoStatus], OrjsonModel] = Field(
         description="Status of the galileo signal"
     )
+
 
 # --------------------------------------------------------------------------------------------

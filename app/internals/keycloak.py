@@ -68,11 +68,11 @@ class _Keycloak:
 
         # Instantiate a session
         self.session = ClientSession(
-                    raise_for_status=True,
-                    json_serialize=lambda x: orjson.dumps(x).decode(),
-                    timeout=timeout,
-                    connector=connector
-            )
+            raise_for_status=True,
+            json_serialize=lambda x: orjson.dumps(x).decode(),
+            timeout=timeout,
+            connector=connector,
+        )
         self.async_lock = Lock()
         self.last_token = await self._get_token()
         self.last_token_reception_time = time.time()
@@ -101,14 +101,12 @@ class _Keycloak:
                     "username": settings.username_keycloak,
                     "password": settings.password,
                     "grant_type": settings.grant_type,
-                    "client_secret": settings.client_secret
-                }
+                    "client_secret": settings.client_secret,
+                },
             ) as resp:
                 return Token.parse_obj(
                     await resp.json(
-                        encoding="utf-8",
-                        loads=orjson.loads,
-                        content_type=None
+                        encoding="utf-8", loads=orjson.loads, content_type=None
                     )
                 ).access_token
 
@@ -123,24 +121,24 @@ class _Keycloak:
                     "grant_type": settings.grant_type,
                     "client_secret": settings.client_secret,
                     "status_code": exc.status,
-                    "error": exc.message
+                    "error": exc.message,
                 }
             )
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Wrong keycloack credentials"
+                detail="Wrong keycloack credentials",
             )
         except TimeoutError:
             # Keycloack is in starvation
             await logger.warning(
                 {
                     "url": settings.token_request_url,
-                    "error": "Keycloack is in starvation"
+                    "error": "Keycloack is in starvation",
                 }
             )
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Keycloack service not available"
+                detail="Keycloack service not available",
             )
 
     async def get_ublox_token(self):
@@ -175,6 +173,7 @@ class _Keycloak:
         # return the stored token
         return self.last_token
 
+
 # --------------------------------------------------------------------------------------------
 
 
@@ -182,6 +181,7 @@ class _Keycloak:
 def _get_keycloack() -> _Keycloak:
     """Instantiate a singleton Keycloack"""
     return _Keycloak()
+
 
 # --------------------------------------------------------------------------------------------
 

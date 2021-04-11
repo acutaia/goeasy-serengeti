@@ -35,7 +35,7 @@ from app.internals.ublox_api import (
     get_ublox_message,
     get_galileo_messages_list,
     get_ublox_messages_list,
-    construct_request
+    construct_request,
 )
 from app.internals.keycloak import KEYCLOACK
 from app.internals.sessions.ublox_api import get_ublox_api_session
@@ -51,19 +51,19 @@ from ..mock.ublox_api.constants import (
     SvID,
     TIMESTAMP,
     LOCATION,
-    NUMBER_REQUESTED_DATA
+    NUMBER_REQUESTED_DATA,
 )
 
 from ..mock.keycloack.constants import FAKE_TOKEN_FOR_TESTING
 from ..mock.ublox_api.get_raw_data import (
     correct_get_raw_data,
     unreachable_get_raw_data,
-    token_expired_get_raw_data
+    token_expired_get_raw_data,
 )
 from ..mock.ublox_api.get_ublox_api_list import (
     correct_get_ublox_api_list,
     unreachable_get_ublox_api_list,
-    token_expired_get_ublox_api_list
+    token_expired_get_ublox_api_list,
 )
 
 # ------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ def mock_aioresponse():
 
 class TestUbloxApi:
     """
-     Test the ublox_api module
+    Test the ublox_api module
     """
 
     @pytest.mark.asyncio
@@ -102,25 +102,29 @@ class TestUbloxApi:
         session = get_ublox_api_session()
 
         # Mock the request
-        correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        correct_get_raw_data(
+            mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo
+        )
         raw_data = await get_galileo_message(
             svid=SvID,
             timestamp=TIMESTAMP,
             location=LOCATION,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
-            session=session
+            session=session,
         )
         assert raw_data == RaW_Galileo, "Raw Galileo data must be the same"
 
         # Mock the request
-        token_expired_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
+        token_expired_get_raw_data(
+            mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo
+        )
         await KEYCLOACK.setup()
         raw_data = await get_galileo_message(
             svid=SvID,
             timestamp=TIMESTAMP,
             location=LOCATION,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
-            session=session
+            session=session,
         )
         assert raw_data == RaW_Galileo, "Raw Galileo data must be the same"
 
@@ -134,7 +138,7 @@ class TestUbloxApi:
                 timestamp=TIMESTAMP,
                 location=LOCATION,
                 ublox_token=FAKE_TOKEN_FOR_TESTING,
-                session=session
+                session=session,
             )
 
         await KEYCLOACK.close()
@@ -158,19 +162,21 @@ class TestUbloxApi:
             timestamp=TIMESTAMP,
             location=LOCATION,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
-            session=session
+            session=session,
         )
         assert raw_data == RaW_Ublox, "Raw Ublox data must be the same"
 
         # Mock the request
-        token_expired_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
+        token_expired_get_raw_data(
+            mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox
+        )
         await KEYCLOACK.setup()
         raw_data = await get_ublox_message(
             svid=SvID,
             timestamp=TIMESTAMP,
             location=LOCATION,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
-            session=session
+            session=session,
         )
         assert raw_data == RaW_Ublox, "Raw Ublox data must be the same"
 
@@ -184,7 +190,7 @@ class TestUbloxApi:
                 timestamp=TIMESTAMP,
                 location=LOCATION,
                 ublox_token=FAKE_TOKEN_FOR_TESTING,
-                session=session
+                session=session,
             )
 
         await KEYCLOACK.close()
@@ -194,17 +200,16 @@ class TestUbloxApi:
         """ Test the construction of the body of the request made to Ublox-Api """
         request = construct_request(svid=SvID, timestamp=TIMESTAMP)
 
-        assert len(request["info"]) == NUMBER_REQUESTED_DATA, "Incorrect number of data requested"
+        assert (
+            len(request["info"]) == NUMBER_REQUESTED_DATA
+        ), "Incorrect number of data requested"
 
         for ublox_api in request["info"]:
             assert ublox_api["raw_data"] is None, "Incorrect format of the request"
-            assert (
-                    TIMESTAMP != ublox_api["timestamp"] and
-                    (
-                            TIMESTAMP - 1000 * NUMBER_REQUESTED_DATA
-                    ) <= ublox_api["timestamp"] <= (
-                            TIMESTAMP + 1000 * NUMBER_REQUESTED_DATA
-                    )
+            assert TIMESTAMP != ublox_api["timestamp"] and (
+                TIMESTAMP - 1000 * NUMBER_REQUESTED_DATA
+            ) <= ublox_api["timestamp"] <= (
+                TIMESTAMP + 1000 * NUMBER_REQUESTED_DATA
             ), "Incorrect format of the request"
 
     @pytest.mark.asyncio
@@ -219,38 +224,36 @@ class TestUbloxApi:
         session = get_ublox_api_session()
 
         # Mock the request
-        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo)
+        correct_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo
+        )
         ublox_api_list = await get_galileo_messages_list(
             svid=SvID,
             timestamp=TIMESTAMP,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
             location=LOCATION,
-            session=session
+            session=session,
         )
         assert [
-                   {
-                       "timestamp": TIMESTAMP,
-                       "raw_data": RaW_Galileo
-                   }
-               ] == ublox_api_list, "List of UbloxApi data must be the same"
+            {"timestamp": TIMESTAMP, "raw_data": RaW_Galileo}
+        ] == ublox_api_list, "List of UbloxApi data must be the same"
 
         # Mock the request
-        token_expired_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo)
+        token_expired_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo
+        )
         await KEYCLOACK.setup()
         ublox_api_list = await get_galileo_messages_list(
             svid=SvID,
             timestamp=TIMESTAMP,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
             location=LOCATION,
-            session=session
+            session=session,
         )
 
         assert [
-                   {
-                       "timestamp": TIMESTAMP,
-                       "raw_data": RaW_Galileo
-                   }
-               ] == ublox_api_list, "List of UbloxApi data must be the same"
+            {"timestamp": TIMESTAMP, "raw_data": RaW_Galileo}
+        ] == ublox_api_list, "List of UbloxApi data must be the same"
 
         # Mock the request
         unreachable_get_ublox_api_list(mock_aioresponse, url=URL_POST_GALILEO)
@@ -260,7 +263,7 @@ class TestUbloxApi:
                 timestamp=TIMESTAMP,
                 ublox_token=FAKE_TOKEN_FOR_TESTING,
                 location=LOCATION,
-                session=session
+                session=session,
             )
 
         await KEYCLOACK.close()
@@ -278,38 +281,36 @@ class TestUbloxApi:
         session = get_ublox_api_session()
 
         # Mock the request
-        correct_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox)
+        correct_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox
+        )
         ublox_api_list = await get_ublox_messages_list(
             svid=SvID,
             timestamp=TIMESTAMP,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
             location=LOCATION,
-            session=session
+            session=session,
         )
         assert [
-                   {
-                       "timestamp": TIMESTAMP,
-                       "raw_data": RaW_Ublox
-                   }
-               ] == ublox_api_list, "List of UbloxApi data must be the same"
+            {"timestamp": TIMESTAMP, "raw_data": RaW_Ublox}
+        ] == ublox_api_list, "List of UbloxApi data must be the same"
 
         # Mock the request
-        token_expired_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox)
+        token_expired_get_ublox_api_list(
+            mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox
+        )
         await KEYCLOACK.setup()
         ublox_api_list = await get_ublox_messages_list(
             svid=SvID,
             timestamp=TIMESTAMP,
             ublox_token=FAKE_TOKEN_FOR_TESTING,
             location=LOCATION,
-            session=session
+            session=session,
         )
 
         assert [
-                   {
-                       "timestamp": TIMESTAMP,
-                       "raw_data": RaW_Ublox
-                   }
-               ] == ublox_api_list, "List of UbloxApi data must be the same"
+            {"timestamp": TIMESTAMP, "raw_data": RaW_Ublox}
+        ] == ublox_api_list, "List of UbloxApi data must be the same"
 
         # Mock the request
         KEYCLOACK.last_token_reception_time = 0
@@ -320,7 +321,7 @@ class TestUbloxApi:
                 timestamp=TIMESTAMP,
                 ublox_token=FAKE_TOKEN_FOR_TESTING,
                 location=LOCATION,
-                session=session
+                session=session,
             )
 
         await KEYCLOACK.close()

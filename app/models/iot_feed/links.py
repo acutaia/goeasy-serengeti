@@ -32,5 +32,7 @@ from typing import TypeVar, Dict, Literal
 DatastreamLink = TypeVar("DatastreamLink", bound=Dict[Literal["@iot.id"], int])
 """Link to the OGC DataStream"""
 
-FeatureOfInterestLink = TypeVar("FeatureOfInterestLink", bound=Dict[Literal["@iot.id"], str])
+FeatureOfInterestLink = TypeVar(
+    "FeatureOfInterestLink", bound=Dict[Literal["@iot.id"], str]
+)
 """Link to the OGC FeatureOfInterest"""

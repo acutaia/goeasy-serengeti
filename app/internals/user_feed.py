@@ -48,14 +48,14 @@ from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObjec
 
 
 async def end_to_end_position_authentication(
-        user_feed: UserFeedInput,
-        timestamp: float,
-        host: str,
-        journey_id: str = "TEST",
-        source_app: str = "TEST",
-        client_id: str = "TEST",
-        user_id: str = "TEST",
-        store: bool = False
+    user_feed: UserFeedInput,
+    timestamp: float,
+    host: str,
+    journey_id: str = "TEST",
+    source_app: str = "TEST",
+    client_id: str = "TEST",
+    user_id: str = "TEST",
+    store: bool = False,
 ) -> UserFeedInput:
     """
     Contact Ublox-API and validate Android Data
@@ -111,7 +111,9 @@ async def end_to_end_position_authentication(
             current_fullbiasnano = position.galileo_auth[0].fullbiasnano
             current_timenano = position.galileo_auth[0].timenano
             # check if the data aren't coherent
-            if (current_fullbiasnano - fullbiasnano) / (current_timenano - timenano) > meaconing_threshold:
+            if (current_fullbiasnano - fullbiasnano) / (
+                current_timenano - timenano
+            ) > meaconing_threshold:
                 # Set the position not authentic
                 position.authenticity = Authenticity.not_authentic
                 position_unknown = False
@@ -129,11 +131,7 @@ async def end_to_end_position_authentication(
                 galileo_auth_number += 1
                 try:
                     galileo_data = await get_galileo_message(
-                        auth.svid,
-                        auth.time,
-                        ublox_token,
-                        location,
-                        session
+                        auth.svid, auth.time, ublox_token, location, session
                     )
                 except HTTPException as exc:
                     if store:
@@ -149,7 +147,7 @@ async def end_to_end_position_authentication(
                             msg_unknown_position=0,
                             msg_total_position=0,
                             msg_error=True,
-                            msg_error_description=exc.detail
+                            msg_error_description=exc.detail,
                         )
                     raise exc
 
@@ -169,11 +167,7 @@ async def end_to_end_position_authentication(
                     try:
                         # Remake the request
                         galileo_data_list = await get_galileo_messages_list(
-                            auth.svid,
-                            auth.time,
-                            ublox_token,
-                            location,
-                            session
+                            auth.svid, auth.time, ublox_token, location, session
                         )
                     except HTTPException as exc:
                         if store:
@@ -189,7 +183,7 @@ async def end_to_end_position_authentication(
                                 msg_unknown_position=0,
                                 msg_total_position=0,
                                 msg_error=True,
-                                msg_error_description=exc.detail
+                                msg_error_description=exc.detail,
                             )
                         raise exc
                     for data in galileo_data_list:
@@ -206,9 +200,8 @@ async def end_to_end_position_authentication(
                                 "satellite_id": auth.svid,
                                 "status": "Real Fake",
                                 "ublox_api_messages": [
-                                    ublox_api.dict()
-                                    for ublox_api in galileo_data_list
-                                ]
+                                    ublox_api.dict() for ublox_api in galileo_data_list
+                                ],
                             }
                         )
 
@@ -222,37 +215,36 @@ async def end_to_end_position_authentication(
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
             "analysis_time": f"{time.time() - start_analysis}",
-            "request_procession_time": f"{time.time() - timestamp}"
+            "request_procession_time": f"{time.time() - timestamp}",
         }
     )
 
     if store:
         await store_in_iota(
-                source_app=source_app,
-                client_id=client_id,
-                user_id=user_id,
-                msg_id=journey_id,
-                msg_size=sys.getsizeof(user_feed.json()),
-                msg_time=timestamp,
-                msg_malicious_position=not_authentic_number,
-                msg_authenticated_position=authentic_number,
-                msg_unknown_position=unknown_number,
-                msg_total_position=galileo_auth_number,
-
-            )
+            source_app=source_app,
+            client_id=client_id,
+            user_id=user_id,
+            msg_id=journey_id,
+            msg_size=sys.getsizeof(user_feed.json()),
+            msg_time=timestamp,
+            msg_malicious_position=not_authentic_number,
+            msg_authenticated_position=authentic_number,
+            msg_unknown_position=unknown_number,
+            msg_total_position=galileo_auth_number,
+        )
 
     return user_feed
 
 
 async def store_android_data(
-        user_feed_input: UserFeedInput,
-        timestamp: float,
-        host: str,
-        journey_id: str,
-        source_app: str,
-        client_id: str,
-        user_id: str,
-        semaphore: Semaphore
+    user_feed_input: UserFeedInput,
+    timestamp: float,
+    host: str,
+    journey_id: str,
+    source_app: str,
+    client_id: str,
+    user_id: str,
+    semaphore: Semaphore,
 ) -> None:
     """
     Store UserFeed data in the anonymizer in a correct format
@@ -276,18 +268,13 @@ async def store_android_data(
                 source_app=source_app,
                 client_id=client_id,
                 user_id=user_id,
-                store=True
+                store=True,
             )
 
         # Generate user feed internal
         user_feed_internal = user_feed.dict(
             exclude={
-                "trace_information": {
-                    "__all__": {
-                        "galileo_auth",
-                        "galileo_status"
-                    }
-                }
+                "trace_information": {"__all__": {"galileo_auth", "galileo_status"}}
             }
         )
         user_feed_internal.update({"source_app": source_app, "journey_id": journey_id})
@@ -317,7 +304,7 @@ async def store_android_data(
                                 "lat": position.lat,
                                 "lon": position.lon,
                                 "partialDistance": position.partialDistance,
-                                "time": position.time
+                                "time": position.time,
                             }
                         )
                         for position in user_feed.trace_information
@@ -325,7 +312,7 @@ async def store_android_data(
                     "sensors": user_feed.sensors_information,
                     "mainTypeSpace": user_feed.mainTypeSpace,
                     "mainTypeTime": user_feed.mainTypeTime,
-                    "sourceApp": source_app
+                    "sourceApp": source_app,
                 }
             ).dict()
         )

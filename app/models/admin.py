@@ -31,5 +31,6 @@ from enum import Enum
 
 class SourceApp(str, Enum):
     """SourceApp Model"""
+
     any = "Any"
     apes_mobility = "ApesMobility"

@@ -37,12 +37,7 @@ from .constants import URL_GET_IOTA_USER, URL_STORE_IN_IOTA
 def correct_get_iota_user(user: str):
     """ Mocked get iota user """
     respx.get(URL_GET_IOTA_USER).mock(
-        return_value=Response(
-            status_code=status.HTTP_200_OK,
-            json={
-                "user": user
-            }
-        )
+        return_value=Response(status_code=status.HTTP_200_OK, json={"user": user})
     )
 
 
@@ -50,15 +45,14 @@ def unreachable_get_iota_user():
     """ Mocked get iota user """
     respx.get(URL_GET_IOTA_USER).mock(side_effect=RequestError)
 
+
 # -------------------------------------------------------------------------------
 
 
 def correct_store_in_iota():
     """ Mocked store in iota """
     respx.post(URL_STORE_IN_IOTA).mock(
-        return_value=Response(
-            status_code=status.HTTP_200_OK
-        )
+        return_value=Response(status_code=status.HTTP_200_OK)
     )
 
 

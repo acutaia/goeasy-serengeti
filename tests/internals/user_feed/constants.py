@@ -28,5 +28,7 @@ import os
 
 # --------------------------------------------------------------------------------------
 
-USER_INPUT_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "fake_user_feed.json")
+USER_INPUT_PATH = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)), "fake_user_feed.json"
+)
 """File Fake_iot_feed path"""

@@ -42,6 +42,7 @@ class GnssID(IntEnum):
     GLONASS = 6
     ERROR = -1
 
+
 # --------------------------------------------------------------------------------------------
 
 
@@ -49,6 +50,7 @@ class Gnss(List[Ublox]):
     """
     Gnss data
     """
+
     @classmethod
     def __get_validators__(cls):
         # order to validate the input, each validator will receive as an input
@@ -58,16 +60,11 @@ class Gnss(List[Ublox]):
     @classmethod
     def validate(cls, v) -> List[Ublox]:
         if not isinstance(v, str):
-            raise TypeError('string required')
+            raise TypeError("string required")
         try:
             m = [
                 Ublox.construct(
-                    **{
-                        "svid": bytes.fromhex(
-                            element
-                        )[5],
-                        "raw_data":element
-                    }
+                    **{"svid": bytes.fromhex(element)[5], "raw_data": element}
                 )
                 for element in v.lower().split("b562")
                 if element != ""

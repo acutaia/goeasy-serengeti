@@ -38,17 +38,14 @@ from ..security.jwt_bearer import Signature
 admin_auth = Signature(realm_access="Administration")
 
 # Instantiate router
-router = APIRouter(
-    prefix="/api/v1/goeasy/getAccounting",
-    tags=["Admin"]
-)
+router = APIRouter(prefix="/api/v1/goeasy/getAccounting", tags=["Admin"])
 
 
 @router.post(
     "/{source_app}",
     response_class=ORJSONResponse,
     summary="Extract Accounting Data",
-    dependencies=[Depends(admin_auth)]
+    dependencies=[Depends(admin_auth)],
 )
 async def extract_user(source_app: SourceApp):
     """
@@ -61,4 +58,3 @@ async def extract_user(source_app: SourceApp):
     ![image](https:/serengeti/static/administrator.png)
     """
     return await get_iota_user(source_app.value)
-

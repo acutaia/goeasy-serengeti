@@ -54,38 +54,32 @@ async def get_iota_user(user: str) -> dict:
         response = await client.get(
             f"{settings.accounting_ip}{settings.accounting_get_uri}",
             params={"user": user},
-            timeout=25
+            timeout=25,
         )
     except httpx.RequestError as exc:
         # Something went wrong during the connection
         await logger.debug(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
+            {"method": exc.request.method, "url": exc.request.url, "error": exc}
         )
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact IoTa service"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Can't contact IoTa service"
         )
     return orjson.loads(response.content)
 
 
 async def store_in_iota(
-        source_app: str,
-        client_id: str,
-        user_id: str,
-        msg_id: str,
-        msg_size: int,
-        msg_time: float,
-        msg_malicious_position: int,
-        msg_authenticated_position: int,
-        msg_unknown_position: int,
-        msg_total_position: int,
-        msg_error: bool = False,
-        msg_error_description: str = ""
-
+    source_app: str,
+    client_id: str,
+    user_id: str,
+    msg_id: str,
+    msg_size: int,
+    msg_time: float,
+    msg_malicious_position: int,
+    msg_authenticated_position: int,
+    msg_unknown_position: int,
+    msg_total_position: int,
+    msg_error: bool = False,
+    msg_error_description: str = "",
 ) -> None:
     """
     Store info inside IoTa
@@ -126,23 +120,17 @@ async def store_in_iota(
                         msg_unknown_position=msg_unknown_position,
                         msg_total_position=msg_total_position,
                         msg_error=msg_error,
-                        msg_error_description=msg_error_description
+                        msg_error_description=msg_error_description,
                     )
-                )
+                ),
             ).jsonify(),
-            timeout=25
+            timeout=25,
         )
 
     except httpx.RequestError as exc:
         # Something went wrong during the connection
         await logger.warning(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
+            {"method": exc.request.method, "url": exc.request.url, "error": exc}
         )
     finally:
         return
-
-

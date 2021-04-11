@@ -34,21 +34,17 @@ from ..model import OrjsonModel
 
 class Resource(OrjsonModel):
     """Resource Model"""
+
     resource_type: str = Field(
         default="PROTECTED SERENGETI",
         title="Resource type",
     )
     url: str = Field(
         default="https://galileocloud.goeasyproject.eu/serengeti/api/v1/goeasy/authenticate",
-        description="Url of the resource"
+        description="Url of the resource",
     )
-    method: str = Field(
-        default="POST"
-    )
-    status: str = Field(
-        default="correct"
-    )
+    method: str = Field(default="POST")
+    status: str = Field(default="correct")
     journey_id: str = Field(
-        description="Id of the journey",
-        example="9d007657-fe13-4bd7-ba3c-d609b110014a"
+        description="Id of the journey", example="9d007657-fe13-4bd7-ba3c-d609b110014a"
     )

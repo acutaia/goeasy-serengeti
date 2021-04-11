@@ -60,8 +60,7 @@ class AccountingManager(OrjsonModel):
 
     def jsonify(self) -> dict:
         """Convert in a python object compatible with httpx request"""
-        return orjson.loads(
-            self.json()
-        )
+        return orjson.loads(self.json())
+
 
 # --------------------------------------------------------------------------------------------

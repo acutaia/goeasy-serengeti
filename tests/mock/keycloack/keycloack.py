@@ -41,11 +41,7 @@ def correct_get_blox_token(m: aioresponses):
     m.post(
         TOKEN_REQUEST_URL,
         status=status.HTTP_200_OK,
-        body=orjson.dumps(
-            {
-                "access_token": FAKE_TOKEN_FOR_TESTING
-            }
-        ).decode()
+        body=orjson.dumps({"access_token": FAKE_TOKEN_FOR_TESTING}).decode(),
     )
 
 
@@ -54,28 +50,16 @@ def new_correct_get_blox_token(m: aioresponses):
     m.post(
         TOKEN_REQUEST_URL,
         status=status.HTTP_200_OK,
-        body=orjson.dumps(
-            {
-                "access_token": "NEW_TOKEN"
-            }
-        ).decode()
+        body=orjson.dumps({"access_token": "NEW_TOKEN"}).decode(),
     )
 
 
 def unauthorized_get_ublox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
 
-    m.post(
-        TOKEN_REQUEST_URL,
-        status=status.HTTP_401_UNAUTHORIZED
-    )
+    m.post(TOKEN_REQUEST_URL, status=status.HTTP_401_UNAUTHORIZED)
 
 
 def unreachable_get_ublox_token(m: aioresponses):
     """Mock the request made to keycloack to obtain a valid token"""
-    m.post(
-        TOKEN_REQUEST_URL,
-        exception=TimeoutError("Timeout")
-    )
-
-
+    m.post(TOKEN_REQUEST_URL, exception=TimeoutError("Timeout"))

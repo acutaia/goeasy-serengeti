@@ -46,22 +46,24 @@ class IptAnonymizerSession:
         store_timeout = ClientTimeout(total=60)
         store_connector = TCPConnector(limit_per_host=10, ssl=False, ttl_dns_cache=300)
         extract_timeout = ClientTimeout(total=60)
-        extract_connector = TCPConnector(limit_per_host=20, ssl=False, ttl_dns_cache=300)
+        extract_connector = TCPConnector(
+            limit_per_host=20, ssl=False, ttl_dns_cache=300
+        )
         self = IptAnonymizerSession(
             store=ClientSession(
                 connector=store_connector,
                 timeout=store_timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=True,
-                connector_owner=True
+                connector_owner=True,
             ),
             extract=ClientSession(
                 connector=extract_connector,
                 timeout=extract_timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=True,
-                connector_owner=True
-            )
+                connector_owner=True,
+            ),
         )
         return self
 
@@ -82,4 +84,3 @@ def store_session() -> ClientSession:
 def extract_session() -> ClientSession:
     """Extract data from the anonymizer session"""
     return get_ipt_anonymizer_session().extract
-

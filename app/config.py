@@ -25,6 +25,7 @@ App Settings
 
 # Standard Library
 from functools import lru_cache
+
 # Third Party
 from pydantic import BaseSettings
 
@@ -48,6 +49,7 @@ def get_security_settings() -> SecuritySettings:
 
 # -------------------------------------------------------------------
 
+
 class KeycloackSettings(BaseSettings):
     token_request_url: str
     client_id: str
@@ -63,6 +65,7 @@ class KeycloackSettings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_keycloack_settings() -> KeycloackSettings:
     return KeycloackSettings()
+
 
 # -------------------------------------------------------------------
 
@@ -115,6 +118,7 @@ class AnonymizerSettings(BaseSettings):
 def get_anonymizer_settings() -> AnonymizerSettings:
     return AnonymizerSettings()
 
+
 # -------------------------------------------------------------------
 
 
@@ -130,6 +134,7 @@ class AccountingManagerSettings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_accounting_manager_settings() -> AccountingManagerSettings:
     return AccountingManagerSettings()
+
 
 # -------------------------------------------------------------------
 

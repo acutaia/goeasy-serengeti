@@ -43,5 +43,3 @@ with open(f"{PATH}/public.pem", "r") as fp:
 with open(f"{PATH}/private.pem", "r") as fp:
     PRIVATE_KEY = fp.read()
 """Private token key used for testing purpose"""
-
-

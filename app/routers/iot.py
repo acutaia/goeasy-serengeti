@@ -46,10 +46,7 @@ test_auth = Signature(realm_access="Test")
 iot_auth = Signature(realm_access="IoTFeed", return_requester=True)
 
 # Instantiate router
-router = APIRouter(
-    prefix="/api/v1/goeasy/IoTauthenticate",
-    tags=["IoT"]
-)
+router = APIRouter(prefix="/api/v1/goeasy/IoTauthenticate", tags=["IoT"])
 
 
 @router.post(
@@ -58,10 +55,10 @@ router = APIRouter(
     summary="Validate data from IoT devices",
 )
 async def iot_authentication(
-        back_ground_tasks: BackgroundTasks,
-        request: Request,
-        requester: Requester = Depends(iot_auth),
-        iot_input: IotInput = Body(...)
+    back_ground_tasks: BackgroundTasks,
+    request: Request,
+    requester: Requester = Depends(iot_auth),
+    iot_input: IotInput = Body(...),
 ):
     """
     This endpoint provides a unique point of access to let IoT devices and LBS applications to send standardized
@@ -96,7 +93,7 @@ async def iot_authentication(
         source_app,
         requester.client,
         requester.user,
-        store_semaphore()
+        store_semaphore(),
     )
     return Resource(observationGEPid=obesrvation_gepid)
 
@@ -106,7 +103,7 @@ async def iot_authentication(
     response_class=ORJSONResponse,
     summary="Test the authentication of User Data",
     response_description="Input with verified data",
-    dependencies=[Depends(test_auth)]
+    dependencies=[Depends(test_auth)],
 )
 async def authenticate_test(request: Request, iot_feed: IotInput = Body(...)):
     """

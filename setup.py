@@ -27,15 +27,15 @@ from Cython.Distutils import build_ext
 
 ext_modules = [
     Extension(
-        "app.internals.position_alteration_detection",    # location of the resulting .so
+        "app.internals.position_alteration_detection",  # location of the resulting .so
         ["app/internals/position_alteration_detection.pyx"],
     )
 ]
 
 
 setup(
-    name='package',
+    name="package",
     packages=find_packages(),
-    cmdclass={'build_ext': build_ext},
+    cmdclass={"build_ext": build_ext},
     ext_modules=ext_modules,
 )

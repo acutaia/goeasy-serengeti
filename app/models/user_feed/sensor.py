@@ -37,49 +37,27 @@ from ..model import OrjsonModel
 
 class SensorDataPosition(OrjsonModel):
     """Model of a sensor data"""
-    x: float = Field(
-        ...,
-        example=15.632355
-    )
-    y: float = Field(
-        ...,
-        example=13.435356
-    )
-    z: float = Field(
-        ...,
-        example=12.32525235
-    )
+
+    x: float = Field(..., example=15.632355)
+    y: float = Field(..., example=13.435356)
+    z: float = Field(..., example=12.32525235)
 
 
 class SensorDataOrientation(OrjsonModel):
     """Model of a sensor data"""
-    azimut: float = Field(
-        ...,
-        example=1.632355
-    )
-    pitch: float = Field(
-        ...,
-        example=0.435356
-    )
-    roll: float = Field(
-        ...,
-        example=1.32525235
-    )
+
+    azimut: float = Field(..., example=1.632355)
+    pitch: float = Field(..., example=0.435356)
+    roll: float = Field(..., example=1.32525235)
 
 
 class SensorInformation(OrjsonModel):
     """Model of sensor information"""
+
     data: Union[SensorDataPosition, SensorDataOrientation] = Field(
-        ...,
-        description="Measurement object obtained by sensor"
+        ..., description="Measurement object obtained by sensor"
     )
-    name: str = Field(
-        ...,
-        description="Sensor name",
-        example="magnetometer"
-    )
+    name: str = Field(..., description="Sensor name", example="magnetometer")
     time: int = Field(
-        ...,
-        description="UTC timestamp expressed in ms",
-        example=1611820537461
+        ..., description="UTC timestamp expressed in ms", example=1611820537461
     )

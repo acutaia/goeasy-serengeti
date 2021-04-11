@@ -40,4 +40,5 @@ class Resource(OrjsonModel):
     journey_id: str
     mobility: Union[str, dict]
 
+
 # --------------------------------------------------------------------------------------------

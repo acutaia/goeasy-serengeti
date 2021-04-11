@@ -37,17 +37,13 @@ from ..model import OrjsonModel
 
 class Point(OrjsonModel):
     """Position description"""
+
     type: Literal["Point"] = Field(
-        ...,
-        title="Point",
-        description="Position type",
-        example="Point"
+        ..., title="Point", description="Position type", example="Point"
     )
     coordinate: conlist(float, min_items=2, max_items=2) = Field(
         ...,
         title="Coordinate",
         description="latitude and longitude of the point",
-        example=[1.6, 7.0]
+        example=[1.6, 7.0],
     )
-
-

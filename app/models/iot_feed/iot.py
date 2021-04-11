@@ -46,33 +46,27 @@ class IotInput(OrjsonModel):
         ...,
         title="Result Time",
         description="The time when the result was generated",
-        example="2020-10-16T09:29:43+02:00"
+        example="2020-10-16T09:29:43+02:00",
     )
     Datastream: DatastreamLink = Field(
         ...,
         description="Link to the OGC DataStream associated to this observation",
-        example={
-            "@iot.id": 5
-        }
+        example={"@iot.id": 5},
     )
 
     FeatureOfInterest: FeatureOfInterestLink = Field(
         ...,
         title="Feature Of Interest",
         description="Link to the OGC FeatureOfInterest associated to this observation",
-        example={
-            "@iot.id": "1"
-            }
+        example={"@iot.id": "1"},
     )
     phenomenonTime: datetime = Field(
         ...,
         title="Phenomenon Time",
         description="The time when the result was generated",
-        example="2020-10-16T09:29:43+02:00"
+        example="2020-10-16T09:29:43+02:00",
     )
 
     result: ResultInput = Field(
-        ...,
-        title="Result",
-        description="Result of the measurement"
+        ..., title="Result", description="Result of the measurement"
     )

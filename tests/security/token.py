@@ -56,18 +56,16 @@ def generate_fake_token() -> str:
         exp=datetime.utcnow() - timedelta(seconds=300),
         iat=datetime.utcnow() - timedelta(seconds=301),
         azp=Azp.test,
-        realm_access=Roles(
-            roles=[
-                RolesEnum.fake
-            ]
-        )
+        realm_access=Roles(roles=[RolesEnum.fake]),
     ).dict()
 
     to_encode.update({"user_name": "Fake"})
     return jwt.encode(to_encode, PRIVATE_KEY, algorithm="RS256")
 
 
-def generate_valid_token(realm: str, client: str = Azp.test, user_name: Optional[str] = None) -> str:
+def generate_valid_token(
+    realm: str, client: str = Azp.test, user_name: Optional[str] = None
+) -> str:
     """
     Generate a valid token
 
@@ -80,11 +78,7 @@ def generate_valid_token(realm: str, client: str = Azp.test, user_name: Optional
         exp=datetime.utcnow() + timedelta(seconds=300),
         iat=datetime.utcnow(),
         azp=client,
-        realm_access=Roles(
-            roles=[
-                RolesEnum(realm)
-            ]
-        )
+        realm_access=Roles(roles=[RolesEnum(realm)]),
     ).dict()
     if user_name:
         to_encode.update({"user_name": user_name})

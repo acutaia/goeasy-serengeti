@@ -40,24 +40,16 @@ from .constants import MOCKED_RESPONSE
 
 def correct_store_in_ipt_anonymizer(m: aioresponses, url: str):
     m.post(
-        url=url,
-        status=status.HTTP_200_OK,
-        body=orjson.dumps(MOCKED_RESPONSE).decode()
-
+        url=url, status=status.HTTP_200_OK, body=orjson.dumps(MOCKED_RESPONSE).decode()
     )
 
 
 def unreachable_store_in_ipt_anonymizer(m: aioresponses, url: str):
-    m.post(
-        url=url,
-        exception=ClientError("Host unreachable")
-    )
+    m.post(url=url, exception=ClientError("Host unreachable"))
 
 
 def starvation_store_in_ipt_anonymizer(m: aioresponses, url: str):
-    m.post(
-        url=url,
-        exception=TimeoutError("Starvation")
-    )
+    m.post(url=url, exception=TimeoutError("Starvation"))
+
 
 # ----------------------------------------------------------------------------------------------

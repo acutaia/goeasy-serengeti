@@ -53,18 +53,15 @@ def correct_get_ublox_api_list(m: aioresponses, url: str, raw_data: Optional[str
         body=orjson.dumps(
             {
                 "satellite_id": SvID,
-                "info": [
-                    {
-                        "timestamp": TIMESTAMP,
-                        "raw_data": raw_data
-                    }
-                ]
+                "info": [{"timestamp": TIMESTAMP, "raw_data": raw_data}],
             }
-        ).decode()
+        ).decode(),
     )
 
 
-def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Optional[str]):
+def token_expired_get_ublox_api_list(
+    m: aioresponses, url: str, raw_data: Optional[str]
+):
     """
     Mock the behaviour in case of token expired
 
@@ -82,14 +79,9 @@ def token_expired_get_ublox_api_list(m: aioresponses, url: str, raw_data: Option
         body=orjson.dumps(
             {
                 "satellite_id": SvID,
-                "info": [
-                    {
-                        "timestamp": TIMESTAMP,
-                        "raw_data": raw_data
-                    }
-                ]
+                "info": [{"timestamp": TIMESTAMP, "raw_data": raw_data}],
             }
-        ).decode()
+        ).decode(),
     )
 
 
@@ -102,7 +94,3 @@ def unreachable_get_ublox_api_list(m: aioresponses, url: str):
     :return:
     """
     m.post(url, exception=TimeoutError("Timeout"))
-
-
-
-

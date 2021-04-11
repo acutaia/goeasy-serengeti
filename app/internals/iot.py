@@ -47,14 +47,14 @@ from ..models.security import Authenticity
 
 
 async def end_to_end_position_authentication(
-        iot_input: IotInput,
-        timestamp: float,
-        host: str,
-        source_app: str = "TEST",
-        client_id: str = "TEST",
-        user_id: str = "TEST",
-        obesrvation_gepid: str = "TEST",
-        store: bool = False
+    iot_input: IotInput,
+    timestamp: float,
+    host: str,
+    source_app: str = "TEST",
+    client_id: str = "TEST",
+    user_id: str = "TEST",
+    obesrvation_gepid: str = "TEST",
+    store: bool = False,
 ) -> dict:
     """
     Contact Ublox-API and validate IoT data
@@ -75,8 +75,7 @@ async def end_to_end_position_authentication(
     start_analysis = time.time()
     # Extract position location
     location = haversine(
-        iot_input.result.Position.coordinate[0],
-        iot_input.result.Position.coordinate[1]
+        iot_input.result.Position.coordinate[0], iot_input.result.Position.coordinate[1]
     )
 
     # Initialize
@@ -100,11 +99,7 @@ async def end_to_end_position_authentication(
 
         try:
             galileo_data = await get_ublox_message(
-                gnss.svid,
-                iot_time,
-                ublox_token,
-                location,
-                session
+                gnss.svid, iot_time, ublox_token, location, session
             )
         except HTTPException as exc:
             if store:
@@ -120,7 +115,7 @@ async def end_to_end_position_authentication(
                     msg_unknown_position=0,
                     msg_total_position=0,
                     msg_error=True,
-                    msg_error_description=exc.detail
+                    msg_error_description=exc.detail,
                 )
 
             raise exc
@@ -138,11 +133,7 @@ async def end_to_end_position_authentication(
             try:
                 # Remake the request
                 galileo_data_list = await get_ublox_messages_list(
-                    gnss.svid,
-                    iot_time,
-                    ublox_token,
-                    location,
-                    session
+                    gnss.svid, iot_time, ublox_token, location, session
                 )
             except HTTPException as exc:
                 if store:
@@ -158,7 +149,7 @@ async def end_to_end_position_authentication(
                         msg_unknown_position=0,
                         msg_total_position=0,
                         msg_error=True,
-                        msg_error_description=exc.detail
+                        msg_error_description=exc.detail,
                     )
                 raise exc
 
@@ -177,9 +168,8 @@ async def end_to_end_position_authentication(
                         "satellite_id": gnss.svid,
                         "status": "Real Fake",
                         "ublox_api_messages": [
-                            ublox_api.dict()
-                            for ublox_api in galileo_data_list
-                        ]
+                            ublox_api.dict() for ublox_api in galileo_data_list
+                        ],
                     }
                 )
             break
@@ -200,7 +190,7 @@ async def end_to_end_position_authentication(
             "not_authentic": not_authentic_number,
             "unknown": unknown_number,
             "analysis_time": f"{time.time() - start_analysis}",
-            "request_procession_time": f"{time.time() - timestamp}"
+            "request_procession_time": f"{time.time() - timestamp}",
         }
     )
     if store:
@@ -214,8 +204,7 @@ async def end_to_end_position_authentication(
             msg_malicious_position=not_authentic_number,
             msg_authenticated_position=authentic_number,
             msg_unknown_position=unknown_number,
-            msg_total_position=galileo_auth_number
-
+            msg_total_position=galileo_auth_number,
         )
 
     iot_output = iot_input.dict(exclude={"result": {"gnss"}})
@@ -226,14 +215,14 @@ async def end_to_end_position_authentication(
 
 
 async def store_iot_data(
-        iot_input: IotInput,
-        timestamp: float,
-        host: str,
-        obesrvation_gepid: str,
-        source_app: str,
-        client_id: str,
-        user_id: str,
-        semaphore: Semaphore
+    iot_input: IotInput,
+    timestamp: float,
+    host: str,
+    obesrvation_gepid: str,
+    source_app: str,
+    client_id: str,
+    user_id: str,
+    semaphore: Semaphore,
 ) -> None:
     """
     Store IoT data in the anonymizer
@@ -257,10 +246,9 @@ async def store_iot_data(
                 source_app=source_app,
                 client_id=client_id,
                 user_id=user_id,
-                store=True
+                store=True,
             )
 
         await store_in_the_anonymizer(iot_output, SETTINGS.store_iot_data_url)
     finally:
         return
-

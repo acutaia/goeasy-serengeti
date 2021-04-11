@@ -40,12 +40,12 @@ class AndroidData(str):
             return cls(v)
 
         if not isinstance(v, list):
-            raise TypeError('list of int required')
+            raise TypeError("list of int required")
         if len(v) != 30:
-            raise ValueError('invalid number of elements in the list')
+            raise ValueError("invalid number of elements in the list")
         try:
             # Convert in bytes
-            m = b''.join(
+            m = b"".join(
                 [
                     int(element).to_bytes(1, byteorder="big", signed=True)
                     for element in v
@@ -54,5 +54,6 @@ class AndroidData(str):
         except ValueError as error:
             raise ValueError(error.args)
         return cls(m)
+
 
 # --------------------------------------------------------------------------------------------

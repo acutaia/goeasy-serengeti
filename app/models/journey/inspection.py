@@ -39,7 +39,8 @@ class DataInspection(OrjsonModel):
     journey_id: UUID4 = Field(
         ...,
         description="Id of the track of interest",
-        example="814eff18-fbf8-4a3e-81d9-670bd987ff3e"
+        example="814eff18-fbf8-4a3e-81d9-670bd987ff3e",
     )
+
 
 # --------------------------------------------------------------------------------------------

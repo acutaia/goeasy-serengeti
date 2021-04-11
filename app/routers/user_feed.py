@@ -45,10 +45,7 @@ test_auth = Signature(realm_access="Test")
 user_feed_auth = Signature(realm_access="UserFeed", return_requester=True)
 
 # Instantiate router
-router = APIRouter(
-    prefix="/api/v1/goeasy/authenticate",
-    tags=["User"]
-)
+router = APIRouter(prefix="/api/v1/goeasy/authenticate", tags=["User"])
 
 
 @router.post(
@@ -59,10 +56,10 @@ router = APIRouter(
     response_description="Resource created",
 )
 async def authenticate(
-        back_ground_tasks: BackgroundTasks,
-        request: Request,
-        requester: Requester = Depends(user_feed_auth),
-        user_feed: UserFeedInput = Body(...)
+    back_ground_tasks: BackgroundTasks,
+    request: Request,
+    requester: Requester = Depends(user_feed_auth),
+    user_feed: UserFeedInput = Body(...),
 ):
     """
     This endpoint provides a unique point of access to let external users and applications to send standardized data
@@ -98,7 +95,7 @@ async def authenticate(
         source_app,
         requester.client,
         requester.user,
-        store_semaphore()
+        store_semaphore(),
     )
 
     # Return the id of the resource
@@ -110,7 +107,7 @@ async def authenticate(
     response_class=ORJSONResponse,
     summary="Test the authentication of User Data",
     response_description="Input with verified data",
-    dependencies=[Depends(test_auth)]
+    dependencies=[Depends(test_auth)],
 )
 async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(...)):
     """
@@ -132,14 +129,7 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
         )
 
     user_feed_internal = user_feed_test.dict(
-        exclude={
-            "trace_information": {
-                "__all__": {
-                    "galileo_auth",
-                    "galileo_status"
-                }
-            }
-        }
+        exclude={"trace_information": {"__all__": {"galileo_auth", "galileo_status"}}}
     )
     user_feed_internal.update({"source_app": "TEST", "journey_id": "TEST"})
     return user_feed_internal

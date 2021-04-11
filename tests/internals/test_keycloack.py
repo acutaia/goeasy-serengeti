@@ -60,7 +60,7 @@ def mock_aioresponse():
 
 class TestKeycloack:
     """
-     Test the ublox_api module
+    Test the ublox_api module
     """
 
     @pytest.mark.asyncio
@@ -76,7 +76,9 @@ class TestKeycloack:
         await KEYCLOACK.setup()
 
         # Check if we used the cached token
-        assert await KEYCLOACK.get_ublox_token() == KEYCLOACK.last_token, "Token must be the same"
+        assert (
+            await KEYCLOACK.get_ublox_token() == KEYCLOACK.last_token
+        ), "Token must be the same"
 
         # clean the cache
         KEYCLOACK.last_token_reception_time = 0
@@ -84,7 +86,9 @@ class TestKeycloack:
 
         # Mock the request
         new_correct_get_blox_token(mock_aioresponse)
-        assert await KEYCLOACK.get_ublox_token() != last_token, "Token must be different"
+        assert (
+            await KEYCLOACK.get_ublox_token() != last_token
+        ), "Token must be different"
 
         # clean the cache
         KEYCLOACK.last_token_reception_time = 0

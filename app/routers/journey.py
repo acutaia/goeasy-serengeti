@@ -40,10 +40,7 @@ inspect_auth = Signature(realm_access="Inspect")
 extraction_auth = Signature(realm_access="Extraction")
 
 # Instantiate router
-router = APIRouter(
-    prefix="/api/v1/goeasy",
-    tags=["Journey"]
-)
+router = APIRouter(prefix="/api/v1/goeasy", tags=["Journey"])
 
 
 @router.post(
@@ -52,7 +49,7 @@ router = APIRouter(
     response_model=Resource,
     summary="Extract from the anonengine the mobility information associated to the requested journey",
     response_description="Journey Mobility Information",
-    dependencies=[Depends(inspect_auth)]
+    dependencies=[Depends(inspect_auth)],
 )
 async def get_mobility(journey: DataInspection = Body(...)):
     """
@@ -77,7 +74,7 @@ async def get_mobility(journey: DataInspection = Body(...)):
     response_class=ORJSONResponse,
     summary="Extract from the anonengine the details associated to the requested journey",
     response_description="Journey Details",
-    dependencies=[Depends(extraction_auth)]
+    dependencies=[Depends(extraction_auth)],
 )
 async def get_details(journey: DataInspection = Body(...)):
     """

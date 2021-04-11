@@ -38,25 +38,11 @@ from ..model import OrjsonModel
 
 class Svs(OrjsonModel):
     """Service Status Model"""
-    azim: int = Field(
-        ...,
-        title="Azimuth",
-        example=86
-    )
-    cno: int = Field(
-        ...,
-        description="Signal Strength",
-        example=16
-    )
-    elev: int = Field(
-        ...,
-        title="Elevation",
-        example=71
-    )
-    flags: int = Field(
-        ...,
-        example=67108864
-    )
+
+    azim: int = Field(..., title="Azimuth", example=86)
+    cno: int = Field(..., description="Signal Strength", example=16)
+    elev: int = Field(..., title="Elevation", example=71)
+    flags: int = Field(..., example=67108864)
     gnssId: GnssID = Field(
         ...,
         description="""Value | Status  |
@@ -67,44 +53,22 @@ class Svs(OrjsonModel):
                          3   | Beidou  | 
                          5   | QZSS    | 
                          6   | GLONASS |""",
-        example=0
+        example=0,
     )
-    prRes: int = Field(
-        ...,
-        title="Pseudo range residual",
-        example=0
-    )
-    svId: int = Field(
-        ...,
-        title="Satellite Identifier",
-        example=7
-    )
+    prRes: int = Field(..., title="Pseudo range residual", example=0)
+    svId: int = Field(..., title="Satellite Identifier", example=7)
 
 
 class SvInfo(OrjsonModel):
     """Service Status info model"""
+
     iTOW: int = Field(
-        ...,
-        description="GPS time of week of the navigation epoch",
-        example=0
+        ..., description="GPS time of week of the navigation epoch", example=0
     )
-    numSvs: int = Field(
-        ...,
-        description="number of per-SV data blocks",
-        example=34
-    )
-    reserved1: int = Field(
-        ...,
-        description="reserved",
-        example=0
-    )
-    svs: List[Svs] = Field(
-        ...,
-        description="List of service status"
-    )
-    version: int = Field(
-        ...,
-        example=0
-    )
+    numSvs: int = Field(..., description="number of per-SV data blocks", example=34)
+    reserved1: int = Field(..., description="reserved", example=0)
+    svs: List[Svs] = Field(..., description="List of service status")
+    version: int = Field(..., example=0)
+
 
 # --------------------------------------------------------------------------------------------

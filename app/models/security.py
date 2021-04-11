@@ -35,21 +35,26 @@ from .model import OrjsonModel
 
 class Requester(OrjsonModel):
     """Requester Model"""
+
     client: str
     user: Optional[str]
+
 
 # ---------------------------------------------------------------
 
 
 class Token(OrjsonModel):
     """Token obtained from Keycloak"""
+
     access_token: str
+
 
 # ---------------------------------------------------------------
 
 
 class Authenticity(IntEnum):
     """Authenticity of the message"""
+
     authentic = 1
     unknown = -1
     not_authentic = 0

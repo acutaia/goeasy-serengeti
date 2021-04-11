@@ -34,18 +34,21 @@ from ..model import OrjsonModel
 
 class UbloxAPI(OrjsonModel):
     """Model of single data from UbloxApi"""
+
     timestamp: int
     raw_data: Optional[str]
 
 
 class UbloxAPIList(OrjsonModel):
     """Model of a list of data from UbloxApi"""
+
     satellite_id: int
     info: List[UbloxAPI]
 
 
 class Ublox(OrjsonModel):
     """Model of a Ublox message"""
+
     svid: int
     raw_data: str
 

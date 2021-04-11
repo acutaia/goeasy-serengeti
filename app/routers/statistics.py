@@ -41,10 +41,7 @@ from ..security.jwt_bearer import Signature
 extraction_auth = Signature(realm_access="Extraction", return_realm_access_list=True)
 
 # Instantiate router
-router = APIRouter(
-    prefix="/api/v1/goeasy/statistics",
-    tags=["Platform"]
-)
+router = APIRouter(prefix="/api/v1/goeasy/statistics", tags=["Platform"])
 
 
 @router.post(
@@ -54,8 +51,8 @@ router = APIRouter(
     status_code=status.HTTP_425_TOO_EARLY,
 )
 async def get_statistics(
-        realm_access_roles: List[str] = Depends(extraction_auth),
-        extraction: InputJSONExtraction = Body(...),
+    realm_access_roles: List[str] = Depends(extraction_auth),
+    extraction: InputJSONExtraction = Body(...),
 ):
     """
     This endpoint provides ways to let external users and applications to request for
@@ -94,5 +91,5 @@ async def get_statistics(
 
     raise HTTPException(
         status_code=status.HTTP_425_TOO_EARLY,
-        detail="The endpoint is still under development"
+        detail="The endpoint is still under development",
     )

@@ -28,20 +28,16 @@ from app.internals.position_alteration_detection import haversine
 
 # -------------------------------------------------------------------------------
 
-ROME = {
-    "lat": 41.8931,
-    "lon": 12.4828
-}
+ROME = {"lat": 41.8931, "lon": 12.4828}
 """ Rome latitude and longitude """
 
-STOCKHOLM = {
-    "lat": 59.334591,
-    "lon": 18.063240
-}
+STOCKHOLM = {"lat": 59.334591, "lon": 18.063240}
 """ Stockholm latitude and longitude """
 
 
 def test_haversine():
     """ Test haversine"""
     assert haversine(ROME["lat"], ROME["lon"]) == "Italy", "Rome is in Italy"
-    assert haversine(STOCKHOLM["lat"], STOCKHOLM["lon"]) == "Sweden", "Stockholm is in Sweden"
+    assert (
+        haversine(STOCKHOLM["lat"], STOCKHOLM["lon"]) == "Sweden"
+    ), "Stockholm is in Sweden"

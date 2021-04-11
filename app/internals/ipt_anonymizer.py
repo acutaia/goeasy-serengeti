@@ -56,36 +56,23 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     try:
         # Store data
         session = store_session()
-        async with session.post(
-            url=url,
-            json=data,
-            timeout=5
-        ):
+        async with session.post(url=url, json=data, timeout=5):
             pass
 
     except TimeoutError:
         # IPT-anonymizer is in starvation
-        await logger.warning(
-            {
-                "url": url,
-                "error": "IPT-anonymizer is in starvation"
-            }
-        )
+        await logger.warning({"url": url, "error": "IPT-anonymizer is in starvation"})
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="IPT-anonymizer is in starvation"
+            detail="IPT-anonymizer is in starvation",
         )
     except ClientError as exc:
         # IPT-anonymizer has some problems
-        await logger.error(
-            {
-                "url": url,
-                "error": repr(str(exc))
-            }
-        )
+        await logger.error({"url": url, "error": repr(str(exc))})
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="IPT-anonymizer is in starvation"
+            detail="IPT-anonymizer is in starvation",
         )
+
 
 # --------------------------------------------------------------------------------------------

@@ -42,6 +42,7 @@ class GunicornSettings(BaseSettings):
     class Config:
         env_file = ".env"
 
+
 # -------------------------------------------------------------------------------
 
 
@@ -55,7 +56,8 @@ class StandaloneApplication(BaseApplication):
 
     def load_config(self):
         config = {
-            key: value for key, value in self.options.items()
+            key: value
+            for key, value in self.options.items()
             if key in self.cfg.settings and value is not None
         }
         for key, value in config.items():
@@ -64,10 +66,11 @@ class StandaloneApplication(BaseApplication):
     def load(self):
         return self.application
 
+
 # -------------------------------------------------------------------------------
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     settings = GunicornSettings()
 
     options = {

@@ -53,24 +53,19 @@ async def store_in_the_anonengine(data: dict) -> None:
         # Store data
         client = get_anonymizer_session()
         response = await client.post(
-            anonymizer_settings.store_data_url,
-            data=data,
-            timeout=1
+            anonymizer_settings.store_data_url, data=data, timeout=1
         )
         await logger.debug(orjson.loads(response.content))
     except httpx.RequestError as exc:
         # Something went wrong during the connection
         await logger.error(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
+            {"method": exc.request.method, "url": exc.request.url, "error": exc}
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Anonymizer service"
+            detail="Can't contact Anonymizer service",
         )
+
 
 # --------------------------------------------------------------------------------------------
 
@@ -93,17 +88,14 @@ async def _extract(url: str) -> Any:
     except httpx.RequestError as exc:
         # Something went wrong during the connection
         await logger.error(
-            {
-                "method": exc.request.method,
-                "url": exc.request.url,
-                "error": exc
-            }
+            {"method": exc.request.method, "url": exc.request.url, "error": exc}
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Can't contact Anonymizer service"
+            detail="Can't contact Anonymizer service",
         )
     return orjson.loads(response.content)
+
 
 # --------------------------------------------------------------------------------------------
 
@@ -116,6 +108,7 @@ async def extract_mobility(journey_id: str) -> Any:
     """
     settings = get_anonymizer_settings()
     return await _extract(f"{settings.get_mobility_url}/{journey_id}")
+
 
 # --------------------------------------------------------------------------------------------
 

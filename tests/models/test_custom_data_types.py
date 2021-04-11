@@ -37,7 +37,7 @@ from .constants import (
     InputAndoidDataConverted,
     InputGnssData,
     InputGnssDataConverted,
-    SvID
+    SvID,
 )
 
 # ----------------------------------------------------------------------------------------
@@ -49,7 +49,9 @@ def test_android_data():
     data = Galileo(data=InputAndoidData)
     assert data.data == InputAndoidDataConverted, "Android data must be the same"
     data = Galileo(data=data.data)
-    assert data.data == InputAndoidDataConverted, "Data already converted... must be the same"
+    assert (
+        data.data == InputAndoidDataConverted
+    ), "Data already converted... must be the same"
 
     with pytest.raises(ValidationError):
         Galileo(data={"Invalid": "Data"})
@@ -73,7 +75,7 @@ def test_gnss_data():
     assert data.data[0].svid == SvID, "Satellite id must be the same"
 
     with pytest.raises(ValidationError):
-        Ublox(data={"Incorrect" : "Format"})
+        Ublox(data={"Incorrect": "Format"})
 
     with pytest.raises(ValueError):
         Ublox(data="WRONG_DATA")

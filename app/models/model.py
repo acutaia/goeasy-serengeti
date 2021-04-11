@@ -40,6 +40,3 @@ class OrjsonModel(BaseModel):
         # Use orjson to improve performance
         json_loads = orjson.loads
         json_dumps = orjson_dumps
-
-
-

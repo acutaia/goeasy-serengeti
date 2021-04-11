@@ -36,10 +36,7 @@ from ..model import OrjsonModel
 
 class GalileoStatus(OrjsonModel):
     """Galileo Status Model"""
+
     svinfo: SvInfo = Field(
-        ...,
-        title="Service Status info",
-        description="UBX-RXM-SVSI Message"
+        ..., title="Service Status info", description="UBX-RXM-SVSI Message"
     )
-
-
