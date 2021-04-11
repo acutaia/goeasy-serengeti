@@ -41,7 +41,7 @@ class _IoTFeedSemaphore:
 def _get_iot_semaphore() -> _IoTFeedSemaphore:
     return _IoTFeedSemaphore(
         store=Semaphore(10),
-        test=Semaphore(10)
+        test=Semaphore(5)
     )
 
 

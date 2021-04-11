@@ -40,8 +40,8 @@ class _UserFeedSemaphore:
 @lru_cache(maxsize=1)
 def _get_user_semaphore() -> _UserFeedSemaphore:
     return _UserFeedSemaphore(
-        store=Semaphore(10),
-        test=Semaphore(10)
+        store=Semaphore(20),
+        test=Semaphore(15)
     )
 
 
