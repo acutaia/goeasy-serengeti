@@ -25,24 +25,31 @@ Constants for mock Anonymizer http requests
 
 # Internal
 from app.config import get_anonymizer_settings
+from app.config import get_ipt_anonymizer_settings
 
 # ---------------------------------------------------------------------------------------
 
-SETTINGS = get_anonymizer_settings()
-""" Anonymizer Settings """
+SETTINGS_ANONENGINE = get_anonymizer_settings()
+""" Anonengine Settings """
+
+SETTINGS_IPT = get_ipt_anonymizer_settings()
+""" IPT-Anonymizer settings """
 
 
-URL_STORE_USER_DATA = SETTINGS.store_user_data_url
-""" Url to store user data in the anonymizer """
+URL_STORE_USER_DATA = SETTINGS_IPT.store_user_data_url
+""" Url to store user data in the IPT-Anonymizer """
 
-URL_STORE_IOT_DATA = SETTINGS.store_iot_data_url
-""" Url to store user data in the anonymizer """
+URL_STORE_IOT_DATA = SETTINGS_IPT.store_iot_data_url
+""" Url to store iot data in the IPT-Anonymizer """
 
-URL_EXTRACT_MOBILITY = SETTINGS.get_mobility_url
-""" Url to extract mobility data from the anonymizer """
+URL_STORE_DATA = SETTINGS_ANONENGINE.store_data_url
+""" Url to store user data in the anonengine """
 
-URL_EXTRACT_DETAILS = SETTINGS.get_details_url
-""" Url to extract details from the anonymizer """
+URL_EXTRACT_MOBILITY = SETTINGS_ANONENGINE.get_mobility_url
+""" Url to extract mobility data from the anonengine """
+
+URL_EXTRACT_DETAILS = SETTINGS_ANONENGINE.get_details_url
+""" Url to extract details from the anonengine """
 
 MOCKED_RESPONSE = {"Foo": "Bar"}
 """ Mocked Response """

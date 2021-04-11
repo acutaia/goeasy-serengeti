@@ -23,9 +23,6 @@ Anonymizer mocked Http requests
     limitations under the License.
 """
 
-# Standard Library
-from typing import Optional
-
 # Third Party
 from fastapi import status
 from httpx import Response, RequestError
@@ -33,8 +30,7 @@ import respx
 
 # Internal
 from .constants import (
-    URL_STORE_USER_DATA,
-    URL_STORE_IOT_DATA,
+    URL_STORE_DATA,
     URL_EXTRACT_MOBILITY,
     URL_EXTRACT_DETAILS,
     MOCKED_RESPONSE
@@ -44,7 +40,7 @@ from .constants import (
 
 
 def correct_store_user_in_the_anonengine():
-    respx.post(URL_STORE_USER_DATA).mock(
+    respx.post(URL_STORE_DATA).mock(
         return_value=Response(
             status_code=status.HTTP_200_OK,
             json=MOCKED_RESPONSE
@@ -53,20 +49,7 @@ def correct_store_user_in_the_anonengine():
 
 
 def unreachable_store_user_in_the_anonengine():
-    respx.post(URL_STORE_USER_DATA).mock(side_effect=RequestError)
-
-
-def correct_store_iot_in_the_anonengine():
-    respx.post(URL_STORE_IOT_DATA).mock(
-        return_value=Response(
-            status_code=status.HTTP_200_OK,
-            json=MOCKED_RESPONSE
-        )
-    )
-
-
-def unreachable_store_iot_in_the_anonengine():
-    respx.post(URL_STORE_USER_DATA).mock(side_effect=RequestError)
+    respx.post(URL_STORE_DATA).mock(side_effect=RequestError)
 
 # ----------------------------------------------------------------------------------------------
 

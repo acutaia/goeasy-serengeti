@@ -88,11 +88,24 @@ def get_ublox_api_settings() -> UbloxApiSettings:
 # -------------------------------------------------------------------
 
 
+class IptAnonymizerSettings(BaseSettings):
+    store_user_data_url: str
+    store_iot_data_url: str
+    extract_user_data_url: str
+
+    class Config:
+        env_file = ".env"
+
+
+@lru_cache(maxsize=1)
+def get_ipt_anonymizer_settings() -> IptAnonymizerSettings:
+    return IptAnonymizerSettings()
+
+
 class AnonymizerSettings(BaseSettings):
     get_mobility_url: str
     get_details_url: str
-    store_user_data_url: str
-    store_iot_data_url: str
+    store_data_url: str
 
     class Config:
         env_file = ".env"

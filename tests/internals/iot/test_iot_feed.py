@@ -51,7 +51,8 @@ from tests.mock.ublox_api.get_ublox_api_list import (
     unreachable_get_ublox_api_list
 )
 
-from tests.mock.anonymizer.anonengine import correct_store_iot_in_the_anonengine
+from tests.mock.anonymizer.constants import URL_STORE_IOT_DATA
+from tests.mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
 from tests.mock.keycloack.keycloack import correct_get_blox_token
 from tests.mock.ublox_api.constants import (
     RaW_Ublox,
@@ -230,7 +231,7 @@ class TestIotFeed:
         # Mock the other requests
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
-        correct_store_iot_in_the_anonengine()
+        correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_IOT_DATA)
 
         # Check if everything went ok
         await store_iot_data(

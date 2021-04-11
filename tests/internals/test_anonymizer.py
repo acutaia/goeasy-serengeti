@@ -70,12 +70,12 @@ class TestAnonengine:
 
         # Mock the request
         correct_store_user_in_the_anonengine()
-        assert await store_in_the_anonengine({"Foo": "Bar"}, "store_user_data_url") is None, "We aren't interested in the response"
+        assert await store_in_the_anonengine({"Foo": "Bar"}) is None, "We aren't interested in the response"
 
         with pytest.raises(HTTPException):
             # Mock the request
             unreachable_store_user_in_the_anonengine()
-            await store_in_the_anonengine({"Foo": "Bar"}, "store_user_data_url")
+            await store_in_the_anonengine({"Foo": "Bar"})
 
     @respx.mock
     @pytest.mark.asyncio

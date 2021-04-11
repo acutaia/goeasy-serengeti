@@ -55,6 +55,8 @@ from .mock.anonymizer.anonengine import (
     correct_extract_mobility,
     correct_store_user_in_the_anonengine
 )
+from .mock.anonymizer.constants import URL_STORE_IOT_DATA, URL_STORE_USER_DATA
+from .mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
 from .mock.ublox_api.constants import (
     RaW_Ublox,
     RaW_Galileo,
@@ -172,6 +174,7 @@ class TestIoT:
         correct_get_blox_token(mock_aioresponse)
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
         correct_store_in_iota()
+        correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_IOT_DATA)
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -543,6 +546,7 @@ class TestUser:
         correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
         correct_store_user_in_the_anonengine()
+        correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_USER_DATA)
 
         # Obtain tokens
         invalid_token = generate_fake_token()

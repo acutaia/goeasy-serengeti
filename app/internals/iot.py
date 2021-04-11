@@ -33,7 +33,7 @@ from fastapi import HTTPException
 
 # Internal
 from .accounting_manager import store_in_iota
-from .anonymizer import store_in_the_anonengine
+from .ipt_anonymizer import store_in_the_anonymizer, SETTINGS
 from .keycloak import KEYCLOACK
 from .logger import get_logger
 from .sessions.ublox_api import get_ublox_api_session
@@ -257,10 +257,10 @@ async def store_iot_data(
                 source_app=source_app,
                 client_id=client_id,
                 user_id=user_id,
-                store=False
+                store=True
             )
 
-        await store_in_the_anonengine(iot_output, "store_iot_data_url")
+        await store_in_the_anonymizer(iot_output, SETTINGS.store_iot_data_url)
     finally:
         return
 

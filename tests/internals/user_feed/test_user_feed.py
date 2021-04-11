@@ -70,6 +70,8 @@ from tests.mock.ublox_api.constants import (
 
 from tests.mock.accounting_manager.iota import correct_store_in_iota
 from tests.mock.anonymizer.anonengine import correct_store_user_in_the_anonengine
+from tests.mock.anonymizer.constants import URL_STORE_USER_DATA
+from tests.mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
 from .constants import USER_INPUT_PATH
 from ..logger import disable_logger
 
@@ -208,6 +210,7 @@ class TestUserFeed:
         # Mock the other requests
         correct_get_raw_data(mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo)
         correct_store_in_iota()
+        correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_USER_DATA)
         correct_store_user_in_the_anonengine()
 
         user_feed_validated = await end_to_end_position_authentication(
