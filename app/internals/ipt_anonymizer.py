@@ -50,8 +50,6 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     """
     # Get Logger
     logger = get_logger()
-    # Get anonymizer settings
-    anonymizer_settings = get_ipt_anonymizer_settings()
 
     try:
         # Store data
