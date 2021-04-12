@@ -111,5 +111,5 @@ class TestIPTAnonymizer:
 
         with pytest.raises(HTTPException):
             # Mock the request
-            starvation_store_in_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+            starvation_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
             await extract_user_info({"request": RequestType.all_positions})
