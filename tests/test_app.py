@@ -38,11 +38,11 @@ from fastapi import status
 # Internal
 from app.main import app
 from app.models.admin import SourceApp
-from app.internals.session import (
-    get_anonymizer_session,
-    get_accounting_session,
-    get_ublox_api_session,
-)
+from app.internals.sessions.ublox_api import get_ublox_api_session
+from app.internals.sessions.anonymizer import get_anonengine_session
+from app.internals.sessions.ipt_anonymizer import get_ipt_anonymizer_session
+from app.internals.sessions.accounting_manager import get_accounting_session
+
 from .internals.iot.constants import IOT_INPUT_PATH
 from .internals.logger import disable_logger
 from .internals.user_feed.constants import USER_INPUT_PATH
@@ -83,8 +83,9 @@ def clear_test():
     disable_logger()
     change_default_security_settings()
     get_ublox_api_session.cache_clear()
-    get_anonymizer_session.cache_clear()
+    get_anonengine_session.cache_clear()
     get_accounting_session.cache_clear()
+    get_ipt_anonymizer_session.cache_clear()
 
 
 def test_docs_and_startup_shutdown(mock_aioresponse):

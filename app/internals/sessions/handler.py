@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Session package
+Sessions handler
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -24,38 +24,34 @@ Session package
 """
 
 # Standard Library
-from functools import lru_cache
-
-# Third Party
-from httpx import AsyncClient
+import asyncio
 
 # Internal
-from .sessions.ublox_api import get_ublox_api_session
+from .accounting_manager import get_accounting_session
+from .anonymizer import get_anonengine_session
+from .ipt_anonymizer import get_ipt_anonymizer_session
+from .ublox_api import get_ublox_api_session
+from ..keycloak import KEYCLOACK
 
 # ----------------------------------------------------------------------------
 
 
-@lru_cache(maxsize=1)
-def get_accounting_session() -> AsyncClient:
-    """Instantiate AccountingSession"""
-    return AsyncClient()
-
-
-@lru_cache(maxsize=1)
-def get_anonymizer_session() -> AsyncClient:
-    """Instantiate AccountingSession"""
-    return AsyncClient(verify=False)
-
-
-def instantiate_all_sessions():
+async def instantiate_all_sessions():
     """instantiate all sessions included in serengeti"""
-    get_ublox_api_session()
     get_accounting_session()
-    get_anonymizer_session()
+    get_anonengine_session()
+    get_ipt_anonymizer_session()
+    get_ublox_api_session()
+    await KEYCLOACK.setup()
 
 
 async def close_all_sessions():
     """Close all instantiated sessions"""
-    await get_ublox_api_session().close()
-    await get_accounting_session().aclose()
-    await get_anonymizer_session().aclose()
+    ublox = asyncio.create_task(get_ublox_api_session().close())
+    iota = asyncio.create_task(get_accounting_session().close())
+    anonymizer = asyncio.create_task(get_anonengine_session().close())
+    ipt_anonymizer = asyncio.create_task(get_accounting_session().close())
+    keycloack = asyncio.create_task(KEYCLOACK.close())
+    await asyncio.gather(
+        *[ublox, iota, anonymizer, ipt_anonymizer, keycloack], return_exceptions=True
+    )
