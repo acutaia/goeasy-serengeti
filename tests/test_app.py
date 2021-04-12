@@ -29,7 +29,6 @@ import uuid
 from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 import pytest
-import respx
 
 # Third Party
 import orjson
@@ -108,7 +107,6 @@ def test_docs_and_startup_shutdown(mock_aioresponse):
 class TestAdmin:
     """Test administrator router"""
 
-    @respx.mock
     def test_administrator(self, mock_aioresponse):
         """Test the behaviour of administrator router"""
 
@@ -158,7 +156,6 @@ class TestAdmin:
 class TestIoT:
     """Test IoT router"""
 
-    @respx.mock
     def test_iot_authentication(self, mock_aioresponse):
         """Test the behaviour of  iot authentication endpoint"""
 
@@ -240,7 +237,6 @@ class TestIoT:
 
         clear_test()
 
-    @respx.mock
     def test_authenticate_test(self, mock_aioresponse):
         """Test the behaviour of  iot authentication endpoint"""
 
@@ -368,7 +364,6 @@ class TestJourney:
 
         clear_test()
 
-    @respx.mock
     def test_get_mobility(self, mock_aioresponse):
         """Test the behaviour of get_mobility endpoint"""
 
@@ -393,7 +388,6 @@ class TestJourney:
             mocked=mock_aioresponse,
         )
 
-    @respx.mock
     def test_get_details(self, mock_aioresponse):
         """Test the behaviour of get_details endpoint"""
 
@@ -422,7 +416,6 @@ class TestJourney:
 class TestUser:
     """Test User router"""
 
-    @respx.mock
     def test_authenticate_test(self, mock_aioresponse):
         """Test the behaviour of  iot authentication endpoint"""
 
@@ -486,7 +479,6 @@ class TestUser:
 
         clear_test()
 
-    @respx.mock
     def test_authenticate(self, mock_aioresponse):
         """Test the behaviour of the authenticate endpoint"""
 

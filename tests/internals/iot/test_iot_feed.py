@@ -30,7 +30,6 @@ import time
 # Test
 from aioresponses import aioresponses
 from fastapi import HTTPException
-import respx
 import pytest
 import uvloop
 
@@ -90,7 +89,6 @@ class TestIotFeed:
     Test the iot module
     """
 
-    @respx.mock
     @pytest.mark.asyncio
     async def test_end_to_end_position_authentication(self, mock_aioresponse):
         """ Test the behaviour of end_to_end_position_authentication """
@@ -222,7 +220,6 @@ class TestIotFeed:
         # Close ublox-session
         await session.close()
 
-    @respx.mock
     @pytest.mark.asyncio
     async def test_store_iot_data(self, mock_aioresponse):
         """ Test the behaviour of store_iot_data """

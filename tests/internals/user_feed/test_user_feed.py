@@ -30,7 +30,6 @@ import time
 # Test
 from aioresponses import aioresponses
 from fastapi import HTTPException
-import respx
 import pytest
 import uvloop
 
@@ -101,7 +100,6 @@ class TestUserFeed:
     Test the user_feed module
     """
 
-    @respx.mock
     @pytest.mark.asyncio
     async def test_end_to_end_position_authentication(self, mock_aioresponse):
         """ Test the behaviour of end_to_end_position_authentication """
@@ -197,7 +195,6 @@ class TestUserFeed:
         # Close Ublox-Api session
         await session.close()
 
-    @respx.mock
     @pytest.mark.asyncio
     async def test_store_android_data(self, mock_aioresponse):
         """ Test the behaviour of store_android_data """
