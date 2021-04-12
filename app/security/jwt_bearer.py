@@ -32,7 +32,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 
 # Internal
-from ..internals.logger import get_logger
 from ..config import get_security_settings
 from ..models.security import Requester
 
@@ -81,12 +80,6 @@ class Signature(HTTPBearer):
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_bearer_token"
             )
 
-        # Get Logger
-        logger = get_logger()
-
-        # Token debug
-        await logger.debug({"token_roles": token["realm_access"]["roles"]})
-
         if self.realm_access not in token["realm_access"]["roles"]:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_bearer_token"
@@ -99,10 +92,5 @@ class Signature(HTTPBearer):
                 requester = Requester(client=token["azp"], user=token["user_name"])
             else:
                 requester = Requester(client=token["azp"])
-
-            # Requester debug
-            await logger.debug(
-                {"requester_client": requester.client, "requester_user": requester.user}
-            )
 
             return requester

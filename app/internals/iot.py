@@ -181,7 +181,7 @@ async def end_to_end_position_authentication(
     else:
         authenticity = Authenticity.unknown
 
-    await logger.debug(
+    await logger.info(
         {
             "host": host,
             "observationGEPid": obesrvation_gepid,

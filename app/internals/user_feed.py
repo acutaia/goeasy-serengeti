@@ -205,7 +205,7 @@ async def end_to_end_position_authentication(
                             }
                         )
 
-    await logger.debug(
+    await logger.info(
         {
             "host": host,
             "source_app": source_app,
