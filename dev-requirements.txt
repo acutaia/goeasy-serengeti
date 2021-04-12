@@ -1,6 +1,5 @@
 # App requirements
 fastapi[all]>=0.63.0
-httpx>=0.17.0
 aiohttp[speedups]
 python-jose[cryptography]
 gunicorn>=20.0.4
@@ -13,5 +12,4 @@ codecov>=2.1.11
 pytest>=6.2.2
 pytest-asyncio>=0.14.0
 pytest-cov>=2.11.1
-respx>=0.16.3
 
