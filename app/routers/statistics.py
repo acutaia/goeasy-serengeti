@@ -31,8 +31,8 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import ORJSONResponse
 
 # Internal
-from ..config import get_anonymizer_settings
-from ..models.extraction.data_extraction import InputJSONExtraction, RequestType
+from ..internals.ipt_anonymizer import extract_user_info
+from ..models.extraction.data_extraction import InputJSONExtraction
 from ..security.jwt_bearer import Signature
 
 # --------------------------------------------------------------------------------------------
@@ -48,7 +48,6 @@ router = APIRouter(prefix="/api/v1/goeasy/statistics", tags=["Platform"])
     "",
     response_class=ORJSONResponse,
     summary="Obtain statistics from the collected data",
-    status_code=status.HTTP_425_TOO_EARLY,
 )
 async def get_statistics(
     realm_access_roles: List[str] = Depends(extraction_auth),
@@ -74,22 +73,6 @@ async def get_statistics(
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid_bearer_token"
             )
-    settings = get_anonymizer_settings()
 
-    if extraction.request == RequestType.partial_mobility:
-        pass
-    if extraction.request == RequestType.complete_mobility:
-        pass
-    if extraction.request == RequestType.all_positions:
-        pass
-    if extraction.request == RequestType.stats_num_tracks:
-        pass
-    if extraction.request == RequestType.stats_avg_time:
-        pass
-    if extraction.request == RequestType.stats_avg_space:
-        pass
-
-    raise HTTPException(
-        status_code=status.HTTP_425_TOO_EARLY,
-        detail="The endpoint is still under development",
-    )
+    status_code, content = await extract_user_info(extraction.dict(exclude_unset=True))
+    return ORJSONResponse(status_code=status_code, content=content)

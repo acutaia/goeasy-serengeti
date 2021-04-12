@@ -53,3 +53,13 @@ def starvation_store_in_ipt_anonymizer(m: aioresponses, url: str):
 
 
 # ----------------------------------------------------------------------------------------------
+
+
+def correct_extract_from_ipt_anonymizer(m: aioresponses, url: str):
+    m.post(
+        url=url, status=status.HTTP_200_OK, body=orjson.dumps(MOCKED_RESPONSE).decode()
+    )
+
+
+def starvation_extract_from_ipt_anonymizer(m: aioresponses, url: str):
+    m.post(url=url, exception=TimeoutError("Starvation"))

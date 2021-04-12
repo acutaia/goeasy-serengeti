@@ -23,15 +23,17 @@ IPT-anonymizer package
     limitations under the License.
 """
 
+# Standard Library
+from asyncio import TimeoutError
 
 # Third Party
-from asyncio import TimeoutError
 from aiohttp import ClientError
 from fastapi import status, HTTPException
+import orjson
 
 # Internal
 from .logger import get_logger
-from .sessions.ipt_anonymizer import store_session
+from .sessions.ipt_anonymizer import store_session, extract_session
 from ..config import get_ipt_anonymizer_settings
 
 # --------------------------------------------------------------------------------------------
@@ -57,20 +59,43 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
         async with session.post(url=url, json=data, timeout=5):
             pass
 
-    except TimeoutError:
+    except (TimeoutError, ClientError) as exc:
         # IPT-anonymizer is in starvation
-        await logger.warning({"url": url, "error": "IPT-anonymizer is in starvation"})
+        await logger.warning({"url": url, "error": repr(str(exc))})
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="IPT-anonymizer is in starvation",
-        )
-    except ClientError as exc:
-        # IPT-anonymizer has some problems
-        await logger.error({"url": url, "error": repr(str(exc))})
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="IPT-anonymizer is in starvation",
+            detail="IPT-anonymizer is in starvation or down",
         )
 
 
 # --------------------------------------------------------------------------------------------
+
+
+async def extract_user_info(info_requested: dict) -> tuple:
+    """
+    Extract info from stored in the IPT-anonymizer
+
+    :param info_requested: User information to store in the anonengine
+    """
+    # Get Logger
+    logger = get_logger()
+
+    try:
+        # Store data
+        session = extract_session()
+        async with session.post(
+            url=SETTINGS.extract_user_data_url, json=info_requested
+        ) as resp:
+            return resp.status, await resp.json(
+                encoding="utf-8", loads=orjson.loads, content_type=None
+            )
+
+    except (TimeoutError, ClientError) as exc:
+        # IPT-anonymizer is in starvation
+        await logger.warning(
+            {"url": SETTINGS.extract_user_data_url, "error": repr(str(exc))}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="IPT-anonymizer is in starvation or down",
+        )

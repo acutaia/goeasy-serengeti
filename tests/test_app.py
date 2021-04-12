@@ -37,6 +37,7 @@ from fastapi import status
 # Internal
 from app.main import app
 from app.models.admin import SourceApp
+from app.models.extraction.data_extraction import RequestType
 from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.internals.sessions.anonymizer import get_anonengine_session
 from app.internals.sessions.ipt_anonymizer import get_ipt_anonymizer_session
@@ -58,8 +59,8 @@ from .mock.anonymizer.anonengine import (
     correct_extract_mobility,
     correct_store_user_in_the_anonengine,
 )
-from .mock.anonymizer.constants import URL_STORE_IOT_DATA, URL_STORE_USER_DATA
-from .mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
+from .mock.anonymizer.constants import URL_STORE_IOT_DATA, URL_STORE_USER_DATA, URL_EXTRACT_USER_DATA
+from .mock.anonymizer.ipt import correct_store_in_ipt_anonymizer, correct_extract_from_ipt_anonymizer
 from .mock.ublox_api.constants import (
     RaW_Ublox,
     RaW_Galileo,
@@ -558,5 +559,75 @@ class TestUser:
                 json={"Wrong": "Body"},
             )
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        clear_test()
+
+
+class TestStatistics:
+    """Test Statistic Router"""
+
+    def test_get_statistics(self, mock_aioresponse):
+        """Test the behaviour of statistic router"""
+
+        clear_test()
+        correct_get_blox_token(mock_aioresponse)
+
+        # Obtain tokens
+        invalid_token = generate_fake_token()
+        valid_token = generate_valid_token(realm=RolesEnum.extract)
+        valid_token_role_not_present = generate_valid_token(realm=RolesEnum.fake)
+
+        with TestClient(app) as client:
+            # Try to use an invalid token
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": f"Bearer {invalid_token}"},
+                json={"request": RequestType.all_positions}
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+            # Try to use an invalid Authorization method in the header
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": invalid_token},
+                json={"request": RequestType.all_positions}
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+
+            # Try to use a valid token but without the requested role
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": f"Bearer {valid_token_role_not_present}"},
+                json={"request": RequestType.all_positions}
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+            correct_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+            # Use a valid token
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": f"Bearer {valid_token}"},
+                json={"request": RequestType.all_positions}
+            )
+            assert response.status_code == status.HTTP_200_OK
+            # we don't check the response value cause we've mocked the request
+
+            # Check if the company code is in the realm access roles
+            # we set it at Extraction just for convenience
+            correct_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": f"Bearer {valid_token}"},
+                json={"request": RequestType.all_positions, "company_code": "Extraction"}
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+            # Check if the company code is in the realm access roles
+            # we set it at NoT_Present just for convenience
+            response = client.post(
+                "http://serengeti/api/v1/goeasy/statistics",
+                headers={"Authorization": f"Bearer {valid_token_role_not_present}"},
+                json={"request": RequestType.all_positions, "company_code": "NoT_Present"}
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
         clear_test()

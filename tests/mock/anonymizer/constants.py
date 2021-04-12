@@ -42,6 +42,9 @@ URL_STORE_USER_DATA = SETTINGS_IPT.store_user_data_url
 URL_STORE_IOT_DATA = SETTINGS_IPT.store_iot_data_url
 """ Url to store iot data in the IPT-Anonymizer """
 
+URL_EXTRACT_USER_DATA = SETTINGS_IPT.extract_user_data_url
+""" Url to extract user data from the IPT-Anonymizer"""
+
 URL_STORE_DATA = SETTINGS_ANONENGINE.store_data_url
 """ Url to store user data in the anonengine """
 

@@ -23,6 +23,9 @@ Data Extraction models
     limitations under the License.
 """
 
+# Standard Library
+from typing import Optional
+
 # Third Party
 from pydantic import Field
 
@@ -44,36 +47,68 @@ class InputJSONExtraction(OrjsonModel):
     request: RequestType = Field(
         ..., description="Typology of request", example="Partial_Mobility"
     )
-    time_window_low: str = Field(description="Left time boundary", example="08:00")
-    time_window_high: str = Field(description="Right time boundary", example="08:15")
-    start_time: int = Field(
-        ..., description="Starting time in ms", example=1611819579051
+    time_window_low: Optional[str] = Field(
+        default=None, description="Left time boundary", example="08:00"
     )
-    start_time_high_threshold: int = Field(
-        ..., description="Right boundary of the starting time", example=3600_000
+    time_window_high: Optional[str] = Field(
+        default=None, description="Right time boundary", example="08:15"
     )
-    start_lat: float = Field(description="Starting latitude", example=5.74235)
-    start_lon: float = Field(description="Starting longitude", example=14.45236)
-    start_radius: float = Field(
-        description="Starting radius with specified center in meters", example=123.35161
+    start_time: Optional[int] = Field(
+        default=None, description="Starting time in ms", example=1611819579051
     )
-    end_time: int = Field(..., description="Ending time in ms", example=1611819589051)
-    end_time_high_threshold: str = Field(
-        ..., description="Right boundary of the ending time", example=3600_000
+    start_time_high_threshold: Optional[int] = Field(
+        default=None,
+        description="Right boundary of the starting time",
+        example=3600_000,
     )
-    end_lat: float = Field(description="Ending latitude", example=16.45236)
-    end_lon: float = Field(description="Ending longitude", example=4.45236)
-    end_radius: float = Field(
-        description="Ending radius with specified center in meters", example=146.45236
+    start_lat: Optional[float] = Field(
+        default=None, description="Starting latitude", example=5.74235
     )
-    type_day: TypeDay = Field(description="Interest type of day", example="Week_End")
-    type_detection: DetectionType = Field()
-    type_mobility: MobilityType = Field()
-    company_code: str = Field(
-        description="Permit the extraction of company related data"
+    start_lon: Optional[float] = Field(
+        default=None, description="Starting longitude", example=14.45236
     )
-    company_trip_type: TypeOfTrack = Field()
-    type_aggregation: AggregationType = Field(example="time")
+    start_radius: Optional[float] = Field(
+        default=None,
+        description="Starting radius with specified center in meters",
+        example=123.35161,
+    )
+    end_time: Optional[int] = Field(
+        default=None, description="Ending time in ms", example=1611819589051
+    )
+    end_time_high_threshold: Optional[str] = Field(
+        default=None, description="Right boundary of the ending time", example=3600_000
+    )
+    end_lat: Optional[float] = Field(
+        default=None, description="Ending latitude", example=16.45236
+    )
+    end_lon: Optional[float] = Field(
+        default=None, description="Ending longitude", example=4.45236
+    )
+    end_radius: Optional[float] = Field(
+        default=None,
+        description="Ending radius with specified center in meters",
+        example=146.45236,
+    )
+    type_day: Optional[TypeDay] = Field(
+        default=None, description="Interest type of day", example="Week_End"
+    )
+    type_detection: Optional[DetectionType] = Field(
+        default=None, example=DetectionType.app
+    )
+    type_mobility: Optional[MobilityType] = Field(
+        default=None, example=MobilityType.bike
+    )
+    company_code: Optional[str] = Field(
+        default=None, description="Permit the extraction of company related data"
+    )
+    company_trip_type: Optional[TypeOfTrack] = Field(
+        default=None, example=TypeOfTrack.business_trip
+    )
+    type_aggregation: Optional[AggregationType] = Field(
+        default=None, example=AggregationType.time
+    )
     value_aggregation: int = Field(
-        description="Amounts of time in minutes or space in Km", example=10
+        default=None,
+        description="Amounts of time in minutes or space in Km",
+        example=10,
     )

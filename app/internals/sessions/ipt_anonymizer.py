@@ -61,7 +61,7 @@ class IptAnonymizerSession:
                 connector=extract_connector,
                 timeout=extract_timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=True,
+                raise_for_status=False,
                 connector_owner=True,
             ),
         )

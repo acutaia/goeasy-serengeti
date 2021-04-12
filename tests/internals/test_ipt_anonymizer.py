@@ -30,13 +30,22 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.ipt_anonymizer import store_in_the_anonymizer
+from app.internals.ipt_anonymizer import store_in_the_anonymizer, extract_user_info
+from app.models.extraction.data_extraction import RequestType
 from .logger import disable_logger
-from ..mock.anonymizer.constants import URL_STORE_USER_DATA, URL_STORE_IOT_DATA
+from ..mock.anonymizer.constants import (
+    URL_STORE_USER_DATA,
+    URL_STORE_IOT_DATA,
+    URL_EXTRACT_USER_DATA,
+    MOCKED_RESPONSE,
+)
+
 from ..mock.anonymizer.ipt import (
     correct_store_in_ipt_anonymizer,
     unreachable_store_in_ipt_anonymizer,
     starvation_store_in_ipt_anonymizer,
+    correct_extract_from_ipt_anonymizer,
+    starvation_extract_from_ipt_anonymizer
 )
 
 # ------------------------------------------------------------------------------
@@ -86,3 +95,21 @@ class TestIPTAnonymizer:
                 # Mock the request
                 starvation_store_in_ipt_anonymizer(mock_aioresponse, url)
                 await store_in_the_anonymizer({"Foo": "Bar"}, URL_STORE_USER_DATA)
+
+    @pytest.mark.asyncio
+    async def test_extract_user_info(self, mock_aioresponse):
+        """ Test the behaviour of extract_user_info """
+
+        # Disable the logger of the app
+        disable_logger()
+
+        # Mock the request
+        correct_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+        assert (
+            await extract_user_info({"request": RequestType.all_positions}) == (200, MOCKED_RESPONSE)
+        ), "We aren't interested in the response"
+
+        with pytest.raises(HTTPException):
+            # Mock the request
+            starvation_store_in_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+            await extract_user_info({"request": RequestType.all_positions})
