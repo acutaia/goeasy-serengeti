@@ -27,8 +27,8 @@ Tests app.internals.accounting_manager module
 import time
 
 # Test
+from aioresponses import aioresponses
 from fastapi import HTTPException
-import respx
 import pytest
 import uvloop
 
@@ -55,40 +55,44 @@ def event_loop():
     loop.close()
 
 
+@pytest.fixture
+def mock_aioresponse():
+    with aioresponses() as m:
+        yield m
+
+
 class TestAccountingManager:
     """
     Test the accounting_manager module
     """
 
-    @respx.mock
     @pytest.mark.asyncio
-    async def test_get_iota_user(self):
+    async def test_get_iota_user(self, mock_aioresponse):
         """ Test the behaviour of get_iota_user """
 
         # Disable the logger of the app
         disable_logger()
 
         # Mock the request
-        correct_get_iota_user(user="TEST")
+        correct_get_iota_user(mock_aioresponse, user="TEST")
         assert await get_iota_user(user="TEST") == {
             "user": "TEST"
         }, "User must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
-            unreachable_get_iota_user()
+            unreachable_get_iota_user(mock_aioresponse, user="TEST")
             await get_iota_user(user="TEST")
 
-    @respx.mock
     @pytest.mark.asyncio
-    async def test_store_iota_user(self):
+    async def test_store_iota_user(self, mock_aioresponse):
         """ Test the behaviour of store_iota_user """
 
         # Disable the logger of the app
         disable_logger()
 
         # Mock the request
-        correct_store_in_iota()
+        correct_store_in_iota(mock_aioresponse)
         assert (
             await store_in_iota(
                 source_app="TEST",
@@ -106,7 +110,7 @@ class TestAccountingManager:
         ), "We aren't interested in the response"
 
         # Mock the request
-        unreachable_store_in_iota()
+        unreachable_store_in_iota(mock_aioresponse)
         # The exceptions in store in iota are ignored, they are only logged
         assert (
             await store_in_iota(

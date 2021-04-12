@@ -109,7 +109,7 @@ class TestIotFeed:
 
         # Position authentic
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
-        correct_store_in_iota()
+        correct_store_in_iota(mock_aioresponse)
 
         iot_output = await end_to_end_position_authentication(
             iot_input=IOT_INPUT,
@@ -241,7 +241,7 @@ class TestIotFeed:
 
         # Mock the other requests
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
-        correct_store_in_iota()
+        correct_store_in_iota(mock_aioresponse)
         correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_IOT_DATA)
 
         # Check if everything went ok

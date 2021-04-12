@@ -23,10 +23,13 @@ Mocked IoTa requests
     limitations under the License.
 """
 
+# Standard Library
+from asyncio import TimeoutError
+
 # Third Party
+from aioresponses import aioresponses
 from fastapi import status
-from httpx import Response, RequestError
-import respx
+import orjson
 
 # Internal
 from .constants import URL_GET_IOTA_USER, URL_STORE_IN_IOTA
@@ -34,28 +37,28 @@ from .constants import URL_GET_IOTA_USER, URL_STORE_IN_IOTA
 # -------------------------------------------------------------------------------
 
 
-def correct_get_iota_user(user: str):
+def correct_get_iota_user(m: aioresponses, user: str):
     """ Mocked get iota user """
-    respx.get(URL_GET_IOTA_USER).mock(
-        return_value=Response(status_code=status.HTTP_200_OK, json={"user": user})
+    m.get(
+        f"{URL_GET_IOTA_USER}?user={user}",
+        status=status.HTTP_200_OK,
+        body=orjson.dumps({"user": user}).decode(),
     )
 
 
-def unreachable_get_iota_user():
+def unreachable_get_iota_user(m: aioresponses, user: str):
     """ Mocked get iota user """
-    respx.get(URL_GET_IOTA_USER).mock(side_effect=RequestError)
+    m.get(f"{URL_GET_IOTA_USER}?user={user}", exception=TimeoutError("Timeout"))
 
 
 # -------------------------------------------------------------------------------
 
 
-def correct_store_in_iota():
+def correct_store_in_iota(m: aioresponses):
     """ Mocked store in iota """
-    respx.post(URL_STORE_IN_IOTA).mock(
-        return_value=Response(status_code=status.HTTP_200_OK)
-    )
+    m.post(URL_STORE_IN_IOTA, status=status.HTTP_200_OK)
 
 
-def unreachable_store_in_iota():
+def unreachable_store_in_iota(m: aioresponses):
     """ Mocked store in iota """
-    respx.post(URL_STORE_IN_IOTA).mock(side_effect=RequestError)
+    m.post(URL_STORE_IN_IOTA, exception=TimeoutError("Timeout"))

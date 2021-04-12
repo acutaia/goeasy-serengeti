@@ -23,14 +23,17 @@ Anonymizer package
     limitations under the License.
 """
 
+# Standard Library
+from asyncio import TimeoutError
+
 # Third Party
+from aiohttp import ClientError
 from fastapi import status, HTTPException
-import httpx
 import orjson
 
 # Internal
 from .logger import get_logger
-from .session import get_accounting_session
+from .sessions.accounting_manager import get_accounting_session
 from ..models.accounting_manager import AccountingManager, Data, Obj
 from ..config import get_accounting_manager_settings
 
@@ -50,21 +53,26 @@ async def get_iota_user(user: str) -> dict:
     settings = get_accounting_manager_settings()
 
     try:
-        client = get_accounting_session()
-        response = await client.get(
+        session = get_accounting_session()
+        async with session.get(
             f"{settings.accounting_ip}{settings.accounting_get_uri}",
             params={"user": user},
-            timeout=25,
-        )
-    except httpx.RequestError as exc:
+        ) as resp:
+            return await resp.json(
+                encoding="utf-8", loads=orjson.loads, content_type=None
+            )
+
+    except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
-        await logger.debug(
-            {"method": exc.request.method, "url": exc.request.url, "error": exc}
+        await logger.warning(
+            {
+                "url": f"{settings.accounting_ip}{settings.accounting_get_uri}",
+                "error": repr(str(exc)),
+            }
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Can't contact IoTa service"
         )
-    return orjson.loads(response.content)
 
 
 async def store_in_iota(
@@ -103,8 +111,8 @@ async def store_in_iota(
     settings = get_accounting_manager_settings()
 
     try:
-        client = get_accounting_session()
-        await client.post(
+        session = get_accounting_session()
+        async with session.post(
             f"{settings.accounting_ip}{settings.accounting_store_uri}",
             json=AccountingManager(
                 target=source_app,
@@ -123,14 +131,17 @@ async def store_in_iota(
                         msg_error_description=msg_error_description,
                     )
                 ),
-            ).jsonify(),
-            timeout=25,
-        )
+            ).dict(),
+        ):
+            pass
 
-    except httpx.RequestError as exc:
+    except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
         await logger.warning(
-            {"method": exc.request.method, "url": exc.request.url, "error": exc}
+            {
+                "url": f"{settings.accounting_ip}{settings.accounting_get_uri}",
+                "error": repr(str(exc)),
+            }
         )
     finally:
         return

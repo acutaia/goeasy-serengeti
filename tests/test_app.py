@@ -112,7 +112,7 @@ class TestAdmin:
         """Test the behaviour of administrator router"""
 
         clear_test()
-        correct_get_iota_user(user=SourceApp.any)
+        correct_get_iota_user(mock_aioresponse, user=SourceApp.any)
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -169,7 +169,7 @@ class TestIoT:
         # Mock the request
         correct_get_blox_token(mock_aioresponse)
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
-        correct_store_in_iota()
+        correct_store_in_iota(mock_aioresponse)
         correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_IOT_DATA)
 
         # Obtain tokens
@@ -499,7 +499,7 @@ class TestUser:
         correct_get_raw_data(
             mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo
         )
-        correct_store_in_iota()
+        correct_store_in_iota(mock_aioresponse)
         correct_store_user_in_the_anonengine(mock_aioresponse)
         correct_store_in_ipt_anonymizer(mock_aioresponse, URL_STORE_USER_DATA)
 
