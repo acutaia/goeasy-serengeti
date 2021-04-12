@@ -39,7 +39,7 @@ class _UserFeedSemaphore:
 
 @lru_cache(maxsize=1)
 def _get_user_semaphore() -> _UserFeedSemaphore:
-    return _UserFeedSemaphore(store=Semaphore(30), test=Semaphore(5))
+    return _UserFeedSemaphore(store=Semaphore(20), test=Semaphore(5))
 
 
 @lru_cache(maxsize=1)
