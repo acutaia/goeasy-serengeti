@@ -23,7 +23,7 @@ Data Inspection response Model
     limitations under the License.
 """
 
-# Third Party
+# Standard Library
 from typing import Union
 
 # Internal
