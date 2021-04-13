@@ -193,7 +193,7 @@ async def end_to_end_position_authentication(
                             not_authentic_number -= 1
                             break
                     if position.authenticity == Authenticity.not_authentic:
-                        await logger.warning(
+                        await logger.debug(
                             {
                                 "message_timestamp": auth.time,
                                 "android_message": auth.data,

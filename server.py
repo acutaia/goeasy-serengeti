@@ -40,6 +40,7 @@ class GunicornSettings(BaseSettings):
     server_port: int
     backlog: int
     max_requests: int
+    timeout: int
 
     class Config:
         env_file = ".env"
@@ -84,6 +85,7 @@ if __name__ == "__main__":
         "errorlog": "-",
         "backlog": settings.backlog,
         "max_requests": settings.max_requests,
+        "timeout": settings.timeout,
         "worker_class": "uvicorn.workers.UvicornWorker",
     }
 
