@@ -39,7 +39,7 @@ class _IoTFeedSemaphore:
 
 @lru_cache(maxsize=1)
 def _get_iot_semaphore() -> _IoTFeedSemaphore:
-    return _IoTFeedSemaphore(store=Semaphore(10), test=Semaphore(5))
+    return _IoTFeedSemaphore(store=Semaphore(5), test=Semaphore(5))
 
 
 @lru_cache(maxsize=1)
