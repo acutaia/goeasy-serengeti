@@ -43,7 +43,7 @@ class AnonengineSession:
     def setup(cls) -> AnonengineSession:
         """Setup the session"""
         timeout = ClientTimeout(total=25)
-        connector = TCPConnector(limit_per_host=5, ssl=False, ttl_dns_cache=300)
+        connector = TCPConnector(ssl=False, ttl_dns_cache=300)
         self = AnonengineSession(
             session=ClientSession(
                 connector=connector,

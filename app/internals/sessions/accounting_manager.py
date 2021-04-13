@@ -43,7 +43,7 @@ class AccountingSession:
     def setup(cls) -> AccountingSession:
         """Setup the session"""
         timeout = ClientTimeout(total=10)
-        connector = TCPConnector(limit_per_host=15, ssl=False, ttl_dns_cache=300)
+        connector = TCPConnector(ssl=False, ttl_dns_cache=300)
         self = AccountingSession(
             session=ClientSession(
                 connector=connector,

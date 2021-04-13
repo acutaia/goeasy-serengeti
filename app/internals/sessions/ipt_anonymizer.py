@@ -43,10 +43,8 @@ class IptAnonymizerSession:
     @classmethod
     def setup(cls) -> IptAnonymizerSession:
         """Setup the session"""
-        store_connector = TCPConnector(limit_per_host=20, ssl=False, ttl_dns_cache=300)
-        extract_connector = TCPConnector(
-            limit_per_host=15, ssl=False, ttl_dns_cache=300
-        )
+        store_connector = TCPConnector(ssl=False, ttl_dns_cache=300)
+        extract_connector = TCPConnector(ssl=False, ttl_dns_cache=300)
         self = IptAnonymizerSession(
             store=ClientSession(
                 connector=store_connector,
