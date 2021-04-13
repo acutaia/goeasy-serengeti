@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     options = {
         "bind": f"0.0.0.0:{settings.server_port}",
-        "workers": settings.cores_number,
+        "workers": (settings.cores_number * 2) + 1,
         "keepalive": settings.keep_alive,
         "loglevel": settings.log_level,
         "accesslog": "-",
