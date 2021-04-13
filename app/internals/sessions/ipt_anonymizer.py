@@ -43,23 +43,19 @@ class IptAnonymizerSession:
     @classmethod
     def setup(cls) -> IptAnonymizerSession:
         """Setup the session"""
-        store_timeout = ClientTimeout(total=60)
-        store_connector = TCPConnector(limit_per_host=30, ssl=False, ttl_dns_cache=300)
-        extract_timeout = ClientTimeout(total=60)
+        store_connector = TCPConnector(limit_per_host=25, ssl=False, ttl_dns_cache=300)
         extract_connector = TCPConnector(
             limit_per_host=20, ssl=False, ttl_dns_cache=300
         )
         self = IptAnonymizerSession(
             store=ClientSession(
                 connector=store_connector,
-                timeout=store_timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=True,
                 connector_owner=True,
             ),
             extract=ClientSession(
                 connector=extract_connector,
-                timeout=extract_timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=False,
                 connector_owner=True,

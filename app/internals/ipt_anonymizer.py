@@ -56,7 +56,7 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     try:
         # Store data
         session = store_session()
-        async with session.post(url=url, json=data, timeout=5):
+        async with session.post(url=url, json=data):
             pass
 
     except (TimeoutError, ClientError) as exc:

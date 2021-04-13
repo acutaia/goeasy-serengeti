@@ -149,7 +149,9 @@ async def end_to_end_position_authentication(
                             msg_error=True,
                             msg_error_description=exc.detail,
                         )
-                    raise exc
+                        galileo_data = None
+                    else:
+                        raise exc
 
                 if galileo_data is None:
                     position.authenticity = Authenticity.unknown
@@ -163,6 +165,7 @@ async def end_to_end_position_authentication(
                 else:
                     position.authenticity = Authenticity.not_authentic
                     not_authentic_number += 1
+                    analyze = True
 
                     try:
                         # Remake the request
@@ -185,25 +188,30 @@ async def end_to_end_position_authentication(
                                 msg_error=True,
                                 msg_error_description=exc.detail,
                             )
-                        raise exc
-                    for data in galileo_data_list:
-                        if data.raw_data == auth.data:
-                            position.authenticity = Authenticity.authentic
-                            authentic_number += 1
-                            not_authentic_number -= 1
-                            break
-                    if position.authenticity == Authenticity.not_authentic:
-                        await logger.debug(
-                            {
-                                "message_timestamp": auth.time,
-                                "android_message": auth.data,
-                                "satellite_id": auth.svid,
-                                "status": "Real Fake",
-                                "ublox_api_messages": [
-                                    ublox_api.dict() for ublox_api in galileo_data_list
-                                ],
-                            }
-                        )
+                            position.authenticity = Authenticity.not_authentic
+                            analyze = False
+                        else:
+                            raise exc
+
+                    if analyze:
+                        for data in galileo_data_list:
+                            if data.raw_data == auth.data:
+                                position.authenticity = Authenticity.authentic
+                                authentic_number += 1
+                                not_authentic_number -= 1
+                                break
+                        if position.authenticity == Authenticity.not_authentic:
+                            await logger.debug(
+                                {
+                                    "message_timestamp": auth.time,
+                                    "android_message": auth.data,
+                                    "satellite_id": auth.svid,
+                                    "status": "Real Fake",
+                                    "ublox_api_messages": [
+                                        ublox_api.dict() for ublox_api in galileo_data_list
+                                    ],
+                                }
+                            )
 
     await logger.info(
         {

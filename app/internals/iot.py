@@ -117,8 +117,9 @@ async def end_to_end_position_authentication(
                     msg_error=True,
                     msg_error_description=exc.detail,
                 )
-
-            raise exc
+                galileo_data = None
+            else:
+                raise exc
 
         if galileo_data is None:
             unknown_number += 1
@@ -129,6 +130,7 @@ async def end_to_end_position_authentication(
         else:
             not_authentic_number += 1
             not_authentic = True
+            analyze = True
 
             try:
                 # Remake the request
@@ -151,27 +153,30 @@ async def end_to_end_position_authentication(
                         msg_error=True,
                         msg_error_description=exc.detail,
                     )
-                raise exc
+                    analyze = False
+                else:
+                    raise exc
 
-            for data in galileo_data_list:
-                if data.raw_data == gnss.raw_data:
-                    authentic_number += 1
-                    not_authentic_number -= 1
-                    not_authentic = False
-                    break
+            if analyze:
+                for data in galileo_data_list:
+                    if data.raw_data == gnss.raw_data:
+                        authentic_number += 1
+                        not_authentic_number -= 1
+                        not_authentic = False
+                        break
 
-            if not_authentic:
-                await logger.warning(
-                    {
-                        "message_timestamp": iot_time,
-                        "ublox_message": gnss.raw_data,
-                        "satellite_id": gnss.svid,
-                        "status": "Real Fake",
-                        "ublox_api_messages": [
-                            ublox_api.dict() for ublox_api in galileo_data_list
-                        ],
-                    }
-                )
+                if not_authentic:
+                    await logger.warning(
+                        {
+                            "message_timestamp": iot_time,
+                            "ublox_message": gnss.raw_data,
+                            "satellite_id": gnss.svid,
+                            "status": "Real Fake",
+                            "ublox_api_messages": [
+                                ublox_api.dict() for ublox_api in galileo_data_list
+                            ],
+                        }
+                    )
             break
 
     if not_authentic_number > 0:
