@@ -44,7 +44,7 @@ class IptAnonymizerSession:
     def setup(cls) -> IptAnonymizerSession:
         """Setup the session"""
         store_timeout = ClientTimeout(total=60)
-        store_connector = TCPConnector(limit_per_host=10, ssl=False, ttl_dns_cache=300)
+        store_connector = TCPConnector(limit_per_host=30, ssl=False, ttl_dns_cache=300)
         extract_timeout = ClientTimeout(total=60)
         extract_connector = TCPConnector(
             limit_per_host=20, ssl=False, ttl_dns_cache=300

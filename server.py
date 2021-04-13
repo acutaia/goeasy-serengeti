@@ -38,6 +38,8 @@ class GunicornSettings(BaseSettings):
     cores_number: int
     keep_alive: int
     server_port: int
+    backlog: int
+    max_requests: int
 
     class Config:
         env_file = ".env"
@@ -80,6 +82,8 @@ if __name__ == "__main__":
         "loglevel": settings.log_level,
         "accesslog": "-",
         "errorlog": "-",
+        "backlog": settings.backlog,
+        "max_requests": settings.max_requests,
         "worker_class": "uvicorn.workers.UvicornWorker",
     }
 
