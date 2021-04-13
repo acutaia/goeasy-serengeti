@@ -42,8 +42,8 @@ class UbloxApiSession:
     @classmethod
     def setup(cls) -> UbloxApiSession:
         """Setup the session"""
-        timeout = ClientTimeout(total=1)
-        connector = TCPConnector(limit_per_host=30, ssl=False, ttl_dns_cache=300)
+        timeout = ClientTimeout(total=5)
+        connector = TCPConnector(limit_per_host=25, ssl=False, ttl_dns_cache=300)
         self = UbloxApiSession(
             session=ClientSession(
                 connector=connector,
