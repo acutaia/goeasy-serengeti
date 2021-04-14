@@ -78,6 +78,8 @@ class RequestType(str, Enum):
     stats_num_tracks = "Stats_num_tracks"
     stats_avg_time = "Stats_avg_time"
     stats_avg_space = "Stats_avg_space"
+    inter_modality_time = "Inter_modality_time"
+    inter_modality_space = "Inter_modality_space"
 
 
 class TypeDay(str, Enum):
