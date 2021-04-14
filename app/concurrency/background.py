@@ -40,6 +40,7 @@ async def frequency_limiter(sem: Semaphore) -> None:
     :param sem: semaphore to store iot or user data
     """
     try:
+        lock_acquired = False
         async with timeout(1.5):
             lock_acquired = await sem.acquire()
             sem.release()
