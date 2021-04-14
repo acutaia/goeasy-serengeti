@@ -32,6 +32,7 @@ from fastapi import APIRouter, Body, Depends, Request, BackgroundTasks
 from fastapi.responses import ORJSONResponse
 
 # Internal
+from ..concurrency.background import frequency_limiter
 from ..concurrency.iot import test_semaphore, store_semaphore
 from ..models.iot_feed.iot import IotInput
 from ..models.iot_feed.response_class import Resource
@@ -83,6 +84,9 @@ async def iot_authentication(
 
     # Generate GEPid
     obesrvation_gepid = str(uuid.uuid4())
+
+    # Wait some time before adding the background task
+    await frequency_limiter(store_semaphore())
 
     back_ground_tasks.add_task(
         store_iot_data,

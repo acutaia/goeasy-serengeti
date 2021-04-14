@@ -31,6 +31,7 @@ from fastapi import APIRouter, Body, Depends, BackgroundTasks, Request
 from fastapi.responses import ORJSONResponse
 
 # Internal
+from ..concurrency.background import frequency_limiter
 from ..concurrency.user_feed import test_semaphore, store_semaphore
 from ..internals.user_feed import end_to_end_position_authentication, store_android_data
 from ..models.user_feed.user import UserFeedInput
@@ -84,6 +85,9 @@ async def authenticate(
 
     # Generate an unique id for the journey
     journey_id = str(uuid.uuid4())
+
+    # Wait some time before adding the background task
+    await frequency_limiter(store_semaphore())
 
     # Store the data in the anonengine in the background
     back_ground_tasks.add_task(
