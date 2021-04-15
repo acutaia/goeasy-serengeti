@@ -35,11 +35,10 @@ from app.main import app
 
 class GunicornSettings(BaseSettings):
     log_level: str
+    backlog: int
     cores_number: int
     keep_alive: int
     server_port: int
-    max_requests: int
-    max_requests_jitter: int
     timeout: int
 
     class Config:
@@ -83,8 +82,7 @@ if __name__ == "__main__":
         "loglevel": settings.log_level,
         "accesslog": "-",
         "errorlog": "-",
-        "max_requests": settings.max_requests,
-        "max_requests_jitter": settings.max_requests_jitter,
+        "backlog": settings.backlog,
         "timeout": settings.timeout,
         "worker_class": "uvicorn.workers.UvicornWorker",
     }

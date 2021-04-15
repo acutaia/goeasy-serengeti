@@ -41,7 +41,7 @@ async def frequency_limiter(sem: Semaphore) -> None:
     """
     try:
         lock_acquired = False
-        async with timeout(1.5):
+        async with timeout(0.50):
             lock_acquired = await sem.acquire()
             sem.release()
             lock_acquired = False
