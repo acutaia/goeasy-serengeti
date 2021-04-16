@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 # Third Party
-from aiohttp import ClientTimeout, ClientSession, TCPConnector
+from aiohttp import ClientSession, TCPConnector
 import orjson
 
 # ----------------------------------------------------------------------------
