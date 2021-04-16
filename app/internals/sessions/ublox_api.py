@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 # Third Party
-from aiohttp import ClientTimeout, ClientSession, TCPConnector
+from aiohttp import ClientSession, TCPConnector
 import orjson
 
 # ----------------------------------------------------------------------------
@@ -42,12 +42,10 @@ class UbloxApiSession:
     @classmethod
     def setup(cls) -> UbloxApiSession:
         """Setup the session"""
-        timeout = ClientTimeout(total=2)
         connector = TCPConnector(ssl=False, ttl_dns_cache=300)
         self = UbloxApiSession(
             session=ClientSession(
                 connector=connector,
-                timeout=timeout,
                 json_serialize=lambda x: orjson.dumps(x).decode(),
                 raise_for_status=True,
                 connector_owner=True,

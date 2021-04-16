@@ -132,6 +132,7 @@ async def store_in_iota(
                     )
                 ),
             ).dict(),
+            timeout=1
         ):
             pass
 
