@@ -279,50 +279,50 @@ async def store_android_data(
                 store=True,
             )
 
-        # Generate user feed internal
-        user_feed_internal = user_feed.dict(
-            exclude={
-                "trace_information": {"__all__": {"galileo_auth", "galileo_status"}}
-            }
-        )
-        user_feed_internal.update({"source_app": source_app, "journey_id": journey_id})
-
-        # Store in the IPT-Anonymizer
-        await store_in_the_anonymizer(user_feed_internal, SETTINGS.store_user_data_url)
-
-        # Store in the anonengine
-        await store_in_the_anonengine(
-            UserFeedOutput.construct(
-                **{
-                    "app_defined_behaviour": user_feed.behaviour.app_defined,
-                    "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
-                    "user_defined_behaviour": user_feed.behaviour.user_defined,
-                    "company_code": user_feed.company_code,
-                    "company_trip_type": user_feed.company_trip_type,
-                    "deviceId": user_feed.id,
-                    "journeyId": journey_id,
-                    "startDate": user_feed.startDate,
-                    "endDate": user_feed.endDate,
-                    "distance": user_feed.distance,
-                    "elapsedTime": user_feed.elapsedTime,
-                    "positions": [
-                        PositionObject.construct(
-                            **{
-                                "authenticity": position.authenticity,
-                                "lat": position.lat,
-                                "lon": position.lon,
-                                "partialDistance": position.partialDistance,
-                                "time": position.time,
-                            }
-                        )
-                        for position in user_feed.trace_information
-                    ],
-                    "sensors": user_feed.sensors_information,
-                    "mainTypeSpace": user_feed.mainTypeSpace,
-                    "mainTypeTime": user_feed.mainTypeTime,
-                    "sourceApp": source_app,
+            # Generate user feed internal
+            user_feed_internal = user_feed.dict(
+                exclude={
+                    "trace_information": {"__all__": {"galileo_auth", "galileo_status"}}
                 }
-            ).dict()
-        )
+            )
+            user_feed_internal.update({"source_app": source_app, "journey_id": journey_id})
+
+            # Store in the IPT-Anonymizer
+            await store_in_the_anonymizer(user_feed_internal, SETTINGS.store_user_data_url)
+
+            # Store in the anonengine
+            await store_in_the_anonengine(
+                UserFeedOutput.construct(
+                    **{
+                        "app_defined_behaviour": user_feed.behaviour.app_defined,
+                        "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
+                        "user_defined_behaviour": user_feed.behaviour.user_defined,
+                        "company_code": user_feed.company_code,
+                        "company_trip_type": user_feed.company_trip_type,
+                        "deviceId": user_feed.id,
+                        "journeyId": journey_id,
+                        "startDate": user_feed.startDate,
+                        "endDate": user_feed.endDate,
+                        "distance": user_feed.distance,
+                        "elapsedTime": user_feed.elapsedTime,
+                        "positions": [
+                            PositionObject.construct(
+                                **{
+                                    "authenticity": position.authenticity,
+                                    "lat": position.lat,
+                                    "lon": position.lon,
+                                    "partialDistance": position.partialDistance,
+                                    "time": position.time,
+                                }
+                            )
+                            for position in user_feed.trace_information
+                        ],
+                        "sensors": user_feed.sensors_information,
+                        "mainTypeSpace": user_feed.mainTypeSpace,
+                        "mainTypeTime": user_feed.mainTypeTime,
+                        "sourceApp": source_app,
+                    }
+                ).dict()
+            )
     finally:
         return

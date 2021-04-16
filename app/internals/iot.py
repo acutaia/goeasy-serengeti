@@ -254,6 +254,6 @@ async def store_iot_data(
                 store=True,
             )
 
-        await store_in_the_anonymizer(iot_output, SETTINGS.store_iot_data_url)
+            await store_in_the_anonymizer(iot_output, SETTINGS.store_iot_data_url)
     finally:
         return
