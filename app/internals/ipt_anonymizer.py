@@ -34,6 +34,7 @@ import orjson
 # Internal
 from .logger import get_logger
 from .sessions.ipt_anonymizer import store_session, extract_session
+from ..concurrency.ipt_anonymizer import ipt_store_semaphore
 from ..config import get_ipt_anonymizer_settings
 
 # --------------------------------------------------------------------------------------------
@@ -53,19 +54,22 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     # Get Logger
     logger = get_logger()
 
-    try:
-        # Store data
-        session = store_session()
-        async with session.post(url=url, json=data):
-            pass
+    # obtain the semaphore to prevent starvation
+    sem = ipt_store_semaphore()
+    async with sem:
+        try:
+            # Store data
+            session = store_session()
+            async with session.post(url=url, json=data):
+                pass
 
-    except (TimeoutError, ClientError) as exc:
-        # IPT-anonymizer is in starvation
-        await logger.warning({"url": url, "error": repr(str(exc))})
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="IPT-anonymizer is in starvation or down",
-        )
+        except (TimeoutError, ClientError) as exc:
+            # IPT-anonymizer is in starvation
+            await logger.warning({"url": url, "error": repr(str(exc))})
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="IPT-anonymizer is in starvation or down",
+            )
 
 
 # --------------------------------------------------------------------------------------------
