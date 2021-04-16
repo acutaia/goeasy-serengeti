@@ -40,9 +40,14 @@ async def frequency_limiter(sem: Semaphore) -> None:
     :param sem: semaphore to store iot or user data
     """
     try:
-        await wait_for(sem.acquire(), 5)
+        await wait_for(sem.acquire(), 4)
         sem.release()
 
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            headers={
+                "Retry-After": 30
+            }
+        )
 
