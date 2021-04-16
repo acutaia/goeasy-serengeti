@@ -24,10 +24,10 @@ Background concurrency
 """
 
 # Standard Library
-from asyncio import Semaphore, TimeoutError
+from asyncio import Semaphore, TimeoutError, wait_for
 
 # Third Party
-from async_timeout import timeout
+from fastapi import HTTPException, status
 
 # --------------------------------------------------------------------------------------------
 
@@ -40,13 +40,9 @@ async def frequency_limiter(sem: Semaphore) -> None:
     :param sem: semaphore to store iot or user data
     """
     try:
-        lock_acquired = False
-        async with timeout(0.50):
-            lock_acquired = await sem.acquire()
-            sem.release()
-            lock_acquired = False
+        await wait_for(sem.acquire(), 4)
+        sem.release()
 
     except TimeoutError:
-        if lock_acquired:
-            sem.release()
-        return
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY)
+
