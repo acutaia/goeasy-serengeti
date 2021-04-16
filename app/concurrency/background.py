@@ -25,6 +25,7 @@ Background concurrency
 
 # Standard Library
 from asyncio import Semaphore, TimeoutError, wait_for
+from random import randrange
 
 # Third Party
 from fastapi import HTTPException, status
@@ -40,14 +41,14 @@ async def frequency_limiter(sem: Semaphore) -> None:
     :param sem: semaphore to store iot or user data
     """
     try:
-        await wait_for(sem.acquire(), 4)
+        await wait_for(sem.acquire(), 1)
         sem.release()
 
     except TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             headers={
-                "Retry-After": 30
+                "Retry-After": 30 + randrange(0, 30)
             }
         )
 
