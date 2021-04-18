@@ -37,7 +37,7 @@ import orjson
 @asynccontextmanager
 async def get_anonengine_session() -> ClientSession:
     """Async Context manager to get a session to communicate with the Anonymizer"""
-    connector = TCPConnector(limit=1, ssl=False, ttl_dns_cache=300)
+    connector = TCPConnector(limit=1, ssl=False)
     session = ClientSession(
         connector=connector,
         json_serialize=lambda x: orjson.dumps(x).decode(),
