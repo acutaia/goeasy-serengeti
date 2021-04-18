@@ -31,6 +31,30 @@ from functools import lru_cache
 
 
 @lru_cache(maxsize=1)
+def user_semaphore() -> Semaphore:
+    """Synchronize user store requests to prevent starvation"""
+    return Semaphore(40)
+
+# --------------------------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def iot_semaphore() -> Semaphore:
+    """synchronize iot store requests to prevent starvation"""
+    return Semaphore(5)
+
+# --------------------------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
 def position_auth() -> Semaphore:
     """Synchronize position authorization requests to prevent starvation"""
     return Semaphore(20)
+
+# --------------------------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def position_test() -> Semaphore:
+    """Synchronize position authorization requests to prevent starvation"""
+    return Semaphore(2)
