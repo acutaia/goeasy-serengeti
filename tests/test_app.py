@@ -86,7 +86,6 @@ def clear_test():
     """Clear tests"""
     disable_logger()
     change_default_security_settings()
-    get_accounting_session.cache_clear()
 
 
 def test_docs_and_startup_shutdown(mock_aioresponse):

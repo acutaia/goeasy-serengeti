@@ -53,14 +53,15 @@ async def get_iota_user(user: str) -> dict:
     settings = get_accounting_manager_settings()
 
     try:
-        session = get_accounting_session()
-        async with session.get(
-            f"{settings.accounting_ip}{settings.accounting_get_uri}",
-            params={"user": user},
-        ) as resp:
-            return await resp.json(
-                encoding="utf-8", loads=orjson.loads, content_type=None
-            )
+        async with get_accounting_session() as session:
+            async with session.get(
+                f"{settings.accounting_ip}{settings.accounting_get_uri}",
+                params={"user": user},
+                timeout=20,
+            ) as resp:
+                return await resp.json(
+                    encoding="utf-8", loads=orjson.loads, content_type=None
+                )
 
     except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
@@ -111,30 +112,30 @@ async def store_in_iota(
     settings = get_accounting_manager_settings()
 
     try:
-        session = get_accounting_session()
-        async with session.post(
-            f"{settings.accounting_ip}{settings.accounting_store_uri}",
-            json=AccountingManager(
-                target=source_app,
-                data=Data(
-                    AppObj=Obj(
-                        client_id=client_id,
-                        user_id=user_id,
-                        msg_id=msg_id,
-                        msg_size=msg_size,
-                        msg_time=msg_time,
-                        msg_malicious_position=msg_malicious_position,
-                        msg_authenticated_position=msg_authenticated_position,
-                        msg_unknown_position=msg_unknown_position,
-                        msg_total_position=msg_total_position,
-                        msg_error=msg_error,
-                        msg_error_description=msg_error_description,
-                    )
-                ),
-            ).dict(),
-            timeout=1
-        ):
-            pass
+        async with get_accounting_session() as session:
+            async with session.post(
+                f"{settings.accounting_ip}{settings.accounting_store_uri}",
+                json=AccountingManager(
+                    target=source_app,
+                    data=Data(
+                        AppObj=Obj(
+                            client_id=client_id,
+                            user_id=user_id,
+                            msg_id=msg_id,
+                            msg_size=msg_size,
+                            msg_time=msg_time,
+                            msg_malicious_position=msg_malicious_position,
+                            msg_authenticated_position=msg_authenticated_position,
+                            msg_unknown_position=msg_unknown_position,
+                            msg_total_position=msg_total_position,
+                            msg_error=msg_error,
+                            msg_error_description=msg_error_description,
+                        )
+                    ),
+                ).dict(),
+                timeout=1,
+            ):
+                pass
 
     except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection

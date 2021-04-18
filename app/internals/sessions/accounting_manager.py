@@ -24,39 +24,26 @@ Accounting-Manager session package
 """
 
 # Standard Library
-from __future__ import annotations
-from dataclasses import dataclass
-from functools import lru_cache
+from contextlib import asynccontextmanager
 
 # Third Party
-from aiohttp import ClientTimeout, ClientSession, TCPConnector
+from aiohttp import ClientSession, TCPConnector
 import orjson
 
 # ----------------------------------------------------------------------------
 
 
-@dataclass(repr=False, eq=False)
-class AccountingSession:
-    session: ClientSession
-
-    @classmethod
-    def setup(cls) -> AccountingSession:
-        """Setup the session"""
-        timeout = ClientTimeout(total=1)
-        connector = TCPConnector(ssl=False, ttl_dns_cache=300)
-        self = AccountingSession(
-            session=ClientSession(
-                connector=connector,
-                timeout=timeout,
-                json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=True,
-                connector_owner=True,
-            )
-        )
-        return self
-
-
-@lru_cache(maxsize=1)
-def get_accounting_session() -> ClientSession:
-    """Instantiate a AccountingSession"""
-    return AccountingSession.setup().session
+@asynccontextmanager
+async def get_accounting_session() -> ClientSession:
+    """Async Context manager to get a session to communicate with the Accounting Manager"""
+    connector = TCPConnector(limit=1, ssl=False)
+    session = ClientSession(
+        connector=connector,
+        json_serialize=lambda x: orjson.dumps(x).decode(),
+        raise_for_status=True,
+        connector_owner=True,
+    )
+    try:
+        yield session
+    finally:
+        await session.close()
