@@ -25,7 +25,7 @@ Background concurrency
 
 # Standard Library
 from asyncio import Semaphore, TimeoutError, wait_for
-from random import randrange
+from random import random, randrange
 
 # Third Party
 from fastapi import HTTPException, status
@@ -47,8 +47,5 @@ async def frequency_limiter(sem: Semaphore) -> None:
     except TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            headers={
-                "Retry-After": 30 + randrange(0, 30)
-            }
+            headers={"Retry-After": str(randrange(1, 29) * random() + 1)},
         )
-
