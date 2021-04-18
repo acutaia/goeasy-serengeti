@@ -32,7 +32,7 @@ from fastapi.responses import ORJSONResponse
 
 # Internal
 from ..concurrency.background import frequency_limiter
-from ..concurrency.position_authentication import position_test, user_semaphore
+from ..concurrency.position_authentication import position_test_lock, store_semaphore
 from ..internals.user_feed import end_to_end_position_authentication, store_android_data
 from ..models.user_feed.user import UserFeedInput
 from ..models.security import Requester
@@ -87,7 +87,7 @@ async def authenticate(
     journey_id = str(uuid.uuid4())
 
     # Wait some time before adding the background task
-    await frequency_limiter(user_semaphore())
+    await frequency_limiter(store_semaphore())
 
     # Store the data in the anonengine in the background
     back_ground_tasks.add_task(
@@ -99,7 +99,7 @@ async def authenticate(
         source_app,
         requester.client,
         requester.user,
-        user_semaphore(),
+        store_semaphore(),
     )
 
     # Return the id of the resource
@@ -124,7 +124,7 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
     """
 
     # Get a semaphore to synchronize this request and prevent starvation
-    async with position_test():
+    async with position_test_lock():
         user_feed_test = await end_to_end_position_authentication(
             user_feed=user_feed,
             timestamp=time.time(),

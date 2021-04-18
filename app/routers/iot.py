@@ -33,7 +33,7 @@ from fastapi.responses import ORJSONResponse
 
 # Internal
 from ..concurrency.background import frequency_limiter
-from ..concurrency.position_authentication import iot_semaphore, position_test
+from ..concurrency.position_authentication import store_semaphore, position_test_lock
 from ..models.iot_feed.iot import IotInput
 from ..models.iot_feed.response_class import Resource
 from ..models.security import Requester
@@ -86,7 +86,7 @@ async def iot_authentication(
     obesrvation_gepid = str(uuid.uuid4())
 
     # Wait some time before adding the background task
-    await frequency_limiter(iot_semaphore())
+    await frequency_limiter(store_semaphore())
 
     back_ground_tasks.add_task(
         store_iot_data,
@@ -97,7 +97,7 @@ async def iot_authentication(
         source_app,
         requester.client,
         requester.user,
-        iot_semaphore(),
+        store_semaphore(),
     )
     return Resource(observationGEPid=obesrvation_gepid)
 
@@ -120,7 +120,7 @@ async def authenticate_test(request: Request, iot_feed: IotInput = Body(...)):
     """
 
     # Get a semaphore to synchronize this request and prevent starvation
-    async with position_test():
+    async with position_test_lock():
         iot_feed_test = await end_to_end_position_authentication(
             iot_input=iot_feed,
             timestamp=time.time(),
