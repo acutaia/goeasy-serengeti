@@ -24,9 +24,8 @@ Anonymizer session package
 """
 
 # Standard Library
-from __future__ import annotations
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from functools import lru_cache
 
 # Third Party
 from aiohttp import ClientTimeout, ClientSession, TCPConnector
@@ -35,28 +34,17 @@ import orjson
 # ----------------------------------------------------------------------------
 
 
-@dataclass(repr=False, eq=False)
-class AnonengineSession:
-    session: ClientSession
-
-    @classmethod
-    def setup(cls) -> AnonengineSession:
-        """Setup the session"""
-        timeout = ClientTimeout(total=25)
-        connector = TCPConnector(ssl=False, ttl_dns_cache=300)
-        self = AnonengineSession(
-            session=ClientSession(
-                connector=connector,
-                timeout=timeout,
-                json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=False,
-                connector_owner=True,
-            )
-        )
-        return self
-
-
-@lru_cache(maxsize=1)
-def get_anonengine_session() -> ClientSession:
-    """Instantiate a AnonengineSession"""
-    return AnonengineSession.setup().session
+@asynccontextmanager
+async def get_anonengine_session() -> ClientSession:
+    """Async Context manager to get a session to communicate with the Anonymizer"""
+    connector = TCPConnector(limit=1, ssl=False, ttl_dns_cache=300)
+    session = ClientSession(
+        connector=connector,
+        json_serialize=lambda x: orjson.dumps(x).decode(),
+        raise_for_status=True,
+        connector_owner=True,
+    )
+    try:
+        yield session
+    finally:
+        await session.close()

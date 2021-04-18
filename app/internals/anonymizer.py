@@ -52,15 +52,15 @@ async def store_in_the_anonengine(data: dict) -> None:
     anonymizer_settings = get_anonymizer_settings()
     try:
         # Store data
-        session = get_anonengine_session()
-        async with session.post(
-            anonymizer_settings.store_data_url, json=data, timeout=0.5
-        ):
-            pass
+        async with get_anonengine_session() as session:
+            async with session.post(
+                anonymizer_settings.store_data_url, json=data, timeout=0.5
+            ):
+                pass
 
     except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
-        await logger.warning(
+        await logger.info(
             {"url": anonymizer_settings.store_data_url, "error": repr(str(exc))}
         )
         return
@@ -81,11 +81,11 @@ async def _extract(url: str) -> Any:
     logger = get_logger()
 
     try:
-        session = get_anonengine_session()
-        async with session.get(url, timeout=20) as resp:
-            return await resp.json(
-                encoding="utf-8", loads=orjson.loads, content_type=None
-            )
+        async with get_anonengine_session() as session:
+            async with session.get(url, timeout=20) as resp:
+                return await resp.json(
+                    encoding="utf-8", loads=orjson.loads, content_type=None
+                )
 
     except (TimeoutError, ClientError) as exc:
         # Something went wrong during the connection
