@@ -33,7 +33,7 @@ import orjson
 
 # Internal
 from .logger import get_logger
-from .sessions.ipt_anonymizer import store_session, extract_session
+from .sessions.ipt_anonymizer import ipt_anonymizer_session
 from ..config import get_ipt_anonymizer_settings
 
 # --------------------------------------------------------------------------------------------
@@ -56,9 +56,9 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     # obtain the semaphore to prevent starvation
     try:
         # Store data
-        session = store_session()
-        async with session.post(url=url, json=data):
-            pass
+        async with ipt_anonymizer_session() as session:
+            async with session.post(url=url, json=data, timeout=5):
+                pass
 
     except (TimeoutError, ClientError) as exc:
         # IPT-anonymizer is in starvation
@@ -82,14 +82,14 @@ async def extract_user_info(info_requested: dict) -> tuple:
     logger = get_logger()
 
     try:
-        # Store data
-        session = extract_session()
-        async with session.post(
-            url=SETTINGS.extract_user_data_url, json=info_requested
-        ) as resp:
-            return resp.status, await resp.json(
-                encoding="utf-8", loads=orjson.loads, content_type=None
-            )
+        # Extract data
+        async with ipt_anonymizer_session() as session:
+            async with session.post(
+                url=SETTINGS.extract_user_data_url, json=info_requested, timeout=20
+            ) as resp:
+                return resp.status, await resp.json(
+                    encoding="utf-8", loads=orjson.loads, content_type=None
+                )
 
     except (TimeoutError, ClientError) as exc:
         # IPT-anonymizer is in starvation

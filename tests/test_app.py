@@ -38,7 +38,6 @@ from fastapi import status
 from app.main import app
 from app.models.admin import SourceApp
 from app.models.extraction.data_extraction import RequestType
-from app.internals.sessions.ipt_anonymizer import get_ipt_anonymizer_session
 from app.internals.sessions.accounting_manager import get_accounting_session
 
 from .internals.iot.constants import IOT_INPUT_PATH
@@ -88,7 +87,6 @@ def clear_test():
     disable_logger()
     change_default_security_settings()
     get_accounting_session.cache_clear()
-    get_ipt_anonymizer_session.cache_clear()
 
 
 def test_docs_and_startup_shutdown(mock_aioresponse):

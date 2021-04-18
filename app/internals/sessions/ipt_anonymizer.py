@@ -24,9 +24,7 @@ IPT-anonymizer session package
 """
 
 # Standard Library
-from __future__ import annotations
-from dataclasses import dataclass
-from functools import lru_cache
+from contextlib import asynccontextmanager
 
 # Third Party
 from aiohttp import ClientSession, TCPConnector
@@ -35,46 +33,17 @@ import orjson
 # ----------------------------------------------------------------------------
 
 
-@dataclass(repr=False, eq=False)
-class IptAnonymizerSession:
-    store: ClientSession
-    extract: ClientSession
-
-    @classmethod
-    def setup(cls) -> IptAnonymizerSession:
-        """Setup the session"""
-        store_connector = TCPConnector(limit=0, ssl=False, ttl_dns_cache=300)
-        extract_connector = TCPConnector(ssl=False, ttl_dns_cache=300)
-        self = IptAnonymizerSession(
-            store=ClientSession(
-                connector=store_connector,
-                json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=True,
-                connector_owner=True,
-            ),
-            extract=ClientSession(
-                connector=extract_connector,
-                json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=False,
-                connector_owner=True,
-            ),
-        )
-        return self
-
-
-@lru_cache(maxsize=1)
-def get_ipt_anonymizer_session() -> IptAnonymizerSession:
-    """Instantiate a IptAnonymizerSession"""
-    return IptAnonymizerSession.setup()
-
-
-@lru_cache(maxsize=1)
-def store_session() -> ClientSession:
-    """Store in the anonymizer session"""
-    return get_ipt_anonymizer_session().store
-
-
-@lru_cache(maxsize=1)
-def extract_session() -> ClientSession:
-    """Extract data from the anonymizer session"""
-    return get_ipt_anonymizer_session().extract
+@asynccontextmanager
+async def ipt_anonymizer_session() -> ClientSession:
+    """Async Context manager to get a session to communicate with the IPT-Anonymizer"""
+    connector = TCPConnector(limit=1, ssl=False)
+    session = ClientSession(
+        connector=connector,
+        json_serialize=lambda x: orjson.dumps(x).decode(),
+        raise_for_status=True,
+        connector_owner=True,
+    )
+    try:
+        yield session
+    finally:
+        await session.close()

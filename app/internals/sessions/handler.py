@@ -28,7 +28,6 @@ import asyncio
 
 # Internal
 from .accounting_manager import get_accounting_session
-from .ipt_anonymizer import get_ipt_anonymizer_session
 from ..keycloak import KEYCLOACK
 
 # ----------------------------------------------------------------------------
@@ -37,13 +36,11 @@ from ..keycloak import KEYCLOACK
 async def instantiate_all_sessions():
     """instantiate all sessions included in serengeti"""
     get_accounting_session()
-    get_ipt_anonymizer_session()
     await KEYCLOACK.setup()
 
 
 async def close_all_sessions():
     """Close all instantiated sessions"""
     iota = asyncio.create_task(get_accounting_session().close())
-    ipt_anonymizer = asyncio.create_task(get_accounting_session().close())
     keycloack = asyncio.create_task(KEYCLOACK.close())
-    await asyncio.gather(*[iota, ipt_anonymizer, keycloack], return_exceptions=True)
+    await asyncio.gather(*[iota, keycloack], return_exceptions=True)
