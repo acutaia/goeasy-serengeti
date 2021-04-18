@@ -25,10 +25,9 @@ Anonymizer session package
 
 # Standard Library
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
 
 # Third Party
-from aiohttp import ClientTimeout, ClientSession, TCPConnector
+from aiohttp import ClientSession, TCPConnector
 import orjson
 
 # ----------------------------------------------------------------------------
