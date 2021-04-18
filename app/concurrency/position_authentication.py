@@ -42,7 +42,7 @@ def store_semaphore() -> Semaphore:
 @lru_cache(maxsize=1)
 def position_auth() -> Semaphore:
     """Synchronize position authorization requests to prevent starvation"""
-    return Semaphore(20)
+    return Semaphore(21)
 
 
 # --------------------------------------------------------------------------------------------

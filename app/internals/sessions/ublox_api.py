@@ -27,7 +27,7 @@ Ublox-Api session package
 from contextlib import asynccontextmanager
 
 # Third Party
-from aiohttp import ClientSession, TCPConnector
+from aiohttp import ClientSession, ClientTimeout, TCPConnector
 import orjson
 
 # ----------------------------------------------------------------------------
@@ -36,9 +36,11 @@ import orjson
 @asynccontextmanager
 async def get_ublox_api_session() -> ClientSession:
     """Async Context manager to get a session to communicate with UbloxApi"""
-    connector = TCPConnector(limit=2, ssl=False, ttl_dns_cache=300)
+    timeout = ClientTimeout(total=None)
+    connector = TCPConnector(limit=1, ssl=False, ttl_dns_cache=300)
     session = ClientSession(
         connector=connector,
+        timeout=timeout,
         json_serialize=lambda x: orjson.dumps(x).decode(),
         raise_for_status=True,
         connector_owner=True,
