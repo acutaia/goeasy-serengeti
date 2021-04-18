@@ -30,7 +30,6 @@ import asyncio
 from .accounting_manager import get_accounting_session
 from .anonymizer import get_anonengine_session
 from .ipt_anonymizer import get_ipt_anonymizer_session
-from .ublox_api import get_ublox_api_session
 from ..keycloak import KEYCLOACK
 
 # ----------------------------------------------------------------------------
@@ -41,17 +40,15 @@ async def instantiate_all_sessions():
     get_accounting_session()
     get_anonengine_session()
     get_ipt_anonymizer_session()
-    get_ublox_api_session()
     await KEYCLOACK.setup()
 
 
 async def close_all_sessions():
     """Close all instantiated sessions"""
-    ublox = asyncio.create_task(get_ublox_api_session().close())
     iota = asyncio.create_task(get_accounting_session().close())
     anonymizer = asyncio.create_task(get_anonengine_session().close())
     ipt_anonymizer = asyncio.create_task(get_accounting_session().close())
     keycloack = asyncio.create_task(KEYCLOACK.close())
     await asyncio.gather(
-        *[ublox, iota, anonymizer, ipt_anonymizer, keycloack], return_exceptions=True
+        *[iota, anonymizer, ipt_anonymizer, keycloack], return_exceptions=True
     )

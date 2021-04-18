@@ -35,7 +35,6 @@ import uvloop
 
 # Internal
 from app.internals.keycloak import KEYCLOACK
-from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.internals.user_feed import (
     end_to_end_position_authentication,
     store_android_data,
@@ -106,10 +105,6 @@ class TestUserFeed:
 
         # Disable the logger of the app
         disable_logger()
-
-        # Obtain a Ublox-Api session
-        get_ublox_api_session.cache_clear()
-        session = get_ublox_api_session()
 
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
@@ -192,8 +187,6 @@ class TestUserFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
-        # Close Ublox-Api session
-        await session.close()
 
     @pytest.mark.asyncio
     async def test_store_android_data(self, mock_aioresponse):
@@ -201,10 +194,6 @@ class TestUserFeed:
 
         # Disable the logger of the app
         disable_logger()
-
-        # Obtain a Ublox-Api session
-        get_ublox_api_session.cache_clear()
-        session = get_ublox_api_session()
 
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
@@ -296,5 +285,3 @@ class TestUserFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
-        # Close Ublox-Api session
-        await session.close()

@@ -45,7 +45,7 @@ from ..mock.anonymizer.ipt import (
     unreachable_store_in_ipt_anonymizer,
     starvation_store_in_ipt_anonymizer,
     correct_extract_from_ipt_anonymizer,
-    starvation_extract_from_ipt_anonymizer
+    starvation_extract_from_ipt_anonymizer,
 )
 
 # ------------------------------------------------------------------------------
@@ -105,11 +105,14 @@ class TestIPTAnonymizer:
 
         # Mock the request
         correct_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
-        assert (
-            await extract_user_info({"request": RequestType.all_positions}) == (200, MOCKED_RESPONSE)
+        assert await extract_user_info({"request": RequestType.all_positions}) == (
+            200,
+            MOCKED_RESPONSE,
         ), "We aren't interested in the response"
 
         with pytest.raises(HTTPException):
             # Mock the request
-            starvation_extract_from_ipt_anonymizer(mock_aioresponse, URL_EXTRACT_USER_DATA)
+            starvation_extract_from_ipt_anonymizer(
+                mock_aioresponse, URL_EXTRACT_USER_DATA
+            )
             await extract_user_info({"request": RequestType.all_positions})

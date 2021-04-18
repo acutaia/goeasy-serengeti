@@ -24,9 +24,7 @@ Ublox-Api session package
 """
 
 # Standard Library
-from __future__ import annotations
-from dataclasses import dataclass
-from functools import lru_cache
+from contextlib import asynccontextmanager
 
 # Third Party
 from aiohttp import ClientSession, TCPConnector
@@ -35,26 +33,17 @@ import orjson
 # ----------------------------------------------------------------------------
 
 
-@dataclass(repr=False, eq=False)
-class UbloxApiSession:
-    session: ClientSession
-
-    @classmethod
-    def setup(cls) -> UbloxApiSession:
-        """Setup the session"""
-        connector = TCPConnector(limit=0, ssl=False, ttl_dns_cache=300)
-        self = UbloxApiSession(
-            session=ClientSession(
-                connector=connector,
-                json_serialize=lambda x: orjson.dumps(x).decode(),
-                raise_for_status=True,
-                connector_owner=True,
-            )
-        )
-        return self
-
-
-@lru_cache(maxsize=1)
-def get_ublox_api_session() -> ClientSession:
-    """Instantiate a UbloxApiSession"""
-    return UbloxApiSession.setup().session
+@asynccontextmanager
+async def get_ublox_api_session() -> ClientSession:
+    """Async Context manager to get a session to communicate with UbloxApi"""
+    connector = TCPConnector(limit=2, ssl=False, ttl_dns_cache=300)
+    session = ClientSession(
+        connector=connector,
+        json_serialize=lambda x: orjson.dumps(x).decode(),
+        raise_for_status=True,
+        connector_owner=True,
+    )
+    try:
+        yield session
+    finally:
+        await session.close()

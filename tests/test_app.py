@@ -38,7 +38,6 @@ from fastapi import status
 from app.main import app
 from app.models.admin import SourceApp
 from app.models.extraction.data_extraction import RequestType
-from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.internals.sessions.anonymizer import get_anonengine_session
 from app.internals.sessions.ipt_anonymizer import get_ipt_anonymizer_session
 from app.internals.sessions.accounting_manager import get_accounting_session
@@ -59,8 +58,15 @@ from .mock.anonymizer.anonengine import (
     correct_extract_mobility,
     correct_store_user_in_the_anonengine,
 )
-from .mock.anonymizer.constants import URL_STORE_IOT_DATA, URL_STORE_USER_DATA, URL_EXTRACT_USER_DATA
-from .mock.anonymizer.ipt import correct_store_in_ipt_anonymizer, correct_extract_from_ipt_anonymizer
+from .mock.anonymizer.constants import (
+    URL_STORE_IOT_DATA,
+    URL_STORE_USER_DATA,
+    URL_EXTRACT_USER_DATA,
+)
+from .mock.anonymizer.ipt import (
+    correct_store_in_ipt_anonymizer,
+    correct_extract_from_ipt_anonymizer,
+)
 from .mock.ublox_api.constants import (
     RaW_Ublox,
     RaW_Galileo,
@@ -82,7 +88,6 @@ def clear_test():
     """Clear tests"""
     disable_logger()
     change_default_security_settings()
-    get_ublox_api_session.cache_clear()
     get_anonengine_session.cache_clear()
     get_accounting_session.cache_clear()
     get_ipt_anonymizer_session.cache_clear()
@@ -582,14 +587,14 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {invalid_token}"},
-                json={"request": RequestType.all_positions}
+                json={"request": RequestType.all_positions},
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
             # Try to use an invalid Authorization method in the header
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": invalid_token},
-                json={"request": RequestType.all_positions}
+                json={"request": RequestType.all_positions},
             )
             assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -597,7 +602,7 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {valid_token_role_not_present}"},
-                json={"request": RequestType.all_positions}
+                json={"request": RequestType.all_positions},
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -606,7 +611,7 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {valid_token}"},
-                json={"request": RequestType.all_positions}
+                json={"request": RequestType.all_positions},
             )
             assert response.status_code == status.HTTP_200_OK
             # we don't check the response value cause we've mocked the request
@@ -617,7 +622,10 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {valid_token}"},
-                json={"request": RequestType.all_positions, "company_code": "Extraction"}
+                json={
+                    "request": RequestType.all_positions,
+                    "company_code": "Extraction",
+                },
             )
             assert response.status_code == status.HTTP_200_OK
 
@@ -626,7 +634,10 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {valid_token_role_not_present}"},
-                json={"request": RequestType.all_positions, "company_code": "NoT_Present"}
+                json={
+                    "request": RequestType.all_positions,
+                    "company_code": "NoT_Present",
+                },
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

@@ -82,6 +82,7 @@ async def _get_raw_data(
         async with session.get(
             f"{url}/{svid}/{timestamp}",
             headers={"Authorization": f"Bearer {ublox_token}"},
+            timeout=5,
         ) as resp:
             # Return RawData
             return UbloxAPI.parse_obj(
@@ -106,6 +107,7 @@ async def _get_raw_data(
         async with session.get(
             f"{url}/{svid}/{timestamp}",
             headers={"Authorization": f"Bearer {ublox_token}"},
+            timeout=5,
         ) as resp:
             # Return RawData
             return UbloxAPI.parse_obj(
@@ -198,6 +200,7 @@ async def _get_ublox_api_list(
             headers={
                 "Authorization": f"Bearer {ublox_token}",
             },
+            timeout=5,
         ) as resp:
             # Return Info requested
             return UbloxAPIList.parse_obj(
@@ -225,6 +228,7 @@ async def _get_ublox_api_list(
             headers={
                 "Authorization": f"Bearer {ublox_token}",
             },
+            timeout=5,
         ) as resp:
             # Return Info requested
             return UbloxAPIList.parse_obj(

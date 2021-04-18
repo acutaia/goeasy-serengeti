@@ -40,6 +40,7 @@ from .logger import get_logger
 from .position_alteration_detection import haversine
 from .sessions.ublox_api import get_ublox_api_session
 from .ublox_api import get_galileo_message, get_galileo_messages_list
+from ..concurrency.position_authentication import position_auth
 from ..config import get_ublox_api_settings
 from ..models.security import Authenticity
 from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
@@ -87,89 +88,50 @@ async def end_to_end_position_authentication(
     fullbiasnano = None
     timenano = None
 
-    # Get Ublox-APi session
-    session = get_ublox_api_session()
-
     # Get Ublox-APi token
     ublox_token = await KEYCLOACK.get_ublox_token()
 
-    # Contact Ublox-Api for every position
-    for position in user_feed.trace_information:
+    # Get Ublox-APi session
+    async with get_ublox_api_session() as session:
 
-        # Set temporally the position as unknown
-        position_unknown = True
+        # Contact Ublox-Api for every position
+        for position in user_feed.trace_information:
 
-        # Check if this position has auth data
-        if len(position.galileo_auth) == 0:
-            # Unset fullbiasnano
-            fullbiasnano = None
-            timenano = None
+            # Set temporally the position as unknown
+            position_unknown = True
 
-        # Check if fullbiasnano and timenano are already set
-        elif fullbiasnano and timenano:
-            # extract current fullbiasnano and timenano
-            current_fullbiasnano = position.galileo_auth[0].fullbiasnano
-            current_timenano = position.galileo_auth[0].timenano
-            # check if the data aren't coherent
-            if (current_fullbiasnano - fullbiasnano) / (
-                current_timenano - timenano
-            ) > meaconing_threshold:
-                # Set the position not authentic
-                position.authenticity = Authenticity.not_authentic
-                position_unknown = False
+            # Check if this position has auth data
+            if len(position.galileo_auth) == 0:
+                # Unset fullbiasnano
+                fullbiasnano = None
+                timenano = None
 
-        else:
-            # Set fullbiasnano and timenano
-            fullbiasnano = position.galileo_auth[0].fullbiasnano
-            timenano = position.galileo_auth[0].timenano
-
-        if position_unknown:
-            # Find the location of the position (Sweden or Italy)
-            location = haversine(position.lat, position.lon)
-
-            for auth in position.galileo_auth:
-                galileo_auth_number += 1
-                try:
-                    galileo_data = await get_galileo_message(
-                        auth.svid, auth.time, ublox_token, location, session
-                    )
-                except HTTPException as exc:
-                    if store:
-                        await store_in_iota(
-                            source_app=source_app,
-                            client_id=client_id,
-                            user_id=user_id,
-                            msg_id=journey_id,
-                            msg_size=0,
-                            msg_time=timestamp,
-                            msg_malicious_position=0,
-                            msg_authenticated_position=0,
-                            msg_unknown_position=0,
-                            msg_total_position=0,
-                            msg_error=True,
-                            msg_error_description=exc.detail,
-                        )
-                        galileo_data = None
-                    else:
-                        raise exc
-
-                if galileo_data is None:
-                    position.authenticity = Authenticity.unknown
-                    unknown_number += 1
-                    break
-
-                elif galileo_data == auth.data:
-                    position.authenticity = Authenticity.authentic
-                    authentic_number += 1
-
-                else:
+            # Check if fullbiasnano and timenano are already set
+            elif fullbiasnano and timenano:
+                # extract current fullbiasnano and timenano
+                current_fullbiasnano = position.galileo_auth[0].fullbiasnano
+                current_timenano = position.galileo_auth[0].timenano
+                # check if the data aren't coherent
+                if (current_fullbiasnano - fullbiasnano) / (
+                    current_timenano - timenano
+                ) > meaconing_threshold:
+                    # Set the position not authentic
                     position.authenticity = Authenticity.not_authentic
-                    not_authentic_number += 1
-                    analyze = True
+                    position_unknown = False
 
+            else:
+                # Set fullbiasnano and timenano
+                fullbiasnano = position.galileo_auth[0].fullbiasnano
+                timenano = position.galileo_auth[0].timenano
+
+            if position_unknown:
+                # Find the location of the position (Sweden or Italy)
+                location = haversine(position.lat, position.lon)
+
+                for auth in position.galileo_auth:
+                    galileo_auth_number += 1
                     try:
-                        # Remake the request
-                        galileo_data_list = await get_galileo_messages_list(
+                        galileo_data = await get_galileo_message(
                             auth.svid, auth.time, ublox_token, location, session
                         )
                     except HTTPException as exc:
@@ -188,31 +150,70 @@ async def end_to_end_position_authentication(
                                 msg_error=True,
                                 msg_error_description=exc.detail,
                             )
-                            position.authenticity = Authenticity.not_authentic
-                            analyze = False
+                            galileo_data = None
                         else:
                             raise exc
 
-                    if analyze:
-                        for data in galileo_data_list:
-                            if data.raw_data == auth.data:
-                                position.authenticity = Authenticity.authentic
-                                authentic_number += 1
-                                not_authentic_number -= 1
-                                break
-                        if position.authenticity == Authenticity.not_authentic:
-                            await logger.debug(
-                                {
-                                    "message_timestamp": auth.time,
-                                    "android_message": auth.data,
-                                    "satellite_id": auth.svid,
-                                    "status": "Real Fake",
-                                    "ublox_api_messages": [
-                                        ublox_api.dict() for ublox_api in galileo_data_list
-                                    ],
-                                }
-                            )
+                    if galileo_data is None:
+                        position.authenticity = Authenticity.unknown
+                        unknown_number += 1
+                        break
 
+                    elif galileo_data == auth.data:
+                        position.authenticity = Authenticity.authentic
+                        authentic_number += 1
+
+                    else:
+                        position.authenticity = Authenticity.not_authentic
+                        not_authentic_number += 1
+                        analyze = True
+
+                        try:
+                            # Remake the request
+                            galileo_data_list = await get_galileo_messages_list(
+                                auth.svid, auth.time, ublox_token, location, session
+                            )
+                        except HTTPException as exc:
+                            if store:
+                                await store_in_iota(
+                                    source_app=source_app,
+                                    client_id=client_id,
+                                    user_id=user_id,
+                                    msg_id=journey_id,
+                                    msg_size=0,
+                                    msg_time=timestamp,
+                                    msg_malicious_position=0,
+                                    msg_authenticated_position=0,
+                                    msg_unknown_position=0,
+                                    msg_total_position=0,
+                                    msg_error=True,
+                                    msg_error_description=exc.detail,
+                                )
+                                position.authenticity = Authenticity.not_authentic
+                                analyze = False
+                            else:
+                                raise exc
+
+                        if analyze:
+                            for data in galileo_data_list:
+                                if data.raw_data == auth.data:
+                                    position.authenticity = Authenticity.authentic
+                                    authentic_number += 1
+                                    not_authentic_number -= 1
+                                    break
+                            if position.authenticity == Authenticity.not_authentic:
+                                await logger.debug(
+                                    {
+                                        "message_timestamp": auth.time,
+                                        "android_message": auth.data,
+                                        "satellite_id": auth.svid,
+                                        "status": "Real Fake",
+                                        "ublox_api_messages": [
+                                            ublox_api.dict()
+                                            for ublox_api in galileo_data_list
+                                        ],
+                                    }
+                                )
     await logger.info(
         {
             "host": host,
@@ -268,16 +269,17 @@ async def store_android_data(
     """
     try:
         async with semaphore:
-            user_feed = await end_to_end_position_authentication(
-                user_feed=user_feed_input,
-                timestamp=timestamp,
-                host=host,
-                journey_id=journey_id,
-                source_app=source_app,
-                client_id=client_id,
-                user_id=user_id,
-                store=True,
-            )
+            async with position_auth():
+                user_feed = await end_to_end_position_authentication(
+                    user_feed=user_feed_input,
+                    timestamp=timestamp,
+                    host=host,
+                    journey_id=journey_id,
+                    source_app=source_app,
+                    client_id=client_id,
+                    user_id=user_id,
+                    store=True,
+                )
 
             # Generate user feed internal
             user_feed_internal = user_feed.dict(
@@ -285,10 +287,14 @@ async def store_android_data(
                     "trace_information": {"__all__": {"galileo_auth", "galileo_status"}}
                 }
             )
-            user_feed_internal.update({"source_app": source_app, "journey_id": journey_id})
+            user_feed_internal.update(
+                {"source_app": source_app, "journey_id": journey_id}
+            )
 
             # Store in the IPT-Anonymizer
-            await store_in_the_anonymizer(user_feed_internal, SETTINGS.store_user_data_url)
+            await store_in_the_anonymizer(
+                user_feed_internal, SETTINGS.store_user_data_url
+            )
 
             # Store in the anonengine
             await store_in_the_anonengine(

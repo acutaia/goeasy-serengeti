@@ -36,7 +36,6 @@ import uvloop
 # Internal
 from app.internals.iot import end_to_end_position_authentication, store_iot_data
 from app.internals.keycloak import KEYCLOACK
-from app.internals.sessions.ublox_api import get_ublox_api_session
 from app.models.iot_feed.iot import IotInput
 
 from app.models.security import Authenticity
@@ -95,10 +94,6 @@ class TestIotFeed:
 
         # Disable the logger of the app
         disable_logger()
-
-        # Obtain a Ublox-Api session
-        get_ublox_api_session.cache_clear()
-        session = get_ublox_api_session()
 
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
@@ -217,8 +212,6 @@ class TestIotFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
-        # Close ublox-session
-        await session.close()
 
     @pytest.mark.asyncio
     async def test_store_iot_data(self, mock_aioresponse):
@@ -226,10 +219,6 @@ class TestIotFeed:
 
         # Disable the logger of the app
         disable_logger()
-
-        # Obtain a Ublox-Api session
-        get_ublox_api_session.cache_clear()
-        session = get_ublox_api_session()
 
         # Setup Keycloack and mock the request
         correct_get_blox_token(mock_aioresponse)
@@ -255,5 +244,3 @@ class TestIotFeed:
 
         # Close Keycloack session
         await KEYCLOACK.close()
-        # Close Ublox-Api session
-        await session.close()

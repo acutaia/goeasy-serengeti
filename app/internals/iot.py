@@ -39,6 +39,7 @@ from .logger import get_logger
 from .sessions.ublox_api import get_ublox_api_session
 from .position_alteration_detection import haversine
 from .ublox_api import get_ublox_message, get_ublox_messages_list
+from ..concurrency.position_authentication import position_auth
 from ..models.iot_feed.iot import IotInput
 from ..models.security import Authenticity
 
@@ -84,57 +85,21 @@ async def end_to_end_position_authentication(
     not_authentic_number = 0
     unknown_number = 0
 
-    # Get Ublox-Api session
-    session = get_ublox_api_session()
-
     # Get Ublox-APi token
     ublox_token = await KEYCLOACK.get_ublox_token()
 
-    # Calculate timestamp
-    iot_time = int(iot_input.phenomenonTime.timestamp() * 1000)
+    # Get Ublox-Api session
+    async with get_ublox_api_session() as session:
 
-    # Check the positions
-    for gnss in iot_input.result.gnss:
-        galileo_auth_number += 1
+        # Calculate timestamp
+        iot_time = int(iot_input.phenomenonTime.timestamp() * 1000)
 
-        try:
-            galileo_data = await get_ublox_message(
-                gnss.svid, iot_time, ublox_token, location, session
-            )
-        except HTTPException as exc:
-            if store:
-                await store_in_iota(
-                    source_app=source_app,
-                    client_id=client_id,
-                    user_id=user_id,
-                    msg_id=obesrvation_gepid,
-                    msg_size=0,
-                    msg_time=timestamp,
-                    msg_malicious_position=0,
-                    msg_authenticated_position=0,
-                    msg_unknown_position=0,
-                    msg_total_position=0,
-                    msg_error=True,
-                    msg_error_description=exc.detail,
-                )
-                galileo_data = None
-            else:
-                raise exc
-
-        if galileo_data is None:
-            unknown_number += 1
-
-        elif galileo_data == gnss.raw_data:
-            authentic_number += 1
-
-        else:
-            not_authentic_number += 1
-            not_authentic = True
-            analyze = True
+        # Check the positions
+        for gnss in iot_input.result.gnss:
+            galileo_auth_number += 1
 
             try:
-                # Remake the request
-                galileo_data_list = await get_ublox_messages_list(
+                galileo_data = await get_ublox_message(
                     gnss.svid, iot_time, ublox_token, location, session
                 )
             except HTTPException as exc:
@@ -153,31 +118,67 @@ async def end_to_end_position_authentication(
                         msg_error=True,
                         msg_error_description=exc.detail,
                     )
-                    analyze = False
+                    galileo_data = None
                 else:
                     raise exc
 
-            if analyze:
-                for data in galileo_data_list:
-                    if data.raw_data == gnss.raw_data:
-                        authentic_number += 1
-                        not_authentic_number -= 1
-                        not_authentic = False
-                        break
+            if galileo_data is None:
+                unknown_number += 1
 
-                if not_authentic:
-                    await logger.warning(
-                        {
-                            "message_timestamp": iot_time,
-                            "ublox_message": gnss.raw_data,
-                            "satellite_id": gnss.svid,
-                            "status": "Real Fake",
-                            "ublox_api_messages": [
-                                ublox_api.dict() for ublox_api in galileo_data_list
-                            ],
-                        }
+            elif galileo_data == gnss.raw_data:
+                authentic_number += 1
+
+            else:
+                not_authentic_number += 1
+                not_authentic = True
+                analyze = True
+
+                try:
+                    # Remake the request
+                    galileo_data_list = await get_ublox_messages_list(
+                        gnss.svid, iot_time, ublox_token, location, session
                     )
-            break
+                except HTTPException as exc:
+                    if store:
+                        await store_in_iota(
+                            source_app=source_app,
+                            client_id=client_id,
+                            user_id=user_id,
+                            msg_id=obesrvation_gepid,
+                            msg_size=0,
+                            msg_time=timestamp,
+                            msg_malicious_position=0,
+                            msg_authenticated_position=0,
+                            msg_unknown_position=0,
+                            msg_total_position=0,
+                            msg_error=True,
+                            msg_error_description=exc.detail,
+                        )
+                        analyze = False
+                    else:
+                        raise exc
+
+                if analyze:
+                    for data in galileo_data_list:
+                        if data.raw_data == gnss.raw_data:
+                            authentic_number += 1
+                            not_authentic_number -= 1
+                            not_authentic = False
+                            break
+
+                    if not_authentic:
+                        await logger.warning(
+                            {
+                                "message_timestamp": iot_time,
+                                "ublox_message": gnss.raw_data,
+                                "satellite_id": gnss.svid,
+                                "status": "Real Fake",
+                                "ublox_api_messages": [
+                                    ublox_api.dict() for ublox_api in galileo_data_list
+                                ],
+                            }
+                        )
+                break
 
     if not_authentic_number > 0:
         authenticity = Authenticity.not_authentic
@@ -243,16 +244,17 @@ async def store_iot_data(
     """
     try:
         async with semaphore:
-            iot_output = await end_to_end_position_authentication(
-                iot_input=iot_input,
-                timestamp=timestamp,
-                host=host,
-                obesrvation_gepid=obesrvation_gepid,
-                source_app=source_app,
-                client_id=client_id,
-                user_id=user_id,
-                store=True,
-            )
+            async with position_auth():
+                iot_output = await end_to_end_position_authentication(
+                    iot_input=iot_input,
+                    timestamp=timestamp,
+                    host=host,
+                    obesrvation_gepid=obesrvation_gepid,
+                    source_app=source_app,
+                    client_id=client_id,
+                    user_id=user_id,
+                    store=True,
+                )
 
             await store_in_the_anonymizer(iot_output, SETTINGS.store_iot_data_url)
     finally:
