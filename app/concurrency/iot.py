@@ -31,7 +31,7 @@ from functools import lru_cache
 # --------------------------------------------------------------------------------------------
 
 
-@dataclass
+@dataclass(repr=False, eq=False)
 class _IoTFeedSemaphore:
     store: Semaphore
     test: Semaphore
@@ -39,7 +39,7 @@ class _IoTFeedSemaphore:
 
 @lru_cache(maxsize=1)
 def _get_iot_semaphore() -> _IoTFeedSemaphore:
-    return _IoTFeedSemaphore(store=Semaphore(5), test=Semaphore(5))
+    return _IoTFeedSemaphore(store=Semaphore(5), test=Semaphore(2))
 
 
 @lru_cache(maxsize=1)
