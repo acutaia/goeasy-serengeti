@@ -31,7 +31,7 @@ from functools import lru_cache
 # --------------------------------------------------------------------------------------------
 
 
-@dataclass
+@dataclass(repr=False, eq=False)
 class _UserFeedSemaphore:
     store: Semaphore
     test: Semaphore
@@ -39,16 +39,16 @@ class _UserFeedSemaphore:
 
 @lru_cache(maxsize=1)
 def _get_user_semaphore() -> _UserFeedSemaphore:
-    return _UserFeedSemaphore(store=Semaphore(30), test=Semaphore(5))
+    return _UserFeedSemaphore(store=Semaphore(40), test=Semaphore(2))
 
 
 @lru_cache(maxsize=1)
 def store_semaphore() -> Semaphore:
-    """synchronize user store requests to prevent starvation"""
+    """Synchronize user store requests to prevent starvation"""
     return _get_user_semaphore().store
 
 
 @lru_cache(maxsize=1)
 def test_semaphore() -> Semaphore:
-    """synchronize user test requests to prevent starvation"""
+    """Synchronize user test requests to prevent starvation"""
     return _get_user_semaphore().test
