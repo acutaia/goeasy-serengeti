@@ -606,7 +606,7 @@ class TestStatistics:
             response = client.post(
                 "http://serengeti/api/v1/goeasy/statistics",
                 headers={"Authorization": f"Bearer {valid_token}"},
-                json={"request": RequestType.all_positions},
+                json={"request": RequestType.all_positions, "source_app": "travis"},
             )
             assert response.status_code == status.HTTP_200_OK
             # we don't check the response value cause we've mocked the request
@@ -620,6 +620,7 @@ class TestStatistics:
                 json={
                     "request": RequestType.all_positions,
                     "company_code": "Extraction",
+                    "source_app": "travis"
                 },
             )
             assert response.status_code == status.HTTP_200_OK

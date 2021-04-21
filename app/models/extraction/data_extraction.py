@@ -47,6 +47,9 @@ class InputJSONExtraction(OrjsonModel):
     request: RequestType = Field(
         ..., description="Typology of request", example="Partial_Mobility"
     )
+    source_app: str = Field(
+        ..., description="Source of the telemetry", example="ApesMobility"
+    )
     time_window_low: Optional[str] = Field(
         default=None, description="Left time boundary", example="08:00"
     )
