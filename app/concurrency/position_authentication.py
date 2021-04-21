@@ -33,7 +33,7 @@ from functools import lru_cache
 @lru_cache(maxsize=1)
 def store_semaphore() -> Semaphore:
     """Synchronize the position to store in order to avoid starvation"""
-    return Semaphore(40)
+    return Semaphore(25)
 
 
 # --------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ def store_semaphore() -> Semaphore:
 @lru_cache(maxsize=1)
 def position_auth() -> Semaphore:
     """Synchronize position authorization requests to prevent starvation"""
-    return Semaphore(21)
+    return Semaphore(10)
 
 
 # --------------------------------------------------------------------------------------------

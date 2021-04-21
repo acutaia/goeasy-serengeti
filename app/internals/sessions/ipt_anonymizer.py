@@ -40,7 +40,6 @@ async def ipt_anonymizer_session() -> ClientSession:
     session = ClientSession(
         connector=connector,
         json_serialize=lambda x: orjson.dumps(x).decode(),
-        raise_for_status=True,
         connector_owner=True,
     )
     try:
