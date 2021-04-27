@@ -34,7 +34,7 @@ from fastapi.responses import ORJSONResponse
 from ..concurrency.background import frequency_limiter
 from ..concurrency.position_authentication import position_test_lock, store_semaphore
 from ..internals.user_feed import end_to_end_position_authentication, store_android_data
-from ..models.user_feed.user import UserFeedInput
+from ..models.user_feed.user import UserFeedInput, UserFeedOutput, PositionObject
 from ..models.security import Requester
 from ..models.user_feed.response_class import Resource
 from ..security.jwt_bearer import Signature
@@ -111,7 +111,7 @@ async def authenticate(
     response_class=ORJSONResponse,
     summary="Test the authentication of User Data",
     response_description="Input with verified data",
-    dependencies=[Depends(test_auth)],
+    # dependencies=[Depends(test_auth)],
 )
 async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(...)):
     """
@@ -135,4 +135,34 @@ async def authenticate_test(request: Request, user_feed: UserFeedInput = Body(..
         exclude={"trace_information": {"__all__": {"galileo_auth", "galileo_status"}}}
     )
     user_feed_internal.update({"source_app": "TEST", "journey_id": "TEST"})
-    return user_feed_internal
+    return UserFeedOutput.construct(
+        **{
+            "app_defined_behaviour": user_feed.behaviour.app_defined,
+            "tpv_defined_behaviour": user_feed.behaviour.tpv_defined,
+            "user_defined_behaviour": user_feed.behaviour.user_defined,
+            "company_code": user_feed.company_code,
+            "company_trip_type": user_feed.company_trip_type,
+            "deviceId": user_feed.id,
+            "journeyId": "hello",
+            "startDate": user_feed.startDate,
+            "endDate": user_feed.endDate,
+            "distance": user_feed.distance,
+            "elapsedTime": user_feed.elapsedTime,
+            "positions": [
+                PositionObject.construct(
+                    **{
+                        "authenticity": position.authenticity,
+                        "lat": position.lat,
+                        "lon": position.lon,
+                        "partialDistance": position.partialDistance,
+                        "time": position.time,
+                    }
+                )
+                for position in user_feed.trace_information
+            ],
+            "sensors": user_feed.sensors_information,
+            "mainTypeSpace": user_feed.mainTypeSpace,
+            "mainTypeTime": user_feed.mainTypeTime,
+            "sourceApp": "TEST",
+        }
+    ).schema_json()

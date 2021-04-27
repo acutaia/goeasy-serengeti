@@ -37,7 +37,7 @@ from app.models.user_feed.position import PositionObjectInput, PositionObject
 
 
 class TrackSegments(OrjsonModel):
-    """ Track Segments """
+    """Track Segments"""
 
     meters: int = Field(..., example=10)
 
@@ -45,7 +45,7 @@ class TrackSegments(OrjsonModel):
 
 
 class TrackSegmentsInput(TrackSegments):
-    """ Track Segments Input"""
+    """Track Segments Input"""
 
     end: PositionObjectInput = Field(..., description="End position")
 
@@ -53,7 +53,7 @@ class TrackSegmentsInput(TrackSegments):
 
 
 class TrackSegmentsOutput(TrackSegments):
-    """ Track Segments Output"""
+    """Track Segments Output"""
 
     end: PositionObject = Field(..., description="End position")
 

@@ -37,7 +37,7 @@ from .routers import user_feed, journey, iot, administrator, statistics
 # --------------------------------------------------------------------------------------------
 
 # Instantiate app
-app = FastAPI(root_path="/serengeti")
+app = FastAPI(root_path="/serengeti", docs_url=None, redoc_url=None)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -86,6 +86,7 @@ def custom_openapi():
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {"url": "/serengeti/static/logo_full.png"}
+    openapi_schema["servers"] = [{"url": app.root_path}]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
