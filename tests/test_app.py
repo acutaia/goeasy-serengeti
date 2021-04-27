@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
 """
 Test app
-
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
 :version: 1.0.0
-
 ..
-
     Copyright 2021 Angelo Cutaia
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
         http://www.apache.org/licenses/LICENSE-2.0
-
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -620,7 +614,7 @@ class TestStatistics:
                 json={
                     "request": RequestType.all_positions,
                     "company_code": "Extraction",
-                    "source_app": "travis"
+                    "source_app": "travis",
                 },
             )
             assert response.status_code == status.HTTP_200_OK
@@ -636,5 +630,3 @@ class TestStatistics:
                 },
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-        clear_test()

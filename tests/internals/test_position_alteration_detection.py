@@ -36,7 +36,7 @@ STOCKHOLM = {"lat": 59.334591, "lon": 18.063240}
 
 
 def test_haversine():
-    """ Test haversine"""
+    """Test haversine"""
     assert haversine(ROME["lat"], ROME["lon"]) == "Italy", "Rome is in Italy"
     assert (
         haversine(STOCKHOLM["lat"], STOCKHOLM["lon"]) == "Sweden"

@@ -30,6 +30,6 @@ from app.internals.logger import get_logger
 
 
 def disable_logger():
-    """ Disable the logger of the application """
+    """Disable the logger of the application"""
     logger = get_logger()
     logger.disabled = True

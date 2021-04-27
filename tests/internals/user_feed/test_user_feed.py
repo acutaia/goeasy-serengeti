@@ -101,7 +101,7 @@ class TestUserFeed:
 
     @pytest.mark.asyncio
     async def test_end_to_end_position_authentication(self, mock_aioresponse):
-        """ Test the behaviour of end_to_end_position_authentication """
+        """Test the behaviour of end_to_end_position_authentication"""
 
         # Disable the logger of the app
         disable_logger()
@@ -190,7 +190,7 @@ class TestUserFeed:
 
     @pytest.mark.asyncio
     async def test_store_android_data(self, mock_aioresponse):
-        """ Test the behaviour of store_android_data """
+        """Test the behaviour of store_android_data"""
 
         # Disable the logger of the app
         disable_logger()

@@ -92,7 +92,7 @@ class TestUbloxApi:
 
     @pytest.mark.asyncio
     async def test_get_galileo_message(self, mock_aioresponse):
-        """ Test the behaviour of get_galileo_message """
+        """Test the behaviour of get_galileo_message"""
 
         # Disable the logger of the app
         disable_logger()
@@ -144,7 +144,7 @@ class TestUbloxApi:
 
     @pytest.mark.asyncio
     async def test_get_ublox_message(self, mock_aioresponse):
-        """ Test the behaviour of get_ublox_message """
+        """Test the behaviour of get_ublox_message"""
 
         # Disable the logger of the app
         disable_logger()
@@ -195,7 +195,7 @@ class TestUbloxApi:
         await KEYCLOACK.close()
 
     def test_construct_request(self):
-        """ Test the construction of the body of the request made to Ublox-Api """
+        """Test the construction of the body of the request made to Ublox-Api"""
         request = construct_request(svid=SvID, timestamp=TIMESTAMP)
 
         assert (
@@ -212,7 +212,7 @@ class TestUbloxApi:
 
     @pytest.mark.asyncio
     async def test_get_galileo_messages_list(self, mock_aioresponse):
-        """ Test the behaviour of get_galileo_messages_list """
+        """Test the behaviour of get_galileo_messages_list"""
 
         # Disable the logger of the app
         disable_logger()
@@ -267,7 +267,7 @@ class TestUbloxApi:
 
     @pytest.mark.asyncio
     async def test_get_ublox_messages_list(self, mock_aioresponse):
-        """ Test the behaviour of get_ublox_messages_list """
+        """Test the behaviour of get_ublox_messages_list"""
 
         # Disable the logger of the app
         disable_logger()

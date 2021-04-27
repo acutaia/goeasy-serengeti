@@ -72,7 +72,7 @@ class TestAnonengine:
 
     @pytest.mark.asyncio
     async def test_store_user_in_the_anonengine(self, mock_aioresponse):
-        """ Test the behaviour of store_user_in_the_anonengine """
+        """Test the behaviour of store_user_in_the_anonengine"""
 
         # Disable the logger of the app
         disable_logger()
@@ -91,7 +91,7 @@ class TestAnonengine:
 
     @pytest.mark.asyncio
     async def test_extract_details(self, mock_aioresponse):
-        """ Test the behaviour of correct_extract_details """
+        """Test the behaviour of correct_extract_details"""
 
         # Disable the logger of the app
         disable_logger()
@@ -109,7 +109,7 @@ class TestAnonengine:
 
     @pytest.mark.asyncio
     async def test_extract_mobility(self, mock_aioresponse):
-        """ Test the behaviour of correct_extract_details """
+        """Test the behaviour of correct_extract_details"""
 
         # Disable the logger of the app
         disable_logger()

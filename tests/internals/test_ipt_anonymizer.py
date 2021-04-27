@@ -74,7 +74,7 @@ class TestIPTAnonymizer:
 
     @pytest.mark.asyncio
     async def test_store_in_the_anonymizer(self, mock_aioresponse):
-        """ Test the behaviour of store_user_in_the_anonengine """
+        """Test the behaviour of store_user_in_the_anonengine"""
 
         # Disable the logger of the app
         disable_logger()
@@ -98,7 +98,7 @@ class TestIPTAnonymizer:
 
     @pytest.mark.asyncio
     async def test_extract_user_info(self, mock_aioresponse):
-        """ Test the behaviour of extract_user_info """
+        """Test the behaviour of extract_user_info"""
 
         # Disable the logger of the app
         disable_logger()

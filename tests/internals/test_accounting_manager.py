@@ -68,7 +68,7 @@ class TestAccountingManager:
 
     @pytest.mark.asyncio
     async def test_get_iota_user(self, mock_aioresponse):
-        """ Test the behaviour of get_iota_user """
+        """Test the behaviour of get_iota_user"""
 
         # Disable the logger of the app
         disable_logger()
@@ -86,7 +86,7 @@ class TestAccountingManager:
 
     @pytest.mark.asyncio
     async def test_store_iota_user(self, mock_aioresponse):
-        """ Test the behaviour of store_iota_user """
+        """Test the behaviour of store_iota_user"""
 
         # Disable the logger of the app
         disable_logger()

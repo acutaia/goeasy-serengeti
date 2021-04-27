@@ -65,7 +65,7 @@ class TestKeycloack:
 
     @pytest.mark.asyncio
     async def test_get_token(self, mock_aioresponse):
-        """ Test the behaviour of get_ublox_token """
+        """Test the behaviour of get_ublox_token"""
 
         # Disable the logger of the app
         disable_logger()

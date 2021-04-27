@@ -38,7 +38,7 @@ from .constants import URL_GET_IOTA_USER, URL_STORE_IN_IOTA
 
 
 def correct_get_iota_user(m: aioresponses, user: str):
-    """ Mocked get iota user """
+    """Mocked get iota user"""
     m.get(
         f"{URL_GET_IOTA_USER}?user={user}",
         status=status.HTTP_200_OK,
@@ -47,7 +47,7 @@ def correct_get_iota_user(m: aioresponses, user: str):
 
 
 def unreachable_get_iota_user(m: aioresponses, user: str):
-    """ Mocked get iota user """
+    """Mocked get iota user"""
     m.get(f"{URL_GET_IOTA_USER}?user={user}", exception=TimeoutError("Timeout"))
 
 
@@ -55,10 +55,10 @@ def unreachable_get_iota_user(m: aioresponses, user: str):
 
 
 def correct_store_in_iota(m: aioresponses):
-    """ Mocked store in iota """
+    """Mocked store in iota"""
     m.post(URL_STORE_IN_IOTA, status=status.HTTP_200_OK)
 
 
 def unreachable_store_in_iota(m: aioresponses):
-    """ Mocked store in iota """
+    """Mocked store in iota"""
     m.post(URL_STORE_IN_IOTA, exception=TimeoutError("Timeout"))
