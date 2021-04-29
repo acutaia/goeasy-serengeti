@@ -23,13 +23,15 @@ Administrator router package
     limitations under the License.
 """
 
+# Standard Library
+from datetime import date
+
 # Third Party
 from fastapi import APIRouter, Depends
 from fastapi.responses import ORJSONResponse
 
 # Internal
 from ..internals.accounting_manager import get_iota_user
-from ..models.admin import SourceApp
 from ..security.jwt_bearer import Signature
 
 # --------------------------------------------------------------------------------------------
@@ -42,12 +44,12 @@ router = APIRouter(prefix="/api/v1/goeasy/getAccounting", tags=["Admin"])
 
 
 @router.post(
-    "/{source_app}",
+    "/{source_app}/{date_app}",
     response_class=ORJSONResponse,
     summary="Extract Accounting Data",
     dependencies=[Depends(admin_auth)],
 )
-async def extract_user(source_app: SourceApp):
+async def extract_user(source_app: str, date_app: date):
     """
     This endpoint provides ways to let administrators to request for accounting information collected
     by the platform on the IOTA network.\n
@@ -57,4 +59,4 @@ async def extract_user(source_app: SourceApp):
     The following diagram shows the final software design of the accounting data extraction service.\n
     ![image](https:/serengeti/static/administrator.png)
     """
-    return await get_iota_user(source_app.value)
+    return await get_iota_user(f"{source_app}-{date_app}")

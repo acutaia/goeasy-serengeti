@@ -25,6 +25,7 @@ Mocked IoTa requests
 
 # Standard Library
 from asyncio import TimeoutError
+from datetime import datetime
 
 # Third Party
 from aioresponses import aioresponses
@@ -40,7 +41,7 @@ from .constants import URL_GET_IOTA_USER, URL_STORE_IN_IOTA
 def correct_get_iota_user(m: aioresponses, user: str):
     """Mocked get iota user"""
     m.get(
-        f"{URL_GET_IOTA_USER}?user={user}",
+        f"{URL_GET_IOTA_USER}?user={user}-{datetime.now().date()}",
         status=status.HTTP_200_OK,
         body=orjson.dumps({"user": user}).decode(),
     )
@@ -48,7 +49,10 @@ def correct_get_iota_user(m: aioresponses, user: str):
 
 def unreachable_get_iota_user(m: aioresponses, user: str):
     """Mocked get iota user"""
-    m.get(f"{URL_GET_IOTA_USER}?user={user}", exception=TimeoutError("Timeout"))
+    m.get(
+        f"{URL_GET_IOTA_USER}?user={user}-{datetime.now().date()}",
+        exception=TimeoutError("Timeout"),
+    )
 
 
 # -------------------------------------------------------------------------------

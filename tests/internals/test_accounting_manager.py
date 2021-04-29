@@ -24,6 +24,7 @@ Tests app.internals.accounting_manager module
 """
 
 # Standard Library
+from datetime import datetime
 import time
 
 # Test
@@ -75,14 +76,14 @@ class TestAccountingManager:
 
         # Mock the request
         correct_get_iota_user(mock_aioresponse, user="TEST")
-        assert await get_iota_user(user="TEST") == {
+        assert await get_iota_user(user=f"TEST-{datetime.now().date()}") == {
             "user": "TEST"
         }, "User must be the same"
 
         with pytest.raises(HTTPException):
             # Mock the request
             unreachable_get_iota_user(mock_aioresponse, user="TEST")
-            await get_iota_user(user="TEST")
+            await get_iota_user(user=f"TEST-{datetime.now().date()}")
 
     @pytest.mark.asyncio
     async def test_store_iota_user(self, mock_aioresponse):

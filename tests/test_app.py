@@ -18,6 +18,7 @@ Test app
 """
 # Standard library
 import uuid
+from datetime import datetime
 
 # Test
 from aioresponses import aioresponses
@@ -30,7 +31,6 @@ from fastapi import status
 
 # Internal
 from app.main import app
-from app.models.admin import SourceApp
 from app.models.extraction.data_extraction import RequestType
 from app.internals.sessions.accounting_manager import get_accounting_session
 
@@ -106,7 +106,7 @@ class TestAdmin:
         """Test the behaviour of administrator router"""
 
         clear_test()
-        correct_get_iota_user(mock_aioresponse, user=SourceApp.any)
+        correct_get_iota_user(mock_aioresponse, user="Any")
 
         # Obtain tokens
         invalid_token = generate_fake_token()
@@ -118,28 +118,28 @@ class TestAdmin:
         with TestClient(app) as client:
             # Try to use an invalid token
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getAccounting/{SourceApp.any}",
+                f"http://serengeti/api/v1/goeasy/getAccounting/Any/{datetime.now().date()}",
                 headers={"Authorization": f"Bearer {invalid_token}"},
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
             # Try to use an invalid Authorization method in the header
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getAccounting/{SourceApp.any}",
+                f"http://serengeti/api/v1/goeasy/getAccounting/Any/{datetime.now().date()}",
                 headers={"Authorization": invalid_token},
             )
             assert response.status_code == status.HTTP_403_FORBIDDEN
 
             # Try to use a valid token but without the requested role
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getAccounting/{SourceApp.any}",
+                f"http://serengeti/api/v1/goeasy/getAccounting/Any/{datetime.now().date()}",
                 headers={"Authorization": f"Bearer {valid_token_role_not_present}"},
             )
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
             # Use a valid token
             response = client.post(
-                f"http://serengeti/api/v1/goeasy/getAccounting/{SourceApp.any}",
+                f"http://serengeti/api/v1/goeasy/getAccounting/Any/{datetime.now().date()}",
                 headers={"Authorization": f"Bearer {valid_token}"},
             )
             assert response.status_code == status.HTTP_200_OK

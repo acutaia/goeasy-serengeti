@@ -25,6 +25,7 @@ Anonymizer package
 
 # Standard Library
 from asyncio import TimeoutError
+from datetime import datetime
 
 # Third Party
 from aiohttp import ClientError
@@ -116,7 +117,7 @@ async def store_in_iota(
             async with session.post(
                 f"{settings.accounting_ip}{settings.accounting_store_uri}",
                 json=AccountingManager(
-                    target=source_app,
+                    target=f"{source_app}-{datetime.now().date()}",
                     data=Data(
                         AppObj=Obj(
                             client_id=client_id,

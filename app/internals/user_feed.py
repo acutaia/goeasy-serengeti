@@ -137,7 +137,7 @@ async def end_to_end_position_authentication(
                     except HTTPException as exc:
                         if store:
                             await store_in_iota(
-                                source_app=source_app,
+                                source_app=f"{source_app}_error",
                                 client_id=client_id,
                                 user_id=user_id,
                                 msg_id=journey_id,
@@ -176,7 +176,7 @@ async def end_to_end_position_authentication(
                         except HTTPException as exc:
                             if store:
                                 await store_in_iota(
-                                    source_app=source_app,
+                                    source_app=f"{source_app}_error",
                                     client_id=client_id,
                                     user_id=user_id,
                                     msg_id=journey_id,
