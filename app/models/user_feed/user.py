@@ -24,10 +24,10 @@ User models package
 """
 
 # Standard Library
-from uuid import uuid4
 from typing import List, Any
 
 # Third Party
+from fastuuid import uuid4
 from pydantic import Field
 
 # Internal

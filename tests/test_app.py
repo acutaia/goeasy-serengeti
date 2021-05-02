@@ -17,12 +17,12 @@ Test app
     limitations under the License.
 """
 # Standard library
-import uuid
 from datetime import datetime
 
 # Test
 from aioresponses import aioresponses
 from fastapi.testclient import TestClient
+from fastuuid import uuid4
 import pytest
 
 # Third Party
@@ -299,7 +299,7 @@ class TestJourney:
     @staticmethod
     def setup() -> str:
         clear_test()
-        return str(uuid.uuid4())
+        return str(uuid4())
 
     @staticmethod
     def journey_analysis(

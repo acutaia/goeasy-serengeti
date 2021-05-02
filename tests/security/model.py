@@ -27,9 +27,9 @@ Security Models
 from enum import Enum
 from datetime import datetime, timedelta
 from typing import List
-import uuid
 
 # Third PArty
+from fastuuid import uuid4
 from pydantic import Field
 
 # Internal
@@ -64,19 +64,19 @@ class Roles(OrjsonModel):
 
 
 class Token(OrjsonModel):
-    jti: str = str(uuid.uuid4())
+    jti: str = str(uuid4())
     exp: datetime = datetime.utcnow() + timedelta(seconds=300)
     nbf: int = 0
     iat: datetime = datetime.utcnow() + timedelta(seconds=0.5)
     iss: str = ISSUER
     aud: str = AUDIENCE
-    sub: str = str(uuid.uuid4())
+    sub: str = str(uuid4())
     typ: str = "Bearer"
     azp: str = Field(...)
     auth_time: int = 0
-    session_state: str = str(uuid.uuid4())
+    session_state: str = str(uuid4())
     acr: int = 1
-    client_session: str = str(uuid.uuid4())
+    client_session: str = str(uuid4())
     allowed_origins: list = []
     realm_access: Roles
     resource_access: dict = {"roles": ["Testing"]}
