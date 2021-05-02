@@ -51,15 +51,11 @@ class Signature(HTTPBearer):
         self.return_requester = return_requester
 
     async def __call__(self, request: Request) -> Optional[Union[List[str], Requester]]:
+        # Extract credentials
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
-        if not credentials.scheme == "Bearer":
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Wrong authentication method",
-            )
+        jwt_token = credentials.credentials
 
         # Get Security settings
-        jwt_token = credentials.credentials
         settings = get_security_settings()
 
         try:
