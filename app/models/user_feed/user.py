@@ -70,7 +70,7 @@ class UserFeed(OrjsonModel):
         ...,
         title="Device ID",
         description="Anonymous UUID_V4 assigned to the device",
-        example=uuid4(),
+        example=str(uuid4()),
     )
 
     mainTypeSpace: str = Field(
@@ -163,13 +163,13 @@ class UserFeedOutput(OrjsonModel):
         ...,
         title="Device ID",
         description="Anonymous UUID_V4 assigned to the device",
-        example=uuid4(),
+        example=str(uuid4()),
     )
     journeyId: str = Field(
         ...,
         title="Journey ID",
         description="Anonymous UUID_V4 assigned to the track",
-        example=uuid4(),
+        example=str(uuid4()),
     )
     mainTypeSpace: str = Field(
         ...,
