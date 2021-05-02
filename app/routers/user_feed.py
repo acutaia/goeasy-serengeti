@@ -20,11 +20,11 @@ UserFeed router package
 """
 # Standard Library
 import time
-import uuid
 
 # Third Party
 from fastapi import APIRouter, Body, Depends, BackgroundTasks, Request
 from fastapi.responses import ORJSONResponse
+from fastuuid import uuid4
 
 # Internal
 from ..concurrency.background import frequency_limiter
@@ -80,7 +80,7 @@ async def authenticate(
         source_app = requester.client
 
     # Generate an unique id for the journey
-    journey_id = str(uuid.uuid4())
+    journey_id = str(uuid4())
 
     # Wait some time before adding the background task
     await frequency_limiter(store_semaphore())

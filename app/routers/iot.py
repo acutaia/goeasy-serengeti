@@ -24,12 +24,12 @@ IoTFeed router package
 """
 
 # Standard Library
-import uuid
 import time
 
 # Third Party
 from fastapi import APIRouter, Body, Depends, Request, BackgroundTasks
 from fastapi.responses import ORJSONResponse
+from fastuuid import uuid4
 
 # Internal
 from ..concurrency.background import frequency_limiter
@@ -83,7 +83,7 @@ async def iot_authentication(
         source_app = requester.client
 
     # Generate GEPid
-    obesrvation_gepid = str(uuid.uuid4())
+    obesrvation_gepid = str(uuid4())
 
     # Wait some time before adding the background task
     await frequency_limiter(store_semaphore())
