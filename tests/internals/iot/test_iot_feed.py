@@ -14,7 +14,7 @@ Tests app.internals.iot module
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ import uvloop
 
 # Internal
 from app.internals.iot import end_to_end_position_authentication, store_iot_data
-from app.internals.keycloak import KEYCLOACK
+from app.internals.keycloak import KEYCLOAK
 from app.models.iot_feed.iot import IotInput
 
 from app.models.security import Authenticity
@@ -51,7 +51,7 @@ from tests.mock.ublox_api.get_ublox_api_list import (
 
 from tests.mock.anonymizer.constants import URL_STORE_IOT_DATA
 from tests.mock.anonymizer.ipt import correct_store_in_ipt_anonymizer
-from tests.mock.keycloack.keycloack import correct_get_blox_token
+from tests.mock.keycloak.keycloak import correct_get_blox_token
 from tests.mock.ublox_api.constants import RaW_Ublox, URL_GET_UBLOX, URL_POST_UBLOX
 
 from tests.mock.accounting_manager.iota import correct_store_in_iota
@@ -95,10 +95,10 @@ class TestIotFeed:
         # Disable the logger of the app
         disable_logger()
 
-        # Setup Keycloack and mock the request
+        # Setup KEYCLOAK and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
-        await KEYCLOACK.setup()
+        await KEYCLOAK.setup()
 
         # Position authentic
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
@@ -210,8 +210,8 @@ class TestIotFeed:
                 obesrvation_gepid="TEST",
             )
 
-        # Close Keycloack session
-        await KEYCLOACK.close()
+        # Close KEYCLOAK session
+        await KEYCLOAK.close()
 
     @pytest.mark.asyncio
     async def test_store_iot_data(self, mock_aioresponse):
@@ -220,10 +220,10 @@ class TestIotFeed:
         # Disable the logger of the app
         disable_logger()
 
-        # Setup Keycloack and mock the request
+        # Setup KEYCLOAK and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
-        await KEYCLOACK.setup()
+        await KEYCLOAK.setup()
 
         # Mock the other requests
         correct_get_raw_data(mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox)
@@ -242,5 +242,5 @@ class TestIotFeed:
             semaphore=Semaphore(2),
         )
 
-        # Close Keycloack session
-        await KEYCLOACK.close()
+        # Close KEYCLOAK session
+        await KEYCLOAK.close()

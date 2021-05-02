@@ -14,7 +14,7 @@ Data Inspection response Model
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ from ..model import OrjsonModel
 
 class Resource(OrjsonModel):
     resource_type: str = "PROTECTED SERENGETI (MOBILITY)"
-    url: str = "http://galileocloud.goeasyproject.eu/api/v1/goeasy/getMobility"
+    url: str = "https://galileocloud.goeasyproject.eu/api/v1/goeasy/getMobility"
     method: str = "POST"
     status: str = "Correct"
     journey_id: str

@@ -14,7 +14,7 @@ App Settings
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,7 +50,7 @@ def get_security_settings() -> SecuritySettings:
 # -------------------------------------------------------------------
 
 
-class KeycloackSettings(BaseSettings):
+class KeycloakSettings(BaseSettings):
     token_request_url: str
     client_id: str
     username_keycloak: str
@@ -63,8 +63,8 @@ class KeycloackSettings(BaseSettings):
 
 
 @lru_cache(maxsize=1)
-def get_keycloack_settings() -> KeycloackSettings:
-    return KeycloackSettings()
+def get_keycloak_settings() -> KeycloakSettings:
+    return KeycloakSettings()
 
 
 # -------------------------------------------------------------------

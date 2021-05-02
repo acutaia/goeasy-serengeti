@@ -31,7 +31,7 @@ from fastapi.staticfiles import StaticFiles
 
 # Internal
 from .internals.logger import get_logger
-from .internals.keycloak import KEYCLOACK
+from .internals.keycloak import KEYCLOAK
 from .routers import user_feed, journey, iot, administrator, statistics
 
 # --------------------------------------------------------------------------------------------
@@ -54,14 +54,14 @@ app.include_router(statistics.router)
 @app.on_event("startup")
 async def startup_logger_and_sessions():
     get_logger()
-    await KEYCLOACK.setup()
+    await KEYCLOAK.setup()
 
 
 # Shutdown logger
 @app.on_event("shutdown")
 async def shutdown_logger_and_sessions():
     logger = get_logger()
-    await KEYCLOACK.close()
+    await KEYCLOAK.close()
     await logger.shutdown()
 
 

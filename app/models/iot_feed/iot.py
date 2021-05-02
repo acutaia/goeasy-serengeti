@@ -31,7 +31,7 @@ from pydantic import Field
 
 # Internal
 from .links import DatastreamLink, FeatureOfInterestLink
-from .result import ResultInput, ResultOutput
+from .result import ResultInput
 from ..model import OrjsonModel
 
 # --------------------------------------------------------------------------------------------

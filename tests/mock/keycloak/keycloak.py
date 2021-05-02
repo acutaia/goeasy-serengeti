@@ -1,5 +1,5 @@
 """
-Mocked keycloack http requests
+Mocked keycloak http requests
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -13,7 +13,7 @@ Mocked keycloack http requests
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,7 +37,7 @@ from .constants import FAKE_TOKEN_FOR_TESTING, TOKEN_REQUEST_URL
 
 
 def correct_get_blox_token(m: aioresponses):
-    """Mock the request made to keycloack to obtain a valid token"""
+    """Mock the request made to keycloak to obtain a valid token"""
     m.post(
         TOKEN_REQUEST_URL,
         status=status.HTTP_200_OK,
@@ -46,7 +46,7 @@ def correct_get_blox_token(m: aioresponses):
 
 
 def new_correct_get_blox_token(m: aioresponses):
-    """Mock the request made to keycloack to obtain a valid token"""
+    """Mock the request made to keycloak to obtain a valid token"""
     m.post(
         TOKEN_REQUEST_URL,
         status=status.HTTP_200_OK,
@@ -55,11 +55,11 @@ def new_correct_get_blox_token(m: aioresponses):
 
 
 def unauthorized_get_ublox_token(m: aioresponses):
-    """Mock the request made to keycloack to obtain a valid token"""
+    """Mock the request made to keycloak to obtain a valid token"""
 
     m.post(TOKEN_REQUEST_URL, status=status.HTTP_401_UNAUTHORIZED)
 
 
 def unreachable_get_ublox_token(m: aioresponses):
-    """Mock the request made to keycloack to obtain a valid token"""
+    """Mock the request made to keycloak to obtain a valid token"""
     m.post(TOKEN_REQUEST_URL, exception=TimeoutError("Timeout"))

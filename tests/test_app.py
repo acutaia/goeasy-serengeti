@@ -9,7 +9,7 @@ Test app
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,6 @@ from fastapi import status
 # Internal
 from app.main import app
 from app.models.extraction.data_extraction import RequestType
-from app.internals.sessions.accounting_manager import get_accounting_session
 
 from .internals.iot.constants import IOT_INPUT_PATH
 from .internals.logger import disable_logger
@@ -43,7 +42,7 @@ from .security.token import (
     generate_fake_token,
     generate_valid_token,
 )
-from .mock.keycloack.keycloack import correct_get_blox_token
+from .mock.keycloak.keycloak import correct_get_blox_token
 from .mock.accounting_manager.iota import correct_get_iota_user, correct_store_in_iota
 from .mock.anonymizer.anonengine import (
     correct_extract_details,

@@ -14,7 +14,7 @@ UserFeed utilities package
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ from fastapi import HTTPException
 from .accounting_manager import store_in_iota
 from .anonymizer import store_in_the_anonengine
 from .ipt_anonymizer import store_in_the_anonymizer, SETTINGS
-from .keycloak import KEYCLOACK
+from .keycloak import KEYCLOAK
 from .logger import get_logger
 from .position_alteration_detection import haversine
 from .sessions.ublox_api import get_ublox_api_session
@@ -89,7 +89,7 @@ async def end_to_end_position_authentication(
     timenano = None
 
     # Get Ublox-APi token
-    ublox_token = await KEYCLOACK.get_ublox_token()
+    ublox_token = await KEYCLOAK.get_ublox_token()
 
     # Get Ublox-APi session
     async with get_ublox_api_session() as session:

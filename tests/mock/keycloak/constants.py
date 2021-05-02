@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Constants for mock Keycloack http requests
+Constants for mock Keycloak http requests
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -14,7 +14,7 @@ Constants for mock Keycloack http requests
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,12 +24,12 @@ Constants for mock Keycloack http requests
 """
 
 # Internal
-from app.internals.keycloak import get_keycloack_settings
+from app.internals.keycloak import get_keycloak_settings
 
 # ---------------------------------------------------------------------------------------
 
-SETTINGS = get_keycloack_settings()
-"""Keycloack Settings"""
+SETTINGS = get_keycloak_settings()
+"""Keycloak Settings"""
 
 FAKE_TOKEN_FOR_TESTING = """eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFuZ2VsbyBDdXRhaWEiLCJpYXQiOjE1MTYyMzkwMjJ9.

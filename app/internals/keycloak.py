@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Keycloack package
+Keycloak package
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -14,7 +14,7 @@ Keycloack package
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,14 +35,14 @@ import orjson
 
 # Internal
 from .logger import get_logger
-from ..config import get_keycloack_settings
+from ..config import get_keycloak_settings
 from ..models.security import Token
 
 # --------------------------------------------------------------------------------------------
 
 
 class _Keycloak:
-    """Class that handles the communication with keycloack"""
+    """Class that handles the communication with keycloak"""
 
     last_token_reception_time: float
     """UTC timestamp"""
@@ -58,7 +58,7 @@ class _Keycloak:
 
     async def setup(self):
         """
-        Setup keycloack, call this method only inside the startup event
+        Setup keycloak, call this method only inside the startup event
         """
 
         # timeout to obtain  token
@@ -79,19 +79,19 @@ class _Keycloak:
 
     async def close(self):
         """
-        Close gracefully Keycloack session
+        Close gracefully Keycloak session
         """
         await self.session.close()
 
     async def _get_token(self):
         """
-        Private method used to make the http request to keycloack
+        Private method used to make the http request to keycloak
         in order to obtain a valid token
         """
         # Get Logger
         logger = get_logger()
         # Get settings
-        settings = get_keycloack_settings()
+        settings = get_keycloak_settings()
 
         try:
             async with self.session.post(
@@ -126,24 +126,24 @@ class _Keycloak:
             )
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Wrong keycloack credentials",
+                detail="Wrong keycloak credentials",
             )
         except TimeoutError:
-            # Keycloack is in starvation
+            # Keycloak is in starvation
             await logger.warning(
                 {
                     "url": settings.token_request_url,
-                    "error": "Keycloack is in starvation",
+                    "error": "Keycloak is in starvation",
                 }
             )
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Keycloack service not available",
+                detail="Keycloak service not available",
             )
 
     async def get_ublox_token(self):
         """
-        Obtain a token from keycloack. If 150 seconds are passed since the last token was obtained,
+        Obtain a token from keycloak. If 150 seconds are passed since the last token was obtained,
         it will obtain a fresh one and adjust it's timestamp
         """
 
@@ -178,13 +178,13 @@ class _Keycloak:
 
 
 @lru_cache(maxsize=1)
-def _get_keycloack() -> _Keycloak:
-    """Instantiate a singleton Keycloack"""
+def _get_keycloak() -> _Keycloak:
+    """Instantiate a singleton Keycloak"""
     return _Keycloak()
 
 
 # --------------------------------------------------------------------------------------------
 
 
-KEYCLOACK = _get_keycloack()
-"""Keycloack Singleton"""
+KEYCLOAK = _get_keycloak()
+"""Keycloak Singleton"""

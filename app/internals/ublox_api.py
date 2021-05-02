@@ -14,7 +14,7 @@ Ublox-Api package
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ from fastapi import status, HTTPException
 import orjson
 
 # Internal
-from .keycloak import KEYCLOACK
+from .keycloak import KEYCLOAK
 from .logger import get_logger
 from ..config import get_ublox_api_settings
 from ..models.galileo.ublox_api import UbloxAPI, UbloxAPIList
@@ -101,7 +101,7 @@ async def _get_raw_data(
             }
         )
         # Get new Token
-        ublox_token = await KEYCLOACK.get_ublox_token()
+        ublox_token = await KEYCLOAK.get_ublox_token()
 
         # Remake the request
         async with session.get(
@@ -219,7 +219,7 @@ async def _get_ublox_api_list(
             }
         )
         # Get new Token
-        ublox_token = await KEYCLOACK.get_ublox_token()
+        ublox_token = await KEYCLOAK.get_ublox_token()
 
         # Remake the request
         async with session.post(

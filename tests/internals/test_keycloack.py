@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests app.internals.keycloack module
+Tests app.internals.keycloak module
 
 :author: Angelo Cutaia
 :copyright: Copyright 2021, Angelo Cutaia
@@ -30,9 +30,9 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.keycloak import KEYCLOACK
+from app.internals.keycloak import KEYCLOAK
 from .logger import disable_logger
-from ..mock.keycloack.keycloack import (
+from ..mock.keycloak.keycloak import (
     correct_get_blox_token,
     new_correct_get_blox_token,
     unreachable_get_ublox_token,
@@ -58,7 +58,7 @@ def mock_aioresponse():
         yield m
 
 
-class TestKeycloack:
+class TestKEYCLOAK:
     """
     Test the ublox_api module
     """
@@ -70,37 +70,35 @@ class TestKeycloack:
         # Disable the logger of the app
         disable_logger()
 
-        # Setup Keycloack and mock the request
+        # Setup KEYCLOAK and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
-        await KEYCLOACK.setup()
+        await KEYCLOAK.setup()
 
         # Check if we used the cached token
         assert (
-            await KEYCLOACK.get_ublox_token() == KEYCLOACK.last_token
+            await KEYCLOAK.get_ublox_token() == KEYCLOAK.last_token
         ), "Token must be the same"
 
         # clean the cache
-        KEYCLOACK.last_token_reception_time = 0
-        last_token = KEYCLOACK.last_token
+        KEYCLOAK.last_token_reception_time = 0
+        last_token = KEYCLOAK.last_token
 
         # Mock the request
         new_correct_get_blox_token(mock_aioresponse)
-        assert (
-            await KEYCLOACK.get_ublox_token() != last_token
-        ), "Token must be different"
+        assert await KEYCLOAK.get_ublox_token() != last_token, "Token must be different"
 
         # clean the cache
-        KEYCLOACK.last_token_reception_time = 0
+        KEYCLOAK.last_token_reception_time = 0
 
         with pytest.raises(HTTPException):
             # Mock the request
             unreachable_get_ublox_token(mock_aioresponse)
-            await KEYCLOACK.get_ublox_token()
+            await KEYCLOAK.get_ublox_token()
 
         with pytest.raises(HTTPException):
             # Mock the request
             unauthorized_get_ublox_token(mock_aioresponse)
-            await KEYCLOACK.get_ublox_token()
+            await KEYCLOAK.get_ublox_token()
 
-        await KEYCLOACK.close()
+        await KEYCLOAK.close()

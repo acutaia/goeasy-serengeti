@@ -37,7 +37,7 @@ from app.internals.ublox_api import (
     get_ublox_messages_list,
     construct_request,
 )
-from app.internals.keycloak import KEYCLOACK
+from app.internals.keycloak import KEYCLOAK
 from app.internals.sessions.ublox_api import get_ublox_api_session
 
 from .logger import disable_logger
@@ -54,7 +54,7 @@ from ..mock.ublox_api.constants import (
     NUMBER_REQUESTED_DATA,
 )
 
-from ..mock.keycloack.constants import FAKE_TOKEN_FOR_TESTING
+from ..mock.keycloak.constants import FAKE_TOKEN_FOR_TESTING
 from ..mock.ublox_api.get_raw_data import (
     correct_get_raw_data,
     unreachable_get_raw_data,
@@ -117,7 +117,7 @@ class TestUbloxApi:
             token_expired_get_raw_data(
                 mock_aioresponse, url=URL_GET_GALILEO, raw_data=RaW_Galileo
             )
-            await KEYCLOACK.setup()
+            await KEYCLOAK.setup()
             raw_data = await get_galileo_message(
                 svid=SvID,
                 timestamp=TIMESTAMP,
@@ -128,7 +128,7 @@ class TestUbloxApi:
             assert raw_data == RaW_Galileo, "Raw Galileo data must be the same"
 
             # Mock the request
-            KEYCLOACK.last_token_reception_time = 0
+            KEYCLOAK.last_token_reception_time = 0
             unreachable_get_raw_data(mock_aioresponse, URL_GET_GALILEO)
             # Check if raises an exception in case of unreachable host
             with pytest.raises(HTTPException):
@@ -140,7 +140,7 @@ class TestUbloxApi:
                     session=session,
                 )
 
-        await KEYCLOACK.close()
+        await KEYCLOAK.close()
 
     @pytest.mark.asyncio
     async def test_get_ublox_message(self, mock_aioresponse):
@@ -169,7 +169,7 @@ class TestUbloxApi:
             token_expired_get_raw_data(
                 mock_aioresponse, url=URL_GET_UBLOX, raw_data=RaW_Ublox
             )
-            await KEYCLOACK.setup()
+            await KEYCLOAK.setup()
             raw_data = await get_ublox_message(
                 svid=SvID,
                 timestamp=TIMESTAMP,
@@ -180,7 +180,7 @@ class TestUbloxApi:
             assert raw_data == RaW_Ublox, "Raw Ublox data must be the same"
 
             # Mock the request
-            KEYCLOACK.last_token_reception_time = 0
+            KEYCLOAK.last_token_reception_time = 0
             unreachable_get_raw_data(mock_aioresponse, URL_GET_UBLOX)
             # Check if raises an exception in case of unreachable host
             with pytest.raises(HTTPException):
@@ -192,7 +192,7 @@ class TestUbloxApi:
                     session=session,
                 )
 
-        await KEYCLOACK.close()
+        await KEYCLOAK.close()
 
     def test_construct_request(self):
         """Test the construction of the body of the request made to Ublox-Api"""
@@ -239,7 +239,7 @@ class TestUbloxApi:
             token_expired_get_ublox_api_list(
                 mock_aioresponse, url=URL_POST_GALILEO, raw_data=RaW_Galileo
             )
-            await KEYCLOACK.setup()
+            await KEYCLOAK.setup()
             ublox_api_list = await get_galileo_messages_list(
                 svid=SvID,
                 timestamp=TIMESTAMP,
@@ -263,7 +263,7 @@ class TestUbloxApi:
                     session=session,
                 )
 
-        await KEYCLOACK.close()
+        await KEYCLOAK.close()
 
     @pytest.mark.asyncio
     async def test_get_ublox_messages_list(self, mock_aioresponse):
@@ -294,7 +294,7 @@ class TestUbloxApi:
             token_expired_get_ublox_api_list(
                 mock_aioresponse, url=URL_POST_UBLOX, raw_data=RaW_Ublox
             )
-            await KEYCLOACK.setup()
+            await KEYCLOAK.setup()
             ublox_api_list = await get_ublox_messages_list(
                 svid=SvID,
                 timestamp=TIMESTAMP,
@@ -308,7 +308,7 @@ class TestUbloxApi:
             ] == ublox_api_list, "List of UbloxApi data must be the same"
 
             # Mock the request
-            KEYCLOACK.last_token_reception_time = 0
+            KEYCLOAK.last_token_reception_time = 0
             unreachable_get_ublox_api_list(mock_aioresponse, url=URL_POST_UBLOX)
             with pytest.raises(HTTPException):
                 await get_ublox_messages_list(
@@ -319,4 +319,4 @@ class TestUbloxApi:
                     session=session,
                 )
 
-        await KEYCLOACK.close()
+        await KEYCLOAK.close()

@@ -34,7 +34,7 @@ import pytest
 import uvloop
 
 # Internal
-from app.internals.keycloak import KEYCLOACK
+from app.internals.keycloak import KEYCLOAK
 from app.internals.user_feed import (
     end_to_end_position_authentication,
     store_android_data,
@@ -54,7 +54,7 @@ from tests.mock.ublox_api.get_ublox_api_list import (
     unreachable_get_ublox_api_list,
 )
 
-from tests.mock.keycloack.keycloack import correct_get_blox_token
+from tests.mock.keycloak.keycloak import correct_get_blox_token
 
 from tests.mock.ublox_api.constants import (
     RaW_Galileo,
@@ -106,10 +106,10 @@ class TestUserFeed:
         # Disable the logger of the app
         disable_logger()
 
-        # Setup Keycloack and mock the request
+        # Setup KEYCLOAK and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
-        await KEYCLOACK.setup()
+        await KEYCLOAK.setup()
 
         # Position authentic
         correct_get_raw_data(
@@ -185,8 +185,8 @@ class TestUserFeed:
                 user_feed=USER_INPUT, timestamp=time.time(), host="localhost"
             )
 
-        # Close Keycloack session
-        await KEYCLOACK.close()
+        # Close KEYCLOAK session
+        await KEYCLOAK.close()
 
     @pytest.mark.asyncio
     async def test_store_android_data(self, mock_aioresponse):
@@ -195,10 +195,10 @@ class TestUserFeed:
         # Disable the logger of the app
         disable_logger()
 
-        # Setup Keycloack and mock the request
+        # Setup KEYCLOAK and mock the request
         correct_get_blox_token(mock_aioresponse)
         # during the setup we'll obtain a token that will be stored in cls.last_token
-        await KEYCLOACK.setup()
+        await KEYCLOAK.setup()
 
         # Mock the other requests
         correct_get_raw_data(
@@ -283,5 +283,5 @@ class TestUserFeed:
             semaphore=Semaphore(2),
         )
 
-        # Close Keycloack session
-        await KEYCLOACK.close()
+        # Close KEYCLOAK session
+        await KEYCLOAK.close()
