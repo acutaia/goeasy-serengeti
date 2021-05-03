@@ -54,7 +54,7 @@ async def store_in_the_anonengine(data: dict) -> None:
         # Store data
         async with get_anonengine_session() as session:
             async with session.post(
-                anonymizer_settings.store_data_url, json=data, timeout=0.5
+                anonymizer_settings.store_data_url, json=data, timeout=2.0
             ):
                 pass
 

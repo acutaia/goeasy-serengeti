@@ -57,7 +57,7 @@ async def store_in_the_anonymizer(data: dict, url: str) -> None:
     try:
         # Store data
         async with ipt_anonymizer_session() as session:
-            async with session.post(url=url, json=data, timeout=5):
+            async with session.post(url=url, json=data, timeout=6):
                 pass
 
     except (TimeoutError, ClientError) as exc:
