@@ -1,6 +1,6 @@
 # App requirements
 Cython>=0.29.22
-fastapi>=0.63.0, <0.64
+fastapi>=0.65.1
 fastuuid>=0.6.0
 aiofiles>=0.6.0, <0.7.0
 uvicorn[standard] >=0.13.4,<0.14.0
