@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """
 UserFeed router package
+
 :author: Angelo Cutaia
-:copyright: Copyright 2021, Angelo Cutaia
+:copyright: Copyright 2021, LINKS Foundation
 :version: 1.0.0
+
 ..
-    Copyright 2021 Angelo Cutaia
+
+    Copyright 2021 LINKS Foundation
+
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -18,6 +22,7 @@ UserFeed router package
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
 # Standard Library
 import time
 

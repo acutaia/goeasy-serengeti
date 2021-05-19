@@ -3,12 +3,12 @@
 Base models package
 
 :author: Angelo Cutaia
-:copyright: Copyright 2021, Angelo Cutaia
+:copyright: Copyright 2021, LINKS Foundation
 :version: 1.0.0
 
 ..
 
-    Copyright 2021 Angelo Cutaia
+    Copyright 2021 LINKS Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ Base models package
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
 import orjson
 from pydantic import BaseModel
 
