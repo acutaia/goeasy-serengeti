@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Constants for mock Accounting Manager http requests
 

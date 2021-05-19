@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Building app.utilities.haversine module
 

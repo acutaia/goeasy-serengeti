@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Anonymizer mocked Http requests
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Tests app.internals.ipt_anonymizer module
 
