@@ -23,7 +23,6 @@ Data Inspection models
 """
 
 # Third Party
-from typing import Union
 from pydantic import Field, UUID4
 
 # Internal
