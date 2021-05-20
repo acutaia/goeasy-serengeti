@@ -23,6 +23,7 @@ Logger package
 """
 
 # Standard Library
+import logging
 from functools import lru_cache
 
 # Third Party
@@ -43,7 +44,9 @@ class LoggerSettings(BaseSettings):
 def get_logger() -> Logger:
     """Instantiate app logger"""
     settings = LoggerSettings()
-
+    # Configure uvicorn logger
+    uvicorn_access_logger = logging.getLogger("uvicorn.access")
+    uvicorn_access_logger.setLevel(settings.log_level)
     return JsonLogger.with_default_handlers(
         name="serengeti",
         level=getattr(LogLevel, settings.log_level, LogLevel.DEBUG),
