@@ -11,6 +11,7 @@ aiologger>=0.6.1
 aiohttp[speedups]
 
 # Testing requirements
+flake8>= 3.9.2
 aioresponses>= 0.7.2
 codecov>=2.1.11
 pytest>=6.2.2
