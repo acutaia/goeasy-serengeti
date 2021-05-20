@@ -46,11 +46,11 @@ class Svs(OrjsonModel):
         ...,
         description="""Value | Status  |
                        ------| --------|
-                         0   | GPS     | 
+                         0   | GPS     |
                          1   | SBAS    |
-                         2   | Galileo | 
-                         3   | Beidou  | 
-                         5   | QZSS    | 
+                         2   | Galileo |
+                         3   | Beidou  |
+                         5   | QZSS    |
                          6   | GLONASS |""",
         example=0,
     )

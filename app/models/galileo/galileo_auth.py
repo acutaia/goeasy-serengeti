@@ -75,15 +75,15 @@ class GalileoAuth(OrjsonModel):
 
     fullbiasnano: int = Field(
         ...,
-        description="""It is the difference between hardware clock (getTimeNanos()) inside GPS receiver 
-                        and the true GPS time since 0000Z, January 6, 1980, in nanoseconds""",
+        description="""It is the difference between hardware clock (getTimeNanos()) inside GPS receiver
+        and the true GPS time since 0000Z, January 6, 1980, in nanoseconds""",
         example=-1295854774332368445,
     )
     msgid: int = Field(..., description="Message identifier", example=24)
     status: int = Field(
         ...,
         title="Status of RXM-SFRBX Message",
-        description="""In Android the status refers to the reception of the Navigation Message with or 
+        description="""In Android the status refers to the reception of the Navigation Message with or
                         without parity errors in its navigation words. U-blox RXM-SFRBX messages are only
                          generated when complete subframes are detected by the receiver and all appropriate
                           parity checks have passed therefore status can be set always at ‘1’""",

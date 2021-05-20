@@ -44,7 +44,7 @@ class PositionObject(OrjsonModel):
         description="""Value | Status        | Description
                        ------| --------------|------------------------------------------------------------
                          1   | Authentic     | Input raw data are authentic
-                        -1   | Unknown       | Input raw data aren't present or impossible to authenticate 
+                        -1   | Unknown       | Input raw data aren't present or impossible to authenticate
                          0   | Not Authentic | Input raw data aren't authentic""",
         example=1,
     )

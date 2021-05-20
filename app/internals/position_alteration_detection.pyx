@@ -65,7 +65,7 @@ def haversine(double lat, double lon) -> str:
     """Given a lat and lng returns the name of the nearest nation"""
     cdef double lat1, lng1, ph1, theta1
     cdef double dphi_italy, dtheta_italy, a_italy, italy_distance
-    cdef double dphi_sweden, dtheta_sweden , a_sweden, sweden_distance
+    cdef double dphi_sweden, dtheta_sweden, a_sweden, sweden_distance
 
     lat1 = lat
     lng1 = lon
@@ -74,13 +74,15 @@ def haversine(double lat, double lon) -> str:
     theta1 = lng1 * 0.0174532925
 
     dphi_italy = PHI_ITALY - ph1
-    dphi_sweden = PHI_SWEDEN -ph1
+    dphi_sweden = PHI_SWEDEN - ph1
 
     dtheta_italy = THETA_ITALY - theta1
     dtheta_sweden = THETA_SWEDEN - theta1
 
-    a_italy = sin(dphi_italy/2)**2 +cos(ph1) * cos(PHI_ITALY) * sin(dtheta_italy/2)**2
-    a_sweden = sin(dphi_sweden/2)**2 +cos(ph1) * cos(PHI_SWEDEN) * sin(dtheta_sweden/2)**2
+    a_italy = sin(dphi_italy/2)**2 + cos(ph1) * \
+        cos(PHI_ITALY) * sin(dtheta_italy/2)**2
+    a_sweden = sin(dphi_sweden/2)**2 + cos(ph1) * \
+        cos(PHI_SWEDEN) * sin(dtheta_sweden/2)**2
 
     italy_distance = 2 * asin(sqrt(a_italy)) * 6367444.7
     sweden_distance = 2 * asin(sqrt(a_sweden)) * 6367444.7
