@@ -29,6 +29,9 @@ jobs:
       - name: Lint with flake8
         run: |
           flake8 app/
+      - name: Check Black format
+        run: |
+          black app tests --check
       - name: Test with pytest
         run: |
            pytest --cov=app --cov-report=xml tests
