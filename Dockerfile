@@ -28,7 +28,6 @@ ENV PYTHONUNBUFFERED=1 \
     PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
 
-
 # prepend poetry and venv to path
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
@@ -36,8 +35,10 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 FROM python-base as builder-base
 LABEL stage=builder
 
-RUN apt update && \
-    apt install --no-install-recommends -y curl gcc
+RUN apt update
+RUN apt install -y
+RUN apt install curl -y
+RUN python -m pip install pip --upgrade
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
@@ -56,6 +57,12 @@ RUN rm poetry.lock && rm pyproject.toml
 FROM builder-base as builder-cython
 LABEL stage=builder
 
+# update
+RUN apt install build-essential -y
+
+# install dependencies for building
+RUN pip install Cython
+
 # set working dir
 WORKDIR /build
 
@@ -65,7 +72,6 @@ COPY .env server.py setup.py ./
 COPY static/ ./static
 
 # build
-RUN pip install Cython
 RUN python setup.py build_ext --inplace
 
 # cleaning
