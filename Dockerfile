@@ -35,13 +35,14 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 FROM python-base as builder-base
 LABEL stage=builder
 
-RUN apt update
-RUN apt install -y
-RUN apt install curl -y
+# obtain all the needed dependencies for building
+RUN apt update && apt upgrade -y
+RUN apt install curl -y && apt install build-essential -y
 RUN python -m pip install pip --upgrade
+RUN pip install Cython
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python3
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
@@ -54,13 +55,13 @@ RUN poetry install --no-dev --no-root
 RUN rm poetry.lock && rm pyproject.toml
 
 # `builder-cython` stage is used to build cython extension and prepare the directory
-FROM builder-base as builder-cython
+FROM python-base as builder-cython
 LABEL stage=builder
 
-# update
+# update python dependencies
+RUN apt update && apt upgrade -y
 RUN apt install build-essential -y
-
-# install dependencies for building
+RUN python -m pip install pip --upgrade
 RUN pip install Cython
 
 # set working dir
@@ -72,7 +73,7 @@ COPY .env server.py setup.py ./
 COPY static/ ./static
 
 # build
-RUN python setup.py build_ext --inplace
+RUN python3 setup.py build_ext --inplace
 
 # cleaning
 RUN rm setup.py && \
