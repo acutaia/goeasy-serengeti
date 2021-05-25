@@ -26,7 +26,10 @@ App Settings
 from functools import lru_cache
 
 # Third Party
+from typing import Tuple
+
 from pydantic import BaseSettings
+from pydantic.env_settings import SettingsSourceCallable
 
 # -------------------------------------------------------------------
 
@@ -38,7 +41,17 @@ class SecuritySettings(BaseSettings):
     realm_public_key: str
 
     class Config:
+        secrets_dir = "/run/secrets"
         env_file = ".env"
+
+        @classmethod
+        def customise_sources(
+                cls,
+                init_settings: SettingsSourceCallable,
+                env_settings: SettingsSourceCallable,
+                file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            return file_secret_settings, env_settings, init_settings
 
 
 @lru_cache(maxsize=1)
@@ -58,7 +71,17 @@ class KeycloakSettings(BaseSettings):
     client_secret: str
 
     class Config:
+        secrets_dir = "/run/secrets"
         env_file = ".env"
+
+        @classmethod
+        def customise_sources(
+                cls,
+                init_settings: SettingsSourceCallable,
+                env_settings: SettingsSourceCallable,
+                file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            return file_secret_settings, env_settings, init_settings
 
 
 @lru_cache(maxsize=1)
