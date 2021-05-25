@@ -68,4 +68,6 @@ jobs:
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
         with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
           repository: acutaia/goeasy-serengeti
