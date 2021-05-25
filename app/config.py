@@ -46,10 +46,10 @@ class SecuritySettings(BaseSettings):
 
         @classmethod
         def customise_sources(
-                cls,
-                init_settings: SettingsSourceCallable,
-                env_settings: SettingsSourceCallable,
-                file_secret_settings: SettingsSourceCallable,
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
         ) -> Tuple[SettingsSourceCallable, ...]:
             return file_secret_settings, env_settings, init_settings
 
@@ -76,10 +76,10 @@ class KeycloakSettings(BaseSettings):
 
         @classmethod
         def customise_sources(
-                cls,
-                init_settings: SettingsSourceCallable,
-                env_settings: SettingsSourceCallable,
-                file_secret_settings: SettingsSourceCallable,
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
         ) -> Tuple[SettingsSourceCallable, ...]:
             return file_secret_settings, env_settings, init_settings
 
