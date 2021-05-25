@@ -38,11 +38,14 @@ LABEL stage=builder
 # obtain all the needed dependencies for building
 RUN apt update && apt upgrade -y
 RUN apt install curl -y && apt install build-essential -y
+RUN apt install python3-dev -y
 RUN python -m pip install pip --upgrade
 RUN pip install Cython
+RUN apt install cargo -y
+RUN pip install maturin
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python3
+RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
@@ -73,7 +76,7 @@ COPY .env server.py setup.py ./
 COPY static/ ./static
 
 # build
-RUN python3 setup.py build_ext --inplace
+RUN python setup.py build_ext --inplace
 
 # cleaning
 RUN rm setup.py && \
