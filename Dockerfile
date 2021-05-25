@@ -34,11 +34,10 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 # `builder-base` stage is used to build deps + create our virtual environment
 FROM python-base as builder-base
-LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
 LABEL stage=builder
 
 RUN apt update && \
-    apt install --no-install-recommends -y curl
+    apt install --no-install-recommends -y curl gcc
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
@@ -55,11 +54,7 @@ RUN rm poetry.lock && rm pyproject.toml
 
 # `builder-cython` stage is used to build cython extension and prepare the directory
 FROM builder-base as builder-cython
-LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
 LABEL stage=builder
-
-# install c compiler
-RUN apt install gcc -y
 
 # set working dir
 WORKDIR /build
@@ -70,8 +65,8 @@ COPY .env server.py setup.py ./
 COPY static/ ./static
 
 # build
-RUN pip install Cython && \
- python setup.py build_ext --inplace
+RUN pip install Cython
+RUN python setup.py build_ext --inplace
 
 # cleaning
 RUN rm setup.py && \
@@ -87,7 +82,6 @@ RUN mkdir serengeti && \
 
 # `production` image used for runtime
 FROM python-base as production
-LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
 
 # Copy python path and compiled code
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
