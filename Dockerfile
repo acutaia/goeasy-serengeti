@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
     # pip
     PIP_NO_CACHE_DIR=on \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=300 \
+    PIP_DEFAULT_TIMEOUT=1000 \
     \
     # poetry
     # https://python-poetry.org/docs/configuration/#using-environment-variables
