@@ -1,5 +1,6 @@
 # `python-base` sets up all our shared environment variables
 FROM python:3.9-slim as python-base
+LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
 
     # python
 ENV PYTHONUNBUFFERED=1 \
@@ -7,9 +8,9 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     \
     # pip
-    PIP_NO_CACHE_DIR=off \
+    PIP_NO_CACHE_DIR=on \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
+    PIP_DEFAULT_TIMEOUT=300 \
     \
     # poetry
     # https://python-poetry.org/docs/configuration/#using-environment-variables
@@ -33,6 +34,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 # `builder-base` stage is used to build deps + create our virtual environment
 FROM python-base as builder-base
+LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
 LABEL stage=builder
 
 RUN apt update && \
@@ -46,22 +48,53 @@ WORKDIR $PYSETUP_PATH
 COPY pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN poetry install --no-dev
+RUN poetry install --no-dev --no-root
+
+# cleaning
+RUN rm poetry.lock && rm pyproject.toml
+
+# `builder-cython` stage is used to build cython extension and prepare the directory
+FROM builder-base as builder-cython
+LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
+LABEL stage=builder
+
+# install c compiler
+RUN apt install gcc -y
+
+# set working dir
+WORKDIR /build
+
+# copy
+COPY app/ ./app
+COPY .env server.py setup.py ./
+COPY static/ ./static
+
+# build
+RUN pip install Cython && \
+ python setup.py build_ext --inplace
+
+# cleaning
+RUN rm setup.py && \
+   rm app/internals/position_alteration_detection.pyx && \
+   rm app/internals/position_alteration_detection.c
+
+# Copy
+RUN mkdir serengeti && \
+    cp -r app serengeti && \
+    cp -r static serengeti && \
+    cp .env serengeti && \
+    cp server.py serengeti
 
 # `production` image used for runtime
 FROM python-base as production
+LABEL manteiner = "Angelo Cutaia <angeloxx92@hotmail.it>"
+
+# Copy python path and compiled code
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=builder-cython build/serengeti /serengeti
 
 # Set the working directory in the container
 WORKDIR /serengeti
-
-# Copy content of the application file to the working directory
-COPY .env server.py setup.py ./
-COPY app/ ./app
-COPY static/ ./static
-
-# Build cython code
-RUN python setup.py build_ext --inplace
 
 # command to run on container start
 CMD [ "python", "./server.py" ]
