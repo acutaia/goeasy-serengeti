@@ -9,7 +9,7 @@
 
 ---
 
-**OpenAPI**: [https://galileocloud.goeasyproject.eu/serengeti/api/v1/docs](https://galileocloud.goeasyproject.eu/*SERENGETI*/api/v1/docs)
+**OpenAPI**: [https://galileocloud.goeasyproject.eu/serengeti/api/v1/docs](https://galileocloud.goeasyproject.eu/serengeti/api/v1/docs)
 
 **Documentation**: [https://acutaia.github.io/goeasy-serengeti/](https://acutaia.github.io/goeasy-serengeti/)
 
