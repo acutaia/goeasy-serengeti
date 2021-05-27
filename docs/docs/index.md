@@ -2,6 +2,7 @@
 
 [![Test](https://github.com/acutaia/goeasy-serengeti/actions/workflows/test.yml/badge.svg)](https://github.com/acutaia/goeasy-serengeti/actions/workflows/test.yml)
 [![Deploy on Docker Hub](https://github.com/acutaia/goeasy-serengeti/actions/workflows/docker_deployment.yml/badge.svg)](https://github.com/acutaia/goeasy-serengeti/actions/workflows/docker_deployment.yml)
+[![Build Docs](https://github.com/acutaia/goeasy-serengeti/actions/workflows/build_docs.yml/badge.svg)](https://github.com/acutaia/goeasy-serengeti/actions/workflows/build_docs.yml)
 [![codecov](https://codecov.io/gh/acutaia/goeasy-serengeti/branch/main/graph/badge.svg?token=AD4AS9A8MV)](https://codecov.io/gh/acutaia/goeasy-serengeti)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8_|_3.9-blue.svg)](https://www.python.org/downloads/release)
@@ -10,9 +11,12 @@
 
 **OpenAPI**: [https://galileocloud.goeasyproject.eu/serengeti/api/v1/docs](https://galileocloud.goeasyproject.eu/*SERENGETI*/api/v1/docs)
 
-**Documentation**: 
+**Documentation**: [https://acutaia.github.io/goeasy-serengeti/](https://acutaia.github.io/goeasy-serengeti/)
+
+**Source Code**: [https://github.com/acutaia/goeasy-serengeti](https://github.com/acutaia/goeasy-serengeti)
 
 ---
+
 ## **The project**
 
 The GOEASY project will provide the technical and business foundations to enable a new generation of trusted and dependable mass-market Location Based Services and Applications to engage, stimulate and reward citizens for more sustainable behaviours and healthier choices.
