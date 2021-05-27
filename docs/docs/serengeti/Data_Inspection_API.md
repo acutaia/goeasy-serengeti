@@ -15,7 +15,7 @@ from the *SERENGETI* perspective.
 
 ---
 
-![image](/img/get_mobility.png)
+![image](https://acutaia.github.io/goeasy-serengeti/img/get_mobility.png)
 
 ---
 

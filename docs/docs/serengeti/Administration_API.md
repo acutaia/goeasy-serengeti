@@ -11,6 +11,6 @@ shows the final software design of the accounting data extraction service from t
 
 ---
 
-![image](/img/administrator.png)
+![image](https://acutaia.github.io/goeasy-serengeti/img/administrator.png)
 
 ---

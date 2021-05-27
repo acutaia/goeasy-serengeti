@@ -33,6 +33,6 @@ exploitations.
 
 ---
 
-![image](/img/user_feed_authenticate.png)
+![image](https://acutaia.github.io/goeasy-serengeti/img/user_feed_authenticate.png)
 
 ---

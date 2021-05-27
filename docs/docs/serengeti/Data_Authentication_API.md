@@ -6,7 +6,7 @@ shows the main steps performed by the deployed software running on the cloud pla
 
 ---
 
-![image](/img/user_feed_authenticate_test.png)
+![image](https://acutaia.github.io/goeasy-serengeti/img/user_feed_authenticate_test.png)
 
 ---
 

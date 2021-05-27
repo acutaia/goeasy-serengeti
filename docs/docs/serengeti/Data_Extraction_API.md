@@ -19,7 +19,7 @@ extraction service from the *SERENGETI* perspective.
 
 ---
 
-![image](/img/get_statistics.png)
+![image](https://acutaia.github.io/goeasy-serengeti/img/get_statistics.png)
 
 ---
 
