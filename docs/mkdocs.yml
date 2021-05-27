@@ -1,0 +1,31 @@
+site_name: Serengeti
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+  logo: img/index.png
+  favicon: img/satellite.png
+repo_name: acutaia/goeasy-serengeti
+repo_url: https://github.com/acutaia/goeasy-serengeti
+
+nav:
+  - GoEasy: index.md
+  - API:
+      - serengeti/overview.md
+      - serengeti/Data_Feeding_API.md
+      - serengeti/Data_Authentication_API.md
+      - serengeti/Data_Inspection_API.md
+      - serengeti/Data_Extraction_API.md
+      - serengeti/Administration_API.md
+  - Deployment: deployment.md
