@@ -3,14 +3,18 @@ on:
   push:
     branches:
       - main
+
 jobs:
-  deploy:
+  build:
+    name: Deploy docs
     runs-on: ubuntu-latest
-    if: github.event.repository.fork == false
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG_FILE: docs/mkdocs.yml
+          EXTRA_PACKAGES: build-base
