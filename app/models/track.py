@@ -94,7 +94,7 @@ class MobilityType(str, Enum):
 
     any = "any"
     walk = "walk"
-    bike = "bike"
+    bicycle = "bicycle"
     train = "train"
     car = "car"
     bus = "bus"

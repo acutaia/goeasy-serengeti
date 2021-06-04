@@ -98,7 +98,7 @@ class InputJSONExtraction(OrjsonModel):
         default=None, example=DetectionType.app
     )
     type_mobility: Optional[MobilityType] = Field(
-        default=None, example=MobilityType.bike
+        default=None, example=MobilityType.bicycle
     )
     company_code: Optional[str] = Field(
         default=None, description="Permit the extraction of company related data"
