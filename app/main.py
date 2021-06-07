@@ -81,7 +81,7 @@ def custom_openapi():
         return app.openapi_schema
     openapi_schema = get_openapi(
         title="Serengeti",
-        version="1.0.0",
+        version="0.2.2",
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {"url": "/serengeti/static/logo_full.png"}

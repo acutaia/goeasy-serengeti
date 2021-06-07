@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "Serengeti"
-version = "1.0.0"
-description = "Secure Proxy used to verify user position"
+version = "0.2.2"
+description = "Secure Proxy used to verify user positions"
 authors = ["Angelo Cutaia <angeloxx92@hotmail.it>"]
 license = "Apache-2.0"
 
