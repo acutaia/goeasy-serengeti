@@ -31,7 +31,6 @@ from pydantic import Field
 # Internal
 from ..security import Authenticity
 from ..galileo.galileo_auth import GalileoAuth
-from ..galileo.galileo_status import GalileoStatus
 from ..model import OrjsonModel
 
 # --------------------------------------------------------------------------------------------
@@ -67,10 +66,6 @@ class PositionObject(OrjsonModel):
 
 class PositionObjectInput(PositionObject):
     galileo_auth: List[Optional[GalileoAuth]] = Field(..., description="Authorization")
-
-    galileo_status: Union[Optional[GalileoStatus], OrjsonModel] = Field(
-        description="Status of the galileo signal"
-    )
 
 
 # --------------------------------------------------------------------------------------------

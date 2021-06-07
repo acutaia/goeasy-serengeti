@@ -40,8 +40,6 @@ class AndroidData(str):
 
         if not isinstance(v, list):
             raise TypeError("list of int required")
-        if len(v) != 30:
-            raise ValueError("invalid number of elements in the list")
         try:
             # Convert in bytes
             m = b"".join(

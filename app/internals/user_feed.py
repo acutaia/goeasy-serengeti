@@ -111,9 +111,15 @@ async def end_to_end_position_authentication(
                 current_fullbiasnano = position.galileo_auth[0].fullbiasnano
                 current_timenano = position.galileo_auth[0].timenano
                 # check if the data aren't coherent
-                if (current_fullbiasnano - fullbiasnano) / (
-                    current_timenano - timenano
-                ) > meaconing_threshold:
+                check_timenano = current_timenano - timenano
+                if check_timenano == 0:
+                    # Set the position not authentic
+                    position.authenticity = Authenticity.not_authentic
+                    position_unknown = False
+
+                elif (
+                    current_fullbiasnano - fullbiasnano
+                ) / check_timenano > meaconing_threshold:
                     # Set the position not authentic
                     position.authenticity = Authenticity.not_authentic
                     position_unknown = False
@@ -128,6 +134,9 @@ async def end_to_end_position_authentication(
                 location = haversine(position.lat, position.lon)
 
                 for auth in position.galileo_auth:
+                    if len(auth.data) != 60:
+                        position.authenticity = Authenticity.not_authentic
+                        break
                     galileo_auth_number += 1
                     try:
                         galileo_data = await get_galileo_message(
@@ -256,7 +265,6 @@ async def store_android_data(
 ) -> None:
     """
     Store UserFeed data in the anonymizer in a correct format
-
     :param user_feed_input: data to validate
     :param timestamp: when the request was received
     :param host: who made the request
@@ -282,9 +290,7 @@ async def store_android_data(
 
             # Generate user feed internal
             user_feed_internal = user_feed.dict(
-                exclude={
-                    "trace_information": {"__all__": {"galileo_auth", "galileo_status"}}
-                }
+                exclude={"trace_information": {"__all__": {"galileo_auth"}}}
             )
             user_feed_internal.update(
                 {"source_app": source_app, "journey_id": journey_id}
