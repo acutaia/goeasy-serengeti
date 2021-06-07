@@ -23,7 +23,7 @@ Position models
 """
 
 # Standard Library
-from typing import List, Optional, Union
+from typing import List, Optional
 
 # Third Party
 from pydantic import Field
