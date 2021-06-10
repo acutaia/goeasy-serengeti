@@ -17,7 +17,7 @@
 
 ---
 
-## **The project**
+## **The project** 🛰
 
 The GOEASY project will provide the technical and business foundations to enable a new generation of trusted and dependable mass-market Location Based Services and Applications to engage, stimulate and reward citizens for more sustainable behaviours and healthier choices.
 
