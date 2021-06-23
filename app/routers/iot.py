@@ -104,13 +104,13 @@ async def iot_authentication(
 @router.post(
     "/test",
     response_class=ORJSONResponse,
-    summary="Test the authentication of User Data",
+    summary="Test the authentication of IoT Data",
     response_description="Input with verified data",
     dependencies=[Depends(test_auth)],
 )
 async def authenticate_test(request: Request, iot_feed: IotInput = Body(...)):
     """
-    This endpoint provides ways to let users and applications to request for position data authentication services
+    This endpoint provides ways to let IoT and applications to request for position data authentication services
     without the exploitation of other GEP features, such as the persistent collection.\n
     The current feature is enabled for testing purposes and for those scenarios where data is already stored on
     the cloud, and the main interests are linked on providing additional information for data trustiness.\n
