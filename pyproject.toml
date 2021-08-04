@@ -14,7 +14,7 @@ orjson = "3.6.0"
 python-jose = {extras = ["cryptography"], version = "3.3.0"}
 gunicorn = "20.1.0"
 aiohttp = {extras = ["speedups"], version = "3.7.4.post0"}
-fastuuid = "0.6.0"
+fastuuid = "0.7.0"
 fastapi = "0.68.0"
 
 [tool.poetry.dev-dependencies]
