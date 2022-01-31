@@ -20,7 +20,7 @@ fastapi = "0.73.0"
 [tool.poetry.dev-dependencies]
 flake8 = "4.0.1"
 black = "21.12b0"
-Cython = "0.29.26"
+Cython = "0.29.27"
 aioresponses = "0.7.3"
 codecov = "2.1.12"
 pytest = "6.2.5"
