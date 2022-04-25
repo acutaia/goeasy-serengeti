@@ -23,7 +23,7 @@ black = "22.3.0"
 Cython = "0.29.28"
 aioresponses = "0.7.3"
 codecov = "2.1.12"
-pytest = "7.1.1"
+pytest = "7.1.2"
 pytest-asyncio = "0.18.3"
 pytest-cov = "3.0.0"
 
