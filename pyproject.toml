@@ -24,7 +24,7 @@ Cython = "0.29.30"
 aioresponses = "0.7.3"
 codecov = "2.1.12"
 pytest = "7.1.2"
-pytest-asyncio = "0.18.3"
+pytest-asyncio = "0.19.0"
 pytest-cov = "3.0.0"
 
 [build-system]
