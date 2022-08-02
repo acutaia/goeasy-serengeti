@@ -18,7 +18,7 @@ fastuuid = "0.8.0"
 fastapi = "0.79.0"
 
 [tool.poetry.dev-dependencies]
-flake8 = "5.0.1"
+flake8 = "5.0.3"
 black = "22.6.0"
 Cython = "0.29.32"
 aioresponses = "0.7.3"
