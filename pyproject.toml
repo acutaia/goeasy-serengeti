@@ -7,7 +7,7 @@ license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-aiofiles = "22.1.0"
+aiofiles = "23.1.0"
 aiologger = "0.7.0"
 uvicorn = {extras = ["standard"], version = "0.20.0"}
 orjson = "3.8.5"
